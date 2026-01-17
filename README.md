@@ -1,4 +1,4 @@
-# TS_Webpack Dashboard ✨
+# File Dashboard ✨
 
 **Kurzbeschreibung**
 
