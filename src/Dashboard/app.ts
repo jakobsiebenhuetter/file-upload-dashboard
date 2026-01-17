@@ -1,4 +1,7 @@
 import '../styles.css';
+
+import axios from 'axios';
+
 import { Event } from '../Components/Event';
 import { DashBoard } from "./Dashboard";
 import { Header } from '../Components/Header';
@@ -17,9 +20,10 @@ export class App extends Event {
 
     static async getData(): Promise<Record<string, any>> {
 
+      
         try {
-            const response = await fetch('http://localhost:2000/getJson');
-            return await response.json();
+            const response = await axios.get('http://localhost:2000/getJson');
+            return response.data;
         } catch (error) {
             console.warn('Fehler beim Laden der Daten', error);
             return { folders: [] };

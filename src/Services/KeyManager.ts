@@ -29,7 +29,6 @@ export class KeyManager {
 
 
     private handleKeydown = (event: KeyboardEvent) => {
-        // event.preventDefault(); // Verhindert das Standardverhalten der Taste und man kann ins inputfeld nichts eingeben   
         if(this.handlers[this.handlers.length -1]?.[event.key]){
             const topModal = this.handlers.pop();
             topModal[event.key]();  

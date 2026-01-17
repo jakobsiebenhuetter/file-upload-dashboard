@@ -1,5 +1,7 @@
-
 import '../styles.css';
+
+import axios from 'axios';
+
 import { Event } from './Event';
 import { Modal } from './Modal';
 import { Toast } from './Toast';
@@ -52,25 +54,18 @@ export class Sidebar extends Event {
             let modal = new Modal({ default: true, backdropOption: true, height: 'h-auto', rounded: true });
 
             modal.saveBtnOnClick(async () => {
+                let data = null;
+                let info = null;
 
                 if(!modal.getInputValue()) {
                     console.warn('Kein Ordnername eingegeben');
                     return;
                 };
                 GlobalEvent.publish('spinner', { action: 'show'});
-                let info = null;
-                let data = null;
 
-                info = await fetch('http://localhost:2000/create-folder', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text: modal.getInputValue(), id: modal.getInputValue() })
-                });
-
-                    data = await info.json();
-                
-
-            console.log('Antwort vom Server:', data);
+                info = await axios.post('http://localhost:2000/create-folder', { text: modal.getInputValue(), id: modal.getInputValue() });
+                data = info.data;
+                console.log('Antwort vom Server:', data);
 
             if (data.info) {
                 GlobalEvent.publish('spinner', { action: 'hide'});
@@ -155,14 +150,8 @@ export class Sidebar extends Event {
                     GlobalEvent.publish('spinner', {action: 'show'});
 
                 try {
-                    const data = await fetch('http://localhost:2000/delete-folder', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id: deleteBtn.getAttribute('btn-id') })
-                    });
-                    
-                   
-                   
+                    const data = await axios.post('http://localhost:2000/delete-folder', { id: deleteBtn.getAttribute('btn-id') });
+                     
                 } catch(error) {
                     console.warn(error);
                 };
@@ -243,8 +232,8 @@ export class Sidebar extends Event {
 
     static async getData(): Promise<Record<string, any>> {
         try {
-            const response = await fetch('http://localhost:2000/getJson');
-            return await response.json();
+            const response = await axios.get('http://localhost:2000/getJson');
+            return response.data;
         } catch (error) {
             console.warn('Fehler beim Laden der Daten', error);
             return { folders: [] };

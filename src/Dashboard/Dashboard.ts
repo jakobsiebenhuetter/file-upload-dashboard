@@ -1,4 +1,6 @@
 import '../styles.css';
+import axios from 'axios';
+
 import { Widget } from '../Components/Widget';
 import { Event } from '../Components/Event';
 import { Sidebar } from '../Components/Sidebar';
@@ -85,18 +87,15 @@ export class DashBoard extends Event {
             for(const item of items) {
                 formData.append('file', item);
             };
-          
-               await fetch('http://localhost:2000/upload', {
-                method:'POST',
-                body: formData
-               });
+            
+            await axios.post('http://localhost:2000/upload', formData);
 
-               const {folders} = await Sidebar.getData();
-               // Den Bug fixxen wenn man den letzten Ordner löscht, hier wird das letzte Thumbnail nicht gelöscht
+            const {folders} = await Sidebar.getData();
+            // Den Bug fixxen wenn man den letzten Ordner löscht, hier wird das letzte Thumbnail nicht gelöscht
           
-                GlobalEvent.publish('renderFiles', {folders});
+            GlobalEvent.publish('renderFiles', {folders});
            
-                GlobalEvent.publish('spinner', { action: 'hide' });
+            GlobalEvent.publish('spinner', { action: 'hide' });
         });
     };
 
@@ -195,12 +194,7 @@ export class DashBoard extends Event {
                 
                 try {
                     // Hier dann löschen der Datei aus dem Ordner und auch aus dem Dateisystem !!!!!!
-                    const response = await fetch('delete-file', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ fileId: widget.element.getAttribute('data-id'), folderId: folderId })
-                    });
-                    const data = await response.json();
+                    await axios.post('delete-file', { fileId: widget.element.getAttribute('data-id'), folderId: folderId })
                     console.log('Datei gelöscht');
                     widget.element.remove();
                     
