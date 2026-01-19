@@ -9,7 +9,11 @@ import { KeyManager } from '../Services/KeyManager';
 import { GlobalEvent } from './events';
 
 /**
- * @todo In server.js Thumbnail Folder und File Folder erstellen wenn nicht vorhanden
+ * @todo Typescript professionell einrichten
+ * @todo Uploadstatus anzeigen lassen, dank axios ist das möglich
+ * @todo SQLite Datenquelle implementieren
+ * @todo Pattern für SQLIte und JSON Datenquellen implementieren
+ * @todo Styling verbessern auch bzgl. der responsivity
  */
 export class App extends Event {
     private filteredFiles: Array<any> = [];

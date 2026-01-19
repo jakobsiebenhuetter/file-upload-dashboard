@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev:build": "webpack"
   },
   "author": "",
@@ -31,6 +30,7 @@
   "devDependencies": {
     "@types/jquery": "^3.5.33",
     "@types/jqueryui": "^1.12.24",
+    "@types/node": "^25.0.9",
     "autoprefixer": "^10.4.21",
     "copy-webpack-plugin": "^13.0.1",
     "css-loader": "^7.1.2",
