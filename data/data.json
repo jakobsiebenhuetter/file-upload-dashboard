@@ -1,3 +1,18 @@
 {
-  "folders": []
+  "folders": [
+    {
+      "id": "f7133885-00fc-4fb8-b89a-d53c8b37da60",
+      "folderName": "scss",
+      "path": "data\\Folders\\c9141be5-e737-4081-ab1c-ceb32902f59f",
+      "files": [
+        {
+          "id": "2feeb0fa-3790-4c2c-9a3e-57fd3029ba6e",
+          "title": "s00203-024-03981-x-1.pdf",
+          "path": "data\\Folders\\c9141be5-e737-4081-ab1c-ceb32902f59f\\s00203-024-03981-x-1.pdf",
+          "thumbnailPath": "./data/Thumbnails/7ed5862d-7d74-4022-9826-525e667ccd5d.png",
+          "date": "24.1.2026"
+        }
+      ]
+    }
+  ]
 }

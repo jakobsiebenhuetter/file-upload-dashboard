@@ -11,6 +11,20 @@ const ffmpegPath = require('ffmpeg-static');
 const ffmpeg = require('fluent-ffmpeg');
 const ffprobePath = require('ffprobe-static');
 
+const StorageInterface = require('./StorageInterface');
+const storage = new StorageInterface('json');
+
+const Database = require('better-sqlite3');
+
+const db = new Database('../data/file-upload-dashboard.db');
+
+try {
+    db.prepare(`CREATE TABLE IF NOT EXISTS folders ( id INTEGER PRIMARY KEY, folderId TEXT, folderName TEXT, path TEXT)`).run();
+} catch(error) {
+    console.error('Error creating folders table:', error);
+};
+
+
 ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfprobePath(ffprobePath.path);
 
@@ -124,25 +138,13 @@ app.get('/', (req, res) => {
 });
 
 app.get('/getJson', async (req, res) => {
-    const file = fs.readFileSync(jsonPath, 'utf-8');
-    const data = JSON.parse(file);
-    const { folders } = data;
-    for (const da of folders) {
-        if (da.files.length) {
-            for (const file of da.files) {
-                // da.tn = await pdfConverter(file);
-
-            }
-        }
-    }
-
+    const data = storage.getData();
     res.json(data);
 });
 
 app.post('/delete-file', async (req, res) => {
     const { fileId, folderId } = req.body;
-    const file = fs.readFileSync(jsonPath, 'utf-8');
-    const data = JSON.parse(file);
+    const data = storage.getData();
     // Hier die Datei aus dem Dateisystem löschen
     for (const folder of data.folders) {
         if (folder.id === folderId) {
@@ -169,8 +171,7 @@ app.post('/delete-file', async (req, res) => {
 app.post('/create-folder', (req, res) => {
     // Hier noch die richtige id übergeben
     const { text, id } = req.body;
-    let file = fs.readFileSync(jsonPath, 'utf-8');
-    file = JSON.parse(file);
+    const file = storage.getData();
 
     if (file.folders.length >= 4) {
         const message = {
@@ -220,8 +221,7 @@ app.post('/upload', (req, res) => {
 
         // Es muss zuerst der focus im frontend in den body gesetzt werden sonst funktioniert das nicht
         destination: (req, file, cb) => {
-            let content = fs.readFileSync(jsonPath, 'utf-8');
-            const { folders } = JSON.parse(content);
+            const folders = storage.getData();
             const dest = req.body.focus;
 
             for (const folder of folders) {
@@ -243,8 +243,7 @@ app.post('/upload', (req, res) => {
 
     upload(req, res, async (err) => {
         let focus = req.body.focus;
-        let content = fs.readFileSync(jsonPath, 'utf-8');
-        const { folders } = JSON.parse(content);
+        const folders = storage.getData();
 
         for (let folder of folders) {
             if (folder.id === focus) {
@@ -339,8 +338,7 @@ app.post('/upload', (req, res) => {
 
 app.post('/delete-folder', (req, res) => {
     const { id } = req.body;
-    const filedata = fs.readFileSync(jsonPath, 'utf-8');
-    const data = JSON.parse(filedata);
+    const data = storage.getData();
     for (const folder of data.folders) {
         if (folder.id === id) {
             const newObj = {
