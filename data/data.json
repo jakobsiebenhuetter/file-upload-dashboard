@@ -1,56 +1,44 @@
 {
   "folders": [
     {
-      "id": "3ff70495-6e5d-4401-89c9-d1983952bd57",
-      "folderName": "fg",
-      "path": "data\\Folders\\63a1fd88-06c4-4195-8d8c-f71b85d5b470",
+      "id": "cb0e0e33-af98-4890-8be4-f5ffddbba6b6",
+      "folderName": "df",
+      "path": "data\\Folders\\4c8c708f-9fff-4200-9b7c-20fc8aaf276f",
       "files": [
         {
-          "id": "94874bbb-d024-4870-849a-78e233e96394",
+          "id": "b5565a8b-e43c-4719-b41d-f51f4beac197",
+          "title": "Mozilla Firefox 2025-10-01 13-24-04.mp4",
+          "path": "data\\Folders\\4c8c708f-9fff-4200-9b7c-20fc8aaf276f\\Mozilla Firefox 2025-10-01 13-24-04.mp4",
+          "thumbnailPath": "data\\Thumbnails\\Mozilla Firefox 2025-10-01 13-24-04.png",
+          "date": "25.1.2026"
+        },
+        {
+          "id": "760570bd-f8f8-4e22-a32e-660d01ffaf09",
           "title": "sample-1.pdf",
-          "path": "data\\Folders\\63a1fd88-06c4-4195-8d8c-f71b85d5b470\\sample-1.pdf",
-          "thumbnailPath": "./data/Thumbnails/0443fd4d-52b9-4ad4-aeff-d5aabb8db18f.png",
+          "path": "data\\Folders\\4c8c708f-9fff-4200-9b7c-20fc8aaf276f\\sample-1.pdf",
+          "thumbnailPath": "./data/Thumbnails/12f9cccc-0a4c-4741-ac99-c00f00b66449.png",
           "date": "25.1.2026"
         },
         {
-          "id": "35c84496-ef4c-4855-bcba-91b46b92dc90",
-          "title": "sample-1.pdf",
-          "path": "data\\Folders\\63a1fd88-06c4-4195-8d8c-f71b85d5b470\\sample-1.pdf",
-          "thumbnailPath": "./data/Thumbnails/80502311-1b8d-4d7e-b12d-bb9e20841707.png",
+          "id": "5a2a3886-e8d4-4af8-9b5b-b2b1225dcc18",
+          "title": "Jakob-W11.mesonic.com - Remotedesktopverbindung 2025-10-27 11-08-37.mp4",
+          "path": "data\\Folders\\4c8c708f-9fff-4200-9b7c-20fc8aaf276f\\Jakob-W11.mesonic.com - Remotedesktopverbindung 2025-10-27 11-08-37.mp4",
+          "thumbnailPath": "data\\Thumbnails\\Jakob-W11.png",
           "date": "25.1.2026"
         },
         {
-          "id": "0a588b15-1809-405f-9972-6ecdf5ba5251",
-          "title": "Meine Erstes Elektron Programm _-) 2025-12-08 11-44-14.mp4",
-          "path": "data\\Folders\\63a1fd88-06c4-4195-8d8c-f71b85d5b470\\Meine Erstes Elektron Programm _-) 2025-12-08 11-44-14.mp4",
-          "thumbnailPath": "data\\Thumbnails\\Meine Erstes Elektron Programm _-) 2025-12-08 11-44-14.png",
-          "date": "25.1.2026"
-        },
-        {
-          "id": "0c04989b-a2c6-4643-bf67-bfbeeaa9e97c",
-          "title": "===================================.txt",
-          "path": "data\\Folders\\63a1fd88-06c4-4195-8d8c-f71b85d5b470\\===================================.txt",
-          "thumbnailPath": "./data/Thumbnails/40c8b651-390f-406a-b802-8e179fca4282.png",
+          "id": "3923d80f-4033-473a-b45a-d4b40bafb99b",
+          "title": "mallard-3478011_640.jpg",
+          "path": "data\\Folders\\4c8c708f-9fff-4200-9b7c-20fc8aaf276f\\mallard-3478011_640.jpg",
+          "thumbnailPath": "data\\Thumbnails\\mallard-3478011_640.jpg",
           "date": "25.1.2026"
         }
       ]
     },
     {
-      "id": "3bac450a-d055-4e0c-8ef3-53ef9c91823e",
-      "folderName": "f",
-      "path": "data\\Folders\\f3e27761-0880-4686-845c-76bd69fdd9ab",
-      "files": []
-    },
-    {
-      "id": "af485b89-d5db-49f8-b416-e02b29f4e57d",
-      "folderName": "df",
-      "path": "data\\Folders\\c49ca335-b305-4404-8fa4-897c17059c61",
-      "files": []
-    },
-    {
-      "id": "3d568f07-90cb-4cf7-9333-c8300bef089d",
-      "folderName": "d",
-      "path": "data\\Folders\\a20e97f5-1098-4a0a-a1ff-b3d3e1f6bb52",
+      "id": "03ff34b1-d771-4845-91d1-e160ab0182a8",
+      "folderName": "23",
+      "path": "data\\Folders\\1fb0c5a2-613d-4689-8cb5-d87b33ff8d92",
       "files": []
     }
   ]

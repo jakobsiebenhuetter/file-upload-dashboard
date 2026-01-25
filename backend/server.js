@@ -146,7 +146,7 @@ app.post('/upload', (req, res) => {
             };
         }
 
-        res.json(message);
+        res.json(msg);
     })
 });
 

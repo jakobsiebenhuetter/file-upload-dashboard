@@ -9,6 +9,7 @@ import { KeyManager } from '../Services/KeyManager';
 import { GlobalEvent } from './events';
 
 /**
+ * @todo Upload von Dateien modifizieren um nicht 2 API Calls zu benötigen
  * @todo Typescript professionell einrichten
  * @todo Uploadstatus anzeigen lassen, dank axios ist das möglich
  * @todo SQLite Datenquelle implementieren
