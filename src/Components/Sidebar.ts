@@ -25,8 +25,7 @@ export class Sidebar extends Event {
 
         const defaults = {
             color: this.color,
-            width: this.width,
-            
+            width: this.width,       
         }
 
         this.props = {
@@ -55,7 +54,6 @@ export class Sidebar extends Event {
 
             modal.saveBtnOnClick(async () => {
                 let data = null;
-                let info = null;
 
                 if(!modal.getInputValue()) {
                     console.warn('Kein Ordnername eingegeben');
@@ -63,17 +61,16 @@ export class Sidebar extends Event {
                 };
                 GlobalEvent.publish('spinner', { action: 'show'});
 
-                info = await axios.post('http://localhost:2000/create-folder', { text: modal.getInputValue(), id: modal.getInputValue() });
-                data = info.data;
+                let response = await axios.post('http://localhost:2000/create-folder', { text: modal.getInputValue(), id: modal.getInputValue() });
+                data = response.data;
                 console.log('Antwort vom Server:', data);
 
             if (data.info) {
                 GlobalEvent.publish('spinner', { action: 'hide'});
                 const toast = new Toast({ text: data.info, icon: 'info', color: 'bg-red-500', width: '' });
-                return;
             };
 
-            this.props.listItems = data.folders;
+            this.props.listItems = data.data.folders;
             this.renderListElements();
             
             const folders = await Sidebar.getData();

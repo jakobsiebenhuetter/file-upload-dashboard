@@ -1,18 +1,57 @@
 {
   "folders": [
     {
-      "id": "f7133885-00fc-4fb8-b89a-d53c8b37da60",
-      "folderName": "scss",
-      "path": "data\\Folders\\c9141be5-e737-4081-ab1c-ceb32902f59f",
+      "id": "3ff70495-6e5d-4401-89c9-d1983952bd57",
+      "folderName": "fg",
+      "path": "data\\Folders\\63a1fd88-06c4-4195-8d8c-f71b85d5b470",
       "files": [
         {
-          "id": "2feeb0fa-3790-4c2c-9a3e-57fd3029ba6e",
-          "title": "s00203-024-03981-x-1.pdf",
-          "path": "data\\Folders\\c9141be5-e737-4081-ab1c-ceb32902f59f\\s00203-024-03981-x-1.pdf",
-          "thumbnailPath": "./data/Thumbnails/7ed5862d-7d74-4022-9826-525e667ccd5d.png",
-          "date": "24.1.2026"
+          "id": "94874bbb-d024-4870-849a-78e233e96394",
+          "title": "sample-1.pdf",
+          "path": "data\\Folders\\63a1fd88-06c4-4195-8d8c-f71b85d5b470\\sample-1.pdf",
+          "thumbnailPath": "./data/Thumbnails/0443fd4d-52b9-4ad4-aeff-d5aabb8db18f.png",
+          "date": "25.1.2026"
+        },
+        {
+          "id": "35c84496-ef4c-4855-bcba-91b46b92dc90",
+          "title": "sample-1.pdf",
+          "path": "data\\Folders\\63a1fd88-06c4-4195-8d8c-f71b85d5b470\\sample-1.pdf",
+          "thumbnailPath": "./data/Thumbnails/80502311-1b8d-4d7e-b12d-bb9e20841707.png",
+          "date": "25.1.2026"
+        },
+        {
+          "id": "0a588b15-1809-405f-9972-6ecdf5ba5251",
+          "title": "Meine Erstes Elektron Programm _-) 2025-12-08 11-44-14.mp4",
+          "path": "data\\Folders\\63a1fd88-06c4-4195-8d8c-f71b85d5b470\\Meine Erstes Elektron Programm _-) 2025-12-08 11-44-14.mp4",
+          "thumbnailPath": "data\\Thumbnails\\Meine Erstes Elektron Programm _-) 2025-12-08 11-44-14.png",
+          "date": "25.1.2026"
+        },
+        {
+          "id": "0c04989b-a2c6-4643-bf67-bfbeeaa9e97c",
+          "title": "===================================.txt",
+          "path": "data\\Folders\\63a1fd88-06c4-4195-8d8c-f71b85d5b470\\===================================.txt",
+          "thumbnailPath": "./data/Thumbnails/40c8b651-390f-406a-b802-8e179fca4282.png",
+          "date": "25.1.2026"
         }
       ]
+    },
+    {
+      "id": "3bac450a-d055-4e0c-8ef3-53ef9c91823e",
+      "folderName": "f",
+      "path": "data\\Folders\\f3e27761-0880-4686-845c-76bd69fdd9ab",
+      "files": []
+    },
+    {
+      "id": "af485b89-d5db-49f8-b416-e02b29f4e57d",
+      "folderName": "df",
+      "path": "data\\Folders\\c49ca335-b305-4404-8fa4-897c17059c61",
+      "files": []
+    },
+    {
+      "id": "3d568f07-90cb-4cf7-9333-c8300bef089d",
+      "folderName": "d",
+      "path": "data\\Folders\\a20e97f5-1098-4a0a-a1ff-b3d3e1f6bb52",
+      "files": []
     }
   ]
 }

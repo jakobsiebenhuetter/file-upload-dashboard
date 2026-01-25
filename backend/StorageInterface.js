@@ -19,12 +19,12 @@ class StorageInterface {
         return this.storage.getData();
     }
 
-    saveFolder(folder) {
-        this.storage.saveFolder(folder);
+    saveFolder(folderObj) {
+        return this.storage.saveFolder(folderObj);
     }
 
-    saveFiles(files, folderId) {
-        this.storage.saveFiles(files, folderId);
+    async saveFiles(files, folderId, date) {
+        await this.storage.saveFiles(files, folderId, date);
     }
 
     getFolders() {
@@ -35,12 +35,12 @@ class StorageInterface {
         return this.storage.getFiles();
     }
     
-    deleteFile(id) {
-
+    deleteFile(folderId, fileId) {
+        this.storage.deleteFile(folderId, fileId);
     }
 
     deleteFolder(id) {
-
+        this.storage.deleteFolder(id);
     }
 }
 

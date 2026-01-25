@@ -5,28 +5,9 @@ const cors = require('cors');
 const multer = require('multer');
 const crypto = require('crypto');
 
-const puppeteer = require('puppeteer');
-
-const ffmpegPath = require('ffmpeg-static');
-const ffmpeg = require('fluent-ffmpeg');
-const ffprobePath = require('ffprobe-static');
-
 const StorageInterface = require('./StorageInterface');
 const storage = new StorageInterface('json');
 
-const Database = require('better-sqlite3');
-
-const db = new Database('../data/file-upload-dashboard.db');
-
-try {
-    db.prepare(`CREATE TABLE IF NOT EXISTS folders ( id INTEGER PRIMARY KEY, folderId TEXT, folderName TEXT, path TEXT)`).run();
-} catch(error) {
-    console.error('Error creating folders table:', error);
-};
-
-
-ffmpeg.setFfmpegPath(ffmpegPath);
-ffmpeg.setFfprobePath(ffprobePath.path);
 
 const app = express();
 app.use(cors());
@@ -39,78 +20,6 @@ const tnPath = './data/Thumbnails';
 // Statische Dateien aus dem dist-Ordner bereitstellen
 app.use(express.static(path.join(__dirname, '..', 'dist')));
 app.use('/data', express.static(path.join(__dirname, 'data')));
-
-async function startPuppeteerBrowser(filePath) {
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
-
-    // Read and escape file content to avoid accidental HTML injection
-
-    const fileContent = fs.readFileSync(filePath, 'utf-8');
-
-    const escapeHtml = (str) =>
-        str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-    const escaped = escapeHtml(fileContent);
-    const htmlContent = `
-    <!doctype html>
-    <html lang="de">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Thumbnail</title>
-        <style>
-            .container {
-                max-width: 960px;
-                margin: 24px auto;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <header>Datei: ${path.basename(filePath)}</header>
-            <pre>${escaped}</pre>
-        </div>
-    </body>
-    </html>
-    `;
-
-    await page.setContent(htmlContent);
-    const tnImage = await page.screenshot();
-    const uuid = crypto.randomUUID();
-    const newthumbnailPath = `${tnPath}/${uuid}.png`;
-
-    fs.writeFileSync(newthumbnailPath, tnImage);
-    await browser.close();
-
-    return newthumbnailPath;
-};
-
-function createVideoThumbnail(videoPath, tnPath, fileName) {
-    return new Promise((resolve, reject) => {
-        ffmpeg(videoPath)
-            .on('end', resolve)
-            .on('error', reject)
-            .screenshots({
-                count: 1,
-                filename: fileName,
-                folder: tnPath,
-                size: '320x240'
-            });
-    });
-}
-
-async function pdfConverter(pdfPath) {
-    const { pdf } = await import('pdf-to-img');
-    const uuid = crypto.randomUUID();
-    const newthumbnailPath = `${tnPath}/${uuid}.png`;
-    const document = await pdf(pdfPath);
-    const pageBuffer = await document.getPage(1);
-
-    fs.writeFileSync(newthumbnailPath, pageBuffer);
-    return newthumbnailPath;
-};
-
-
 
 // Hier noch überprüfen,ob die Datenstruktur existiert, wenn nicht, dann erstellen
 if (!fs.existsSync(jsonPath)) {
@@ -144,72 +53,48 @@ app.get('/getJson', async (req, res) => {
 
 app.post('/delete-file', async (req, res) => {
     const { fileId, folderId } = req.body;
-    const data = storage.getData();
-    // Hier die Datei aus dem Dateisystem löschen
-    for (const folder of data.folders) {
-        if (folder.id === folderId) {
-            for (const file of folder.files) {
-                console.log(fileId, file.id);
-                if (fileId === file.id) {
-                    try {
-                        fs.rmSync(file.thumbnailPath);
-                        fs.rmSync(file.path);
-                        const fileIndex = folder.files.findIndex((file) => { return file.id === fileId });
-                        folder.files.splice(fileIndex, 1);
-                        fs.writeFileSync(jsonPath, JSON.stringify(data), 'utf-8');
-                    } catch (error) {
-                        console.log('Fehler aus Zeile 84: ' + error)
-                    }
-                }
-            }
-        }
-    }
-
+    const data = storage.deleteFile(folderId, fileId);
     res.json(data);
 });
 
 app.post('/create-folder', (req, res) => {
     // Hier noch die richtige id übergeben
     const { text, id } = req.body;
-    const file = storage.getData();
-
-    if (file.folders.length >= 4) {
-        const message = {
-            info: 'Maximale Anzahl an Ordnern erreicht'
-        };
-        return res.json(message);
-        ;
-    }
     const uuidFolderName = crypto.randomUUID();
+    const uuid = crypto.randomUUID();
     const newFolderPath = path.join(folderPath, uuidFolderName);
+    
+    let data = storage.getData();
+    let msg = {};
 
-    // Das hier in eine seperate Funktion auslagern
-    if (fs.existsSync(newFolderPath)) {
-        const message = {
-            info: 'Folder existiert bereits'
-        };
-        return res.json(message);
-    }
+        if (data.folders.length >= 4) {
+            msg = {
+                info: 'Maximale Anzahl an Ordnern erreicht',
+                data: data
+            };
+            return res.json(msg);
+        }
 
     fs.mkdirSync(newFolderPath, { recursive: true });
 
-    const uuid = crypto.randomUUID();
     const folderObj = {
         id: uuid,
         folderName: text,
         path: newFolderPath,
         files: [],
     };
+    
+    // Hier ist ein Bug
+    data = storage.saveFolder(folderObj);
+    console.log(msg)
+    // Hier wird der Fokus dynamisch gesetzt und nicht gespeichert  
+    data.folders[data.folders.length - 1].focus = true;
+    msg = {
+        info: 'Ordner erstellt Backend test',
+        data: data
+    };
 
-
-    file.folders.push(folderObj);
-    fs.writeFileSync(jsonPath, JSON.stringify(file, null, 2), 'utf-8');
-    // Hier wird der Fokus dynamisch gesetzt und nicht gespeichert
-
-    const { folders } = file;
-    folders[folders.length - 1].focus = true;
-
-    res.json(file);
+    res.json(msg);
 });
 
 app.post('/upload', (req, res) => {
@@ -217,14 +102,15 @@ app.post('/upload', (req, res) => {
     let newPath = null;
     const datetime = new Date(); // Hier weiter machen
     let date = `${datetime.getDate()}.${datetime.getMonth() + 1}.${datetime.getFullYear()}`;
-    const storage = multer.diskStorage({
+    const uploadStorage = multer.diskStorage({
 
         // Es muss zuerst der focus im frontend in den body gesetzt werden sonst funktioniert das nicht
         destination: (req, file, cb) => {
-            const folders = storage.getData();
+            const data = storage.getData();
+            console.log(data);
             const dest = req.body.focus;
 
-            for (const folder of folders) {
+            for (const folder of data.folders) {
                 if (folder.id === dest) {
                     newPath = folder.path;
                     break;
@@ -239,97 +125,26 @@ app.post('/upload', (req, res) => {
         }
     });
 
-    const upload = multer({ storage }).array('file');
+    const upload = multer({ storage: uploadStorage }).array('file');
 
     upload(req, res, async (err) => {
         let focus = req.body.focus;
-        const folders = storage.getData();
 
-        for (let folder of folders) {
-            if (folder.id === focus) {
-                for (const f of req.files) {
+        let msg = {
+            message: '',
+        };
 
-                    for (const filePath of folder.files) {
-                        if (filePath.path === f.path) {
-                            // Dieser Befehl ist nur für das data.json gedacht, es wird das file ja mit dem gleichen Namen überschrieben, dewegen braucht man das
-                            console.log('Datei existiert bereits, wird übersprungen');
-                            continue;
-                        };
-                    };
-
-                    // Thumbnail generieren und speichern
-                    const uuid = crypto.randomUUID();
-
-                    if (path.extname(f.path) === '.pdf') {
-
-                        const title = f.originalname;
-                        const fPath = await pdfConverter(f.path);
-
-                        folder.files.push({ id: uuid, title: title, path: f.path, thumbnailPath: fPath, date: date });
-
-
-                    } else if (path.extname(f.path) === '.mp4') {
-
-                        const title = f.originalname;
-                        const fileName = path.basename(f.path);
-                        var rr = '';
-                        for (const n of fileName) {
-
-                            if (n === '.') {
-                                break;
-                            }
-                            rr += n;
-                        }
-
-                        rr += '.png';
-                        const targetTnPath = path.join(tnPath, rr);
-
-                        console.log(targetTnPath);
-                        console.log(f.path);
-
-                        // ffmpeg(f.path).screenshots({
-                        //     count: 1,
-                        //     filename: rr,
-                        //     folder: tnPath,
-                        //     size: '320x240'
-                        // });
-
-                        await createVideoThumbnail(f.path, tnPath, rr).then(() => {
-                            folder.files.push({ id: uuid, title: title, path: f.path, thumbnailPath: targetTnPath, date: date });
-                        });
-
-
-
-                    } else if (path.extname(f.path) === '.txt') {
-
-                        const title = f.originalname;
-
-                        const newthumbnailPath = await startPuppeteerBrowser(f.path);
-
-                        folder.files.push({ id: uuid, title: title, path: f.path, thumbnailPath: newthumbnailPath, date: date });
-
-                    } else {
-                        const title = f.originalname;
-                        const fileName = path.basename(f.path);
-                        const targetTnPath = path.join(tnPath, fileName);
-                        fs.copyFileSync(f.path, targetTnPath);
-
-                        folder.files.push({ id: uuid, title: title, path: f.path, thumbnailPath: targetTnPath, date: date });
-                    };
-                };
+        try {
+            await storage.saveFiles(req.files, focus, date);
+            msg = {
+                message: 'Erfolgreich upgeloadet'
             };
-        };
 
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        };
-
-        fs.writeFileSync(jsonPath, JSON.stringify({ folders }, null, 2), 'utf-8')
-
-
-        const message = {
-            message: 'Erfolgreich upgeloadet'
-        };
+        } catch (error) {
+            msg = {
+                message: 'Fehler beim speichern' + error,
+            };
+        }
 
         res.json(message);
     })
@@ -338,29 +153,11 @@ app.post('/upload', (req, res) => {
 
 app.post('/delete-folder', (req, res) => {
     const { id } = req.body;
-    const data = storage.getData();
-    for (const folder of data.folders) {
-        if (folder.id === id) {
-            const newObj = {
-                folders: null,
-            }
-            newObj.folders = data.folders.filter((f) => f !== folder);
-
-            fs.writeFileSync(jsonPath, JSON.stringify(newObj, null, 2), 'utf-8');
-            fs.rmSync(folder.path, { recursive: true, force: true });
-            if (folder.files.length) {
-                for (const paths of folder.files) {
-                    fs.rmSync(paths.thumbnailPath);
-                }
-            }
-            break;
-        }
-    }
+    storage.deleteFolder(id);
 
     const message = {
         info: 'Folder entfernt'
-    }
-    console.log(message);
+    };
     res.json(message);
 })
 

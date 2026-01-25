@@ -12,7 +12,7 @@ import { GlobalEvent } from './events';
  * @todo Typescript professionell einrichten
  * @todo Uploadstatus anzeigen lassen, dank axios ist das möglich
  * @todo SQLite Datenquelle implementieren
- * @todo Pattern für SQLIte und JSON Datenquellen implementieren
+ * @todo Backdrop Bug fixxen und Scrollen verhindern während des droppens
  * @todo Styling verbessern auch bzgl. der responsivity
  */
 export class App extends Event {
