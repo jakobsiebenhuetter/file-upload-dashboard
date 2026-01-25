@@ -72,13 +72,13 @@ async function startPuppeteerBrowser(filePath) {
 }
 
 // video thumbnail generator middleware
-function createVideoThumbnail(videoPath, tnPath, fileName) {
+async function createVideoThumbnail(videoPath, tnPath, fileName) {
     return new Promise((resolve, reject) => {
         ffmpeg(videoPath)
             .on('end', resolve)
             .on('error', reject)
             .screenshots({
-                count: 1,
+                timestamps: ['00:00:01'],
                 filename: fileName,
                 folder: tnPath,
                 size: '320x240'

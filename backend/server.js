@@ -97,7 +97,7 @@ app.post('/create-folder', (req, res) => {
     res.json(msg);
 });
 
-app.post('/upload', (req, res) => {
+app.post('/upload', async (req, res) => {
 
     let newPath = null;
     const datetime = new Date(); // Hier weiter machen
