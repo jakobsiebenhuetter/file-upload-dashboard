@@ -88,10 +88,9 @@ export class DashBoard extends Event {
                 formData.append('file', item);
             };
             
-            await axios.post('http://localhost:2000/upload', formData);
-
-            const {folders} = await Sidebar.getData();
-            // Den Bug fixxen wenn man den letzten Ordner löscht, hier wird das letzte Thumbnail nicht gelöscht
+            const response = await axios.post('http://localhost:2000/upload', formData);
+            
+            const folders = response.data.data.folders;
           
             GlobalEvent.publish('renderFiles', {folders});
            
@@ -104,10 +103,8 @@ export class DashBoard extends Event {
     }
 
     renderSidebar() {
-
         this.sidebar = new Sidebar({ listItems: this.listItems, width: 'min-w-[220px]' });
         this.element.append(this.sidebar.element);
-
     }
 
     async renderUI(listItems: Array<any> = []) {

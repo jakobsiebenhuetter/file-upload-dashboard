@@ -21,8 +21,14 @@ class DatabaseStorage {
         }
     }
 
-    saveFiles() {
-
+    saveFiles(fileArrayObj) {
+        for (const fileObj of fileArrayObj) {
+            try {
+                db.prepare(`INSERT INTO files (fileId, folderId, fileName, path, thumbnailPath, date) VALUES (?, ?, ?, ?, ?, ?)`).run(fileObj.id, fileObj.folderId, fileObj.fileName, fileObj.path, fileObj.thumbnailPath, fileObj.date);
+            } catch (error) {
+                console.error('Error saving file:', error);
+            }
+        }
     }
 
     getFolders() {
@@ -34,12 +40,21 @@ class DatabaseStorage {
     }
 
     
-    deleteFile() {
-
+    deleteFile(fileId) {
+        try {
+            db.prepare(`DELETE FROM files WHERE fileId = ?`).run(fileId);
+        } catch (error) {
+            console.error('Error deleting file:', error);
+        }
     }
 
     deleteFolder() {
-
+        try {
+            db.prepare(`DELETE FROM folders WHERE folderId = ?`).run(folderId);
+            db.prepare(`DELETE FROM files WHERE folderId = ?`).run(folderId);
+        } catch (error) {
+            console.error('Error deleting folder and its files:', error);
+        }
     }
 }
 

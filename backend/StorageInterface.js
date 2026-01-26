@@ -24,7 +24,7 @@ class StorageInterface {
     }
 
     async saveFiles(files, folderId, date) {
-        await this.storage.saveFiles(files, folderId, date);
+        return await this.storage.saveFiles(files, folderId, date);
     }
 
     getFolders() {

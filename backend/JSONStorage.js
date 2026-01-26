@@ -38,14 +38,7 @@ class JSONStorage {
                              const title = f.originalname;
                              let fileName = path.basename(f.path);
                              fileName = fileName.split('.')[0] + '.png';
-                             
-                        // ffmpeg(f.path).screenshots({
-                        //     count: 1,
-                        //     filename: rr,
-                        //     folder: tnPath,
-                        //     size: '320x240'
-                        // });
-                            const targetTnPath = path.join(tnPath, fileName);
+                             const targetTnPath = path.join(tnPath, fileName);
                             
                             await TNGenerator.createVideoThumbnail(f.path, tnPath, fileName)
                             folder.files.push({ id: uuid, title: title, path: f.path, thumbnailPath: targetTnPath, date: date})
@@ -74,6 +67,7 @@ class JSONStorage {
          }
     }
     fs.writeFileSync(jsonPath, JSON.stringify(data, null, 2), 'utf-8');
+    return data;
 }
 
     getData() {

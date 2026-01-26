@@ -129,20 +129,23 @@ app.post('/upload', async (req, res) => {
 
     upload(req, res, async (err) => {
         let focus = req.body.focus;
-
+        let data = null;
         let msg = {
             message: '',
+            data: null
         };
 
         try {
-            await storage.saveFiles(req.files, focus, date);
+            data = await storage.saveFiles(req.files, focus, date);
             msg = {
-                message: 'Erfolgreich upgeloadet'
+                message: 'Erfolgreich upgeloadet',
+                data: data
             };
 
         } catch (error) {
             msg = {
                 message: 'Fehler beim speichern' + error,
+                data: data
             };
         }
 
