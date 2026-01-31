@@ -21,8 +21,9 @@ class DatabaseStorage {
         }
     }
 
-    saveFiles() {
-
+    // Next Step: Hier weiter machen
+    saveFiles(files, folderId, date) {
+        for (const f of files) {}
     }
 
     getFolders() {

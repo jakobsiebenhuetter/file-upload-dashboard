@@ -21,60 +21,17 @@ class JSONStorage {
         
          for (let folder of data.folders) {
             if (folder.id === folderId) {
-                for (const f of files) {
-                     const uuid = crypto.randomUUID();
-                     const extname = path.extname(f.path);
-                     
-                    // UUID für jede Datei an den Namen anhängen, sonst überschreiben sich gleiche Dateinamen
-                     switch(extname) {
-                        case '.pdf': {
-                            const title = f.originalname;
-                            const thumbnailPath = await TNGenerator.pdfConverter(f.path);
-                            folder.files.push({ id: uuid, title: title, path: f.path, thumbnailPath: thumbnailPath, date: date });
-                            break;
-                        }
-
-                        case '.mp4': {
-                             const title = f.originalname;
-                             let fileName = path.basename(f.path);
-                             fileName = fileName.split('.')[0] + '.png';
-                             
-                        // ffmpeg(f.path).screenshots({
-                        //     count: 1,
-                        //     filename: rr,
-                        //     folder: tnPath,
-                        //     size: '320x240'
-                        // });
-                            const targetTnPath = path.join(tnPath, fileName);
-                            
-                            await TNGenerator.createVideoThumbnail(f.path, tnPath, fileName)
-                            folder.files.push({ id: uuid, title: title, path: f.path, thumbnailPath: targetTnPath, date: date})
-                            break;
-                        }
-
-                        case '.txt': {
-                            const title = f.originalname;
-                            const thumbnailPath = await TNGenerator.startPuppeteerBrowser(f.path);
-                            folder.files.push({ id: uuid, title: title, path: f.path, thumbnailPath: thumbnailPath, date: date });
-                            
-                            break;
-                        }
-
-                        default: {                        
-                            const title = f.originalname;
-                            const fileName = path.basename(f.path);
-                            const thumbnailPath = path.join(tnPath, fileName);
-                            fs.copyFileSync(f.path, thumbnailPath);
-                            folder.files.push({ id: uuid, title: title, path: f.path, thumbnailPath: thumbnailPath, date: date });
-                            
-                            break;
-                     }
+                for (const file of files) {
+                    const uuid = crypto.randomUUID();
+                    const title = file.originalname;
+                    let thumbnailPath = await TNGenerator.generateTN(file);
+                    folder.files.push({ id: uuid, title: title, path: file.path, thumbnailPath: thumbnailPath, date: date });
                 }
             }
-         }
+        }
+        fs.writeFileSync(jsonPath, JSON.stringify(data, null, 2), 'utf-8');
+        return data;
     }
-    fs.writeFileSync(jsonPath, JSON.stringify(data, null, 2), 'utf-8');
-}
 
     getData() {
         const file = fs.readFileSync(jsonPath, 'utf-8');

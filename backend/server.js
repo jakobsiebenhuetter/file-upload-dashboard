@@ -90,7 +90,7 @@ app.post('/create-folder', (req, res) => {
     // Hier wird der Fokus dynamisch gesetzt und nicht gespeichert  
     data.folders[data.folders.length - 1].focus = true;
     msg = {
-        info: 'Ordner erstellt Backend test',
+        info: 'Ordner erstellt',
         data: data
     };
 
@@ -135,14 +135,15 @@ app.post('/upload', async (req, res) => {
         };
 
         try {
-            await storage.saveFiles(req.files, focus, date);
+            const data = await storage.saveFiles(req.files, focus, date);
             msg = {
-                message: 'Erfolgreich upgeloadet'
+                message: 'Erfolgreich upgeloadet',
+                data: data
             };
 
         } catch (error) {
             msg = {
-                message: 'Fehler beim speichern' + error,
+                message: 'Fehler beim speichern ' + error,
             };
         }
 

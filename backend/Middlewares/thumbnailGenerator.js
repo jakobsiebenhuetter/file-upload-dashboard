@@ -86,8 +86,40 @@ async function createVideoThumbnail(videoPath, tnPath, fileName) {
     });
 }
 
+async function generateTN(file) {
+    let thumbnailPath = null;
+    let filePath = file.path;
+    const extname = path.extname(filePath);
+    try {
+        switch (extname) {
+            case '.pdf': {
+                thumbnailPath = await pdfConverter(filePath);
+                break;
+            }
+            case '.mp4': {
+                let fileName = path.basename(filePath);
+                fileName = fileName.split('.')[0] + '.png';
+                thumbnailPath = path.join(tnPath, fileName);
+                await createVideoThumbnail(filePath, tnPath, fileName)
+                break;
+            }
+            case '.txt': {
+                thumbnailPath = await startPuppeteerBrowser(filePath);
+                break;
+            }
+            default: {
+                const fileName = path.basename(filePath);
+                thumbnailPath = path.join(tnPath, fileName);
+                fs.copyFileSync(filePath, thumbnailPath);
+                break;
+            }
+        }
+    } catch (error) {
+        console.error('Error generating thumbnail:', error);
+    }
+    return thumbnailPath;
+}
+
 module.exports = {
-    pdfConverter,
-    startPuppeteerBrowser,
-    createVideoThumbnail
+    generateTN,
 };
