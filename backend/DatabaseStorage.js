@@ -35,12 +35,21 @@ class DatabaseStorage {
     }
 
     
-    deleteFile() {
-
+    deleteFile(fileId) {
+        try {
+            db.prepare(`DELETE FROM files WHERE fileId = ?`).run(fileId);
+        } catch (error) {
+            console.error('Error deleting file:', error);
+        }
     }
 
     deleteFolder() {
-
+        try {
+            db.prepare(`DELETE FROM folders WHERE folderId = ?`).run(folderId);
+            db.prepare(`DELETE FROM files WHERE folderId = ?`).run(folderId);
+        } catch (error) {
+            console.error('Error deleting folder and its files:', error);
+        }
     }
 }
 

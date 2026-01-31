@@ -101,10 +101,8 @@ export class DashBoard extends Event {
     }
 
     renderSidebar() {
-
         this.sidebar = new Sidebar({ listItems: this.listItems, width: 'min-w-[220px]' });
         this.element.append(this.sidebar.element);
-
     }
 
     async renderUI(listItems: Array<any> = []) {
