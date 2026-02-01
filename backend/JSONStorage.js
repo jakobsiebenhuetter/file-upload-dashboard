@@ -1,6 +1,5 @@
 const fs = require('fs');
 const crypto = require('crypto');
-const path = require('path');
 
 const TNGenerator = require('./Middlewares/thumbnailGenerator');
 

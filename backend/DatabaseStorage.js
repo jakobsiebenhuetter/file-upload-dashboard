@@ -1,5 +1,5 @@
+const crypto = require('crypto');
 const Database = require('better-sqlite3');
-
 const db = new Database('../data/file-upload-dashboard.db');
 
 class DatabaseStorage {
@@ -13,6 +13,10 @@ class DatabaseStorage {
         };
     }
 
+    getData() {
+        
+    }
+
     saveFolder() {
         try {
             db.prepare(`INSERT INTO folders (folderId, folderName, path) VALUES (?, ?, ?)`).run(folderObj.id, folderObj.folderName, folderObj.path);
@@ -22,8 +26,17 @@ class DatabaseStorage {
     }
 
     // Next Step: Hier weiter machen
-    saveFiles(files, folderId, date) {
-        for (const f of files) {}
+    async saveFiles(files, folderId, date) {
+        for (const file of files) {
+            const uuid = crypto.randomUUID();
+            const fileName = file.originalname;
+            let thumbnailPath = await TNGenerator.generateTN(file);
+            try {
+                db.prepare('INSERT INTO files (fileId, folderId, fileName, path, thumbnailPath, date) VALUES (?, ?, ?, ?, ?, ?)').run(uuid, folderId, fileName, file.path, thumbnailPath, date);
+            } catch (error) {
+                console.error('Error saving file:', error);
+            }
+        }
     }
 
     getFolders() {
