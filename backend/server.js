@@ -6,7 +6,7 @@ const multer = require('multer');
 const crypto = require('crypto');
 
 const StorageInterface = require('./StorageInterface');
-const storage = new StorageInterface('json');
+const storage = new StorageInterface('db');
 
 
 const app = express();

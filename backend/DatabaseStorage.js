@@ -1,5 +1,8 @@
 const crypto = require('crypto');
+const fs = require('fs');
+
 const Database = require('better-sqlite3');
+const TNGenerator = require('./Middlewares/thumbnailGenerator');
 const db = new Database('../data/file-upload-dashboard.db');
 
 class DatabaseStorage {
@@ -14,15 +17,41 @@ class DatabaseStorage {
     }
 
     getData() {
-        
+        try {
+            const folders = db.prepare(`SELECT * FROM folders`).all();
+            const files = db.prepare(`SELECT * FROM files`).all();
+
+            const data = {
+                folders: folders.map(folder => ({
+                    id:folder.folderId,
+                    folderName: folder.folderName,
+                    path: folder.path,
+                    files: files
+                    .filter(file => file.folderId === folder.folderId)
+                    .map(file => ({
+                        id: file.fileId,
+                        title: file.fileName,
+                        path: file.path,
+                        thumbnailPath: file.thumbnailPath,
+                        date: file.date
+                    }))
+                }))
+            }
+            
+            return data;
+        } catch (error) {
+            console.error('Error getting data:', error);
+            return { folders: [] };
+        }
     }
 
-    saveFolder() {
+    saveFolder(folderObj) {
         try {
             db.prepare(`INSERT INTO folders (folderId, folderName, path) VALUES (?, ?, ?)`).run(folderObj.id, folderObj.folderName, folderObj.path);
          } catch (error) {
             console.error('Error saving folder:', error);
         }
+        return this.getData();
     }
 
     // Next Step: Hier weiter machen
@@ -30,25 +59,31 @@ class DatabaseStorage {
         for (const file of files) {
             const uuid = crypto.randomUUID();
             const fileName = file.originalname;
+          
             let thumbnailPath = await TNGenerator.generateTN(file);
+           
             try {
                 db.prepare('INSERT INTO files (fileId, folderId, fileName, path, thumbnailPath, date) VALUES (?, ?, ?, ?, ?, ?)').run(uuid, folderId, fileName, file.path, thumbnailPath, date);
             } catch (error) {
                 console.error('Error saving file:', error);
             }
         }
-    }
 
-    getFolders() {
-
-    }
-
-    getFiles() {
-        
+        return this.getData();
     }
 
     
-    deleteFile(fileId) {
+    deleteFile(folderId, fileId) {
+        try {
+            const file = db.prepare(`SELECT * FROM files WHERE fileId = ? AND folderId = ?`).get(fileId, folderId);
+            if(file) {
+                fs.rmSync(file.thumbnailPath);
+                fs.rmSync(file.path);
+            }
+        } catch (error) {
+            console.error('Error deleting file from filesystem:', error);
+        }
+
         try {
             db.prepare(`DELETE FROM files WHERE fileId = ?`).run(fileId);
         } catch (error) {
@@ -56,8 +91,18 @@ class DatabaseStorage {
         }
     }
 
-    deleteFolder() {
+    deleteFolder(folderId) {
         try {
+           const files = db.prepare('SELECT * FROM files WHERE folderId = ?').all(folderId);
+           const folder = db.prepare('SELECT * FROM folders WHERE folderId = ?').get(folderId);
+           if(folder) {
+                fs.rmdirSync(folder.path, { recursive: true });
+           }
+           if(files) {
+            for (const file of files) {
+                fs.rmSync(file.thumbnailPath);
+            }
+        }
             db.prepare(`DELETE FROM folders WHERE folderId = ?`).run(folderId);
             db.prepare(`DELETE FROM files WHERE folderId = ?`).run(folderId);
         } catch (error) {
