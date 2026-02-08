@@ -10,22 +10,23 @@ import { DropZone } from '../Components/Dropzone';
 import { lockScreen, unlockScreen } from './globVar';
 import { Tooltip } from '../Components/Tooltip';
 
+type DashBoardData = {
+    //...
+}
+
 export class DashBoard extends Event {
      element: HTMLElement = document.createElement('div');
      sidebar: Sidebar;
      widgetContainer: HTMLElement = document.createElement('div');
      widgetContainerWrapper: HTMLElement = document.createElement('div');
      dropzone: DropZone;
-     items: any;
      listItems: any;
      tooltipWidgets: Tooltip;
      tooltipSidebar: Tooltip;
 
      constructor(items: Record<string, any>) {
          super();
-       
-         this.items = items;
-         this.listItems = this.items;
+         this.listItems = items;
          this.renderSidebar();
          this.sidebar.setFocus(this.listItems[0]?.id || null);
          this.renderUI(this.listItems);
@@ -33,7 +34,7 @@ export class DashBoard extends Event {
  
      };
 
-     addListeners() {
+     addListeners(): void {
          GlobalEvent.subscribe('renderFiles', (data: Record<string, any>) => {
              const {folders} = data;
              console.log('aus Dashboard!');
@@ -100,12 +101,12 @@ export class DashBoard extends Event {
         return this.sidebar;
     }
 
-    renderSidebar() {
+    renderSidebar(): void {
         this.sidebar = new Sidebar({ listItems: this.listItems, width: 'min-w-[220px]' });
         this.element.append(this.sidebar.element);
     }
 
-    async renderUI(listItems: Array<any> = []) {
+    async renderUI(listItems: Array<any> = []): Promise<void>{
         
         let folderItems = null;
 
@@ -133,7 +134,7 @@ export class DashBoard extends Event {
             this.element.append(this.widgetContainerWrapper);
     };
 
-    createWidgets(folder: any = null) {
+    createWidgets(folder: any = null): void {
 
         if(!folder.files.length) {
             console.warn('Keine Files vorhanden');
@@ -202,5 +203,4 @@ export class DashBoard extends Event {
             this.widgetContainer.append(widget.element);
         }
     };
-
 }

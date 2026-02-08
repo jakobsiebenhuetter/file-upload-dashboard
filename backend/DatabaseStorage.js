@@ -21,6 +21,7 @@ class DatabaseStorage {
             const folders = db.prepare(`SELECT * FROM folders`).all();
             const files = db.prepare(`SELECT * FROM files`).all();
 
+            // Eine Variante mit Schleifen hinzufügen und die performance messen
             const data = {
                 folders: folders.map(folder => ({
                     id:folder.folderId,

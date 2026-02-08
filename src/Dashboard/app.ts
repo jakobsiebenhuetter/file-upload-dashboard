@@ -9,11 +9,10 @@ import { KeyManager } from '../Services/KeyManager';
 import { GlobalEvent } from './events';
 
 /**
- * @todo Upload von Dateien modifizieren um nicht 2 API Calls zu benötigen
+ * @todo Sidebar und Dashboard anfangen schön zu typisieren und getData() nur einmal deklarieren
  * @todo Typescript professionell einrichten
  * @todo Uploadstatus anzeigen lassen, dank axios ist das möglich
- * @todo SQLite Datenquelle implementieren
- * @todo Backdrop Bug fixxen und Scrollen verhindern während des droppens
+ * @todo Backdrop Bug fixen und Scrollen verhindern während des droppens
  * @todo Styling verbessern auch bzgl. der responsivity
  */
 export class App extends Event {
@@ -24,8 +23,6 @@ export class App extends Event {
     };
 
     static async getData(): Promise<Record<string, any>> {
-
-      
         try {
             const response = await axios.get('http://localhost:2000/getJson');
             return response.data;
