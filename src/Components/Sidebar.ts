@@ -7,25 +7,24 @@ import { Modal } from './Modal';
 import { Toast } from './Toast';
 import { Tooltip } from './Tooltip';
 import { GlobalEvent } from '../Dashboard/events';
-
+import { FileData, FolderData } from '../Dashboard/Dashboard';
+import { App } from '../Dashboard/app';
 
 
 export class Sidebar extends Event {
-    private focus = null;
+    private focus: string | null = null;
+    protected props: Record<string, any> = {};
     element: HTMLElement = document.createElement('div');
     listElement: HTMLElement = document.createElement('ul');
-    protected props: Record<string, any> = {};
-    color: string = 'lightgray';
-    allIds: number[] = [];
-    width: 'w-xs';
-    renderDashb: any;
+    listItems: FolderData[] | null = null;
 
     constructor(props?: Record<string, any>) {
         super();
 
         const defaults = {
-            color: this.color,
-            width: this.width,       
+            color: 'lightgray',
+            width: 'w-xs',
+            listItems: this.listItems     
         }
 
         this.props = {
@@ -36,29 +35,26 @@ export class Sidebar extends Event {
         this.renderUI();
     }
 
-    addListeners() {
-
-    };
-
-    renderUI() {
-
+    renderUI(): void {
         const createFolderBtn: HTMLElement = document.createElement('div');
         createFolderBtn.classList.add('mb-4', 'hover:cursor-pointer');
-
         createFolderBtn.setAttribute('id', 'create-folder');
         createFolderBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" /></svg>`;
 
         createFolderBtn.onclick = async (e) => {
-            
             let modal = new Modal({ default: true, backdropOption: true, height: 'h-auto', rounded: true });
 
             modal.saveBtnOnClick(async () => {
+                /**
+                 *@todo Hier muss noch ein Fehler gefangen werden, falls kein Name eingegeben wurde oder der Ordnername bereits existiert. Aktuell wird einfach ein Request mit einem leeren Namen abgeschickt, was zu einem Fehler auf dem Server führt, da der Name ein Pflichtfeld ist. Das gleiche gilt für den Fall, dass der Ordnername bereits existiert. 
+                 */
                 let data = null;
 
                 if(!modal.getInputValue()) {
                     console.warn('Kein Ordnername eingegeben');
                     return;
                 };
+
                 GlobalEvent.publish('spinner', { action: 'show'});
 
                 let response = await axios.post('http://localhost:2000/create-folder', { text: modal.getInputValue(), id: modal.getInputValue() });
@@ -73,34 +69,32 @@ export class Sidebar extends Event {
             this.props.listItems = data.data.folders;
             this.renderListElements();
             
-            const folders = await Sidebar.getData();
+            const {folders} = await App.getData();
             
-            if(folders.length === 0) {
-                console.warn('Keine Ordner mehr vorhanden');
-                return;
-            };
-            
-            GlobalEvent.publish('renderFiles', folders);
-   
+            for(const folder of folders) {
+
+                if(folder.id === this.getFocus()) {
+                    GlobalEvent.publish('renderFiles', folder.files);
+                    break;
+                }
+            }
             GlobalEvent.publish('spinner', { action: 'hide'});
-
-            });
-            
-            document.body.append(modal.element);
-        };
-
-        this.element.append(createFolderBtn, this.listElement);
-        this.element.classList.add('bg-stone-200', 'p-2', this.props.width, 'min-h-screen', 'w-[100px]', 'p-2');
-        this.listElement.classList.add('flex', 'flex-col', 'justify-center');
-
-        this.renderListElements();
+        });
+        
+        document.body.append(modal.element);
+    };
+    
+    this.element.append(createFolderBtn, this.listElement);
+    this.element.classList.add('bg-stone-200', 'p-2', this.props.width, 'min-h-screen', 'w-[100px]', 'p-2');
+    this.listElement.classList.add('flex', 'flex-col', 'justify-center');
+    this.renderListElements();
 
     };
 
-    renderListElements() {
+    renderListElements(): void {
         this.listElement.innerHTML = '';
  
-        this.props.listItems.forEach((item) => {
+        this.props.listItems.forEach((item: any) => {
 
             const listItemElement: HTMLElement = document.createElement('li');
             listItemElement.classList.add('listElement');
@@ -125,54 +119,62 @@ export class Sidebar extends Event {
             
             listItemElement.onclick = async (e) => {
                 GlobalEvent.publish('spinner', { action: 'show'});
-                let id = listItemElement.dataset.id
+                let id = listItemElement.dataset.id as string;
                 this.setFocus(id)
-
-               const { folders } = await Sidebar.getData();
-               GlobalEvent.publish('renderFiles', {folders});
-            
-               GlobalEvent.publish('spinner', { action: 'hide'});
-        };
+                
+                const { folders } = await App.getData();
+                for(const folder of folders) {
+                    if(folder.id === this.getFocus()) {
+                        GlobalEvent.publish('renderFiles', folder.files);
+                        break;
+                    }
+                }
+                GlobalEvent.publish('spinner', { action: 'hide'});
+            };
 
             deleteBtn.onclick = async (e) => {
-        
-                let confirmModal = new Modal({ default: false, confirmModal: true, backdropOption: true, height: 'h-auto', width:'w-[200px]', rounded: true, text: 'Möchten Sie den Ordner wirklich löschen?' });
-
+                
+                let confirmModal: Modal | null = new Modal({ default: false, confirmModal: true, backdropOption: true, height: 'h-auto', width:'w-[200px]', rounded: true, text: 'Möchten Sie den Ordner wirklich löschen?' });
                 document.body.append(confirmModal.element);
-
-                confirmModal.saveBtnOnClick( async (e) => {
-                    confirmModal.element.remove();
-                    confirmModal.backdrop.remove();
-                    confirmModal = null;
+                
+                confirmModal.saveBtnOnClick( async (e) => {     
+                    if(confirmModal) {                  
+                        confirmModal.element.remove();
+                        confirmModal.backdrop.remove();
+                        confirmModal = null;
+                    }
                     GlobalEvent.publish('spinner', {action: 'show'});
+                    try {
+                        // Hier die Daten nach dem löschen wieder holen
+                        const data = await axios.post('http://localhost:2000/delete-folder', { id: deleteBtn.getAttribute('btn-id') });
+                    } catch(error) {
+                        console.warn(error);
+                    };
 
-                try {
-                    const data = await axios.post('http://localhost:2000/delete-folder', { id: deleteBtn.getAttribute('btn-id') });
-                     
-                } catch(error) {
-                    console.warn(error);
-                };
-        
-                const { folders } = await Sidebar.getData();
-                this.props.listItems = folders;
-
-          setTimeout(() => {
-              GlobalEvent.publish('renderFiles', {folders});
-            }, 100);
-                GlobalEvent.publish('spinner', {action: 'hide'});
-
-                const toast = new Toast({text: 'Ordner gelöscht', icon: 'success', backdrop: true});
-
-                this.renderListElements();
-                if(folders.length >= 1) {
-                    this.setFocus(folders[folders.length - 1].id);
-                } else {
-                    console.warn('Keine Ordner mehr vorhanden');
-                    return;
-                };
-
-            });
-               
+                    let data: FileData[] = [];
+                    const { folders } = await App.getData();
+                    this.props.listItems = folders;
+                    GlobalEvent.publish('spinner', {action: 'hide'});
+                    const toast = new Toast({text: 'Ordner gelöscht', icon: 'success', backdrop: true});
+                    
+                    // Hier werden noch die alten Daten gerendert
+                    this.renderListElements();
+                    
+                    if(folders.length >= 1) {
+                        this.setFocus(folders[folders.length - 1].id);
+                    } else {
+                        console.warn('Keine Ordner mehr vorhanden');
+                        this.setFocus(null);
+                    };
+                    
+                    for(const folder of folders) {  
+                        if(folder.id === this.getFocus()) {
+                            data = folder.files;
+                            break;
+                        }
+                    }
+                    GlobalEvent.publish('renderFiles', data);
+                });
             };
 
             span.innerText = item.folderName;
@@ -194,17 +196,15 @@ export class Sidebar extends Event {
 
     };
 
-    getListItems(): Array<any> {
-        return this.props.listItems;
-    }
-
-    getFocus(): string | null
-
-    {
+    getFocus(): string{
+        if(!this.focus) {
+            console.warn('Kein Fokus gesetzt');
+            return '';
+        }
         return this.focus;
     };
 
-    setFocus(id: string): void {
+    setFocus(id: string | null): void {
 
         if(!id) {
             console.warn('Keine id vorhanden für den Fokus. id = ', id );
@@ -226,14 +226,4 @@ export class Sidebar extends Event {
         }
         console.log('Focus bei ' + this.focus);
     };
-
-    static async getData(): Promise<Record<string, any>> {
-        try {
-            const response = await axios.get('http://localhost:2000/getJson');
-            return response.data;
-        } catch (error) {
-            console.warn('Fehler beim Laden der Daten', error);
-            return { folders: [] };
-        }
-    }
 }

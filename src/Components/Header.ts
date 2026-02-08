@@ -16,6 +16,8 @@ export class Header {
 
     constructor(props?: Record<string, any>) {
 
+        this.filter = new Filter();
+        
         const defaults = {
             width: this.width,
             height: this.height,
@@ -37,7 +39,6 @@ export class Header {
 
     renderUI() {
         this.element.classList.add('w-screen', 'bg-stone-200', 'flex', 'flex-row', 'justify-center', 'p-6');
-        this.filter = new Filter();
         this.element.append(this.filter.element);
     }
 

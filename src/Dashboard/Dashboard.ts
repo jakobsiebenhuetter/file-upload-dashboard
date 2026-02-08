@@ -8,39 +8,52 @@ import { Modal } from '../Components/Modal';
 import { GlobalEvent } from './events';
 import { DropZone } from '../Components/Dropzone';
 import { lockScreen, unlockScreen } from './globVar';
-import { Tooltip } from '../Components/Tooltip';
+import { isImage } from '../Util/util';
 
-type DashBoardData = {
-    //...
+export type DashBoardData = {
+    folders: FolderData[];
 }
+
+export type FolderData = {
+    id: string;
+    folderName: string;
+    path: string;
+    files: FileData[];
+}
+
+export type FileData = {
+    id: string;
+    title: string;
+    date: string;
+    path: string;
+    thumbnailPath: string;
+}
+
+
 
 export class DashBoard extends Event {
      element: HTMLElement = document.createElement('div');
      sidebar: Sidebar;
      widgetContainer: HTMLElement = document.createElement('div');
      widgetContainerWrapper: HTMLElement = document.createElement('div');
-     dropzone: DropZone;
-     listItems: any;
-     tooltipWidgets: Tooltip;
-     tooltipSidebar: Tooltip;
+     dropzone: DropZone | null = null;
+     files: FileData[];
 
-     constructor(items: Record<string, any>) {
+     constructor(items: DashBoardData) {
          super();
-         this.listItems = items;
-         this.renderSidebar();
-         this.sidebar.setFocus(this.listItems[0]?.id || null);
-         this.renderUI(this.listItems);
+         this.files = items.folders[0]?.files || [];
+         const folders: FolderData[] = items.folders || [];
+         this.sidebar = new Sidebar({ listItems: folders, width: 'min-w-[220px]' });
+         this.renderSidebar();   
+         this.renderGrid(this.files);
          this.addListeners();
- 
-     };
+        };
 
      addListeners(): void {
-         GlobalEvent.subscribe('renderFiles', (data: Record<string, any>) => {
-             const {folders} = data;
-             console.log('aus Dashboard!');
-             this.renderUI(folders);
-             
-         });
+         GlobalEvent.subscribe('renderFiles', (files: FileData[]) => {
+            this.files = files;
+            this.renderGrid(this.files);
+        });
 
          GlobalEvent.subscribe('spinner', (data: Record<string, any>) => {
             const { action } = data;
@@ -52,25 +65,42 @@ export class DashBoard extends Event {
         });
 
 
-        this.widgetContainerWrapper.addEventListener('dragover', (e) => {
-            e.preventDefault(); // wichtig, sonst wird drop blockiert
-            console.log('show:element');
+        this.widgetContainerWrapper.addEventListener('dragover', (e: DragEvent) => {
+            e.preventDefault();
+            let focus = this.getSidebar().getFocus();
+            if(!focus) {
+                console.warn('Focus ist nicht gesetzt');
+                return;
+            }
+            const containsData = e.dataTransfer.types.includes('Files');
+            if(!containsData) return;
             if(this.dropzone) return;
+
             this.dropzone = new DropZone({ target: this.widgetContainerWrapper, text: 'Hier Dateien fallen lassen', width: 'w-full', height: 'h-full' });
             this.dropzone.show();
         });
 
-        this.widgetContainerWrapper.addEventListener('dragleave', (e) => {
-            e.preventDefault(); // wichtig, sonst wird drop blockiert
-            if(this.dropzone) {
-                this.dropzone.destroy();
-                this.dropzone = null;
+        this.widgetContainerWrapper.addEventListener('dragleave', (e: DragEvent) => {
+            e.preventDefault();
+            let focus = this.getSidebar().getFocus();
+            if(!focus) {
+                console.warn('Focus ist nicht gesetzt');
+                return;
             }
-            console.log('show:element');
+            this.dropzone.destroy();
+            this.dropzone = null;
         });
 
-        this.widgetContainerWrapper.addEventListener('drop', async (e: DragEvent) => {
+        this.widgetContainerWrapper.addEventListener('drop', async (e: DragEvent) => {    
             e.preventDefault();
+            let response = null;
+
+            let focus = this.getSidebar().getFocus();
+            if(!focus) {
+                console.warn('Focus ist nicht gesetzt');
+                return;
+            }
+          
             if(this.dropzone) {
                 this.dropzone.destroy();
                 this.dropzone = null;
@@ -81,17 +111,24 @@ export class DashBoard extends Event {
             const formData = new FormData();
             const items = e.dataTransfer.files;
 
-            let focus = this.getSidebar().getFocus();
-            console.log(focus)
-            formData.append('focus', focus);
 
+            formData.append('focus', focus);
             for(const item of items) {
                 formData.append('file', item);
             };
-            
-            const response = await axios.post('http://localhost:2000/upload', formData);
-    
-            GlobalEvent.publish('renderFiles', {folders: response.data.data.folders });
+
+            try {
+                response = await axios.post('http://localhost:2000/upload', formData);
+            } catch (error) {
+                console.warn('Fehler beim Hochladen der Datei', error);
+            }
+
+            const folders = response.data.data.folders;
+            for(const folder of folders) {
+                if(folder.id = this.getSidebar().getFocus()) {
+                    GlobalEvent.publish('renderFiles', folder.files);
+                }
+            }
            
             GlobalEvent.publish('spinner', { action: 'hide' });
         });
@@ -101,52 +138,29 @@ export class DashBoard extends Event {
         return this.sidebar;
     }
 
-    renderSidebar(): void {
-        this.sidebar = new Sidebar({ listItems: this.listItems, width: 'min-w-[220px]' });
+    renderSidebar(): void {   
         this.element.append(this.sidebar.element);
+        this.sidebar.setFocus(this.files[0]?.id || null);    
     }
 
-    async renderUI(listItems: Array<any> = []): Promise<void>{
-        
-        let folderItems = null;
-
-        this.listItems = listItems;
-        // Hier einen Button für das Hochladen von Dokumenten einfügen bzw. auch eine Info für das droppen mehrerer Elemente; der Focus bleibt oder er wird auf den neu erstellten Ordner gesetzt; angezeigt wird das durch den hover effekt im jeweiligen Folder an der Sidebar
+    renderGrid(files: FileData[]): void{
+        this.widgetContainer.innerHTML = ``;
         this.element.classList.add('flex');
 
         this.widgetContainerWrapper.append(this.widgetContainer);
         this.widgetContainerWrapper.classList.add('w-full', 'bg-stone-200', 'p-4');
-        this.widgetContainer.classList.add('min-h-screen', 'rounded', 'p-[10px]', 'bg-blue-200');
-        this.widgetContainer.style.display = 'grid';
-        this.widgetContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(210px, 1fr))';
-        this.widgetContainer.style.gridAutoRows = '300px'
-        this.widgetContainer.style.borderRadius = '12px';
-
-           console.log(this.listItems);
-           this.widgetContainer.innerHTML = ``;
-           for(const folder of this.listItems) {
-               if(folder.id === this.getSidebar().getFocus()) { 
-                   this.createWidgets(folder);
-                     folderItems = folder;
-                   break;
-                };
-            };
-            this.element.append(this.widgetContainerWrapper);
+        this.widgetContainer.classList.add('min-h-screen', 'rounded', 'p-[10px]', 'bg-blue-200', 'grid', 'grid-cols-[repeat(auto-fill,minmax(210px,1fr))]', 'auto-rows-[300px]', 'rounded-[12px]');    
+        this.element.append(this.widgetContainerWrapper);
+        this.createWidgets(files);
     };
 
-    createWidgets(folder: any = null): void {
+    createWidgets(files: FileData[]): void {
 
-        if(!folder.files.length) {
-            console.warn('Keine Files vorhanden');
-            return;
-        };
-
-        for (const file of folder?.files || []) {
+        for (const file of files) {
             let height = 'h-[800px]';
             let width = 'w-[1000px]';
             const widget = new Widget({ text: file.title, date: file.date, width: 'w-[200px]', height: 230, imgPath: file.thumbnailPath });
             widget.element.setAttribute('data-id', file.id);
-            // Hier Tooltip einfügen
 
             widget.onClick(() => {
                 // Hier unterscheiden ob Bilddatei oder PDF Datei oder andere Datei
@@ -154,7 +168,9 @@ export class DashBoard extends Event {
                 let modalContent: HTMLIFrameElement | HTMLImageElement = null;;
                 let modalContentWidth = 'auto';
                 let modalContentHeight = 'auto';
-                if(file.path.endsWith('png') || file.path.endsWith('jpg') || file.path.endsWith('jpeg') || file.path.endsWith('gif')) {
+                let ext = file.path.split('.').pop();
+
+                if(isImage(ext)) {
                     modal = new Modal({ backdropOption: true, height: '', width: '', rounded: true});
                     modalContent = document.createElement('img');
                  
@@ -164,22 +180,11 @@ export class DashBoard extends Event {
                     modalContentHeight = '95%';
                 }
 
+                modal.element.classList.add('flex', 'flex-col', 'overflow-hidden', 'justify-end');
                 modal.element.append(modalContent);
+                modalContent.classList.add('m-1', 'border-none', 'bg-white', `w-[${modalContentWidth}]`, `h-[${modalContentHeight}]`);
                 document.body.append(modal.element);
-                modalContent.src = file.path; // PDF oder URL setzen
-                modalContent.style.width = modalContentWidth;
-                modalContent.style.height = modalContentHeight;
-        
-                modalContent.style.border = 'none';
-                modalContent.style.margin = '4px';
-                modalContent.style.border = '';
-                
-                modalContent.style.background = '#fff';
-
-                modal.element.style.display = 'flex';
-                modal.element.style.flexDirection = 'column';
-                modal.element.style.overflow = 'hidden';
-                modal.element.style.justifyContent = 'end';
+                modalContent.src = file.path; // PDF oder URL setzen 
             });
 
             widget.getDeleteBtn().onclick = async (e) => {
@@ -188,8 +193,9 @@ export class DashBoard extends Event {
                 const folderId = this.getSidebar().getFocus();
                 console.log(folderId);
                 
-                try {
-                    // Hier dann löschen der Datei aus dem Ordner und auch aus dem Dateisystem !!!!!!
+                try { 
+                    // Hier die Daten nach dem löschen wieder holen und im backend checken, ob erfolgreich oder nicht mit
+                    // mit Discriminated Unions arbeiten
                     await axios.post('delete-file', { fileId: widget.element.getAttribute('data-id'), folderId: folderId })
                     console.log('Datei gelöscht');
                     widget.element.remove();

@@ -1,15 +1,16 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
-  mode: 'development',
+  mode: 'development', // Ensure development mode is set
   entry: './src/Playground.ts',
   output: {
     filename: 'main.bundle.js',
     path: path.resolve(__dirname, 'dist'),
   },
-  devtool: 'inline-source-map',
-
+  // devtool: 'inline-source-map',
+  devtool: 'eval-source-map', // Best option for debugging during development
   plugins: [
     new HtmlWebpackPlugin({
       template: './index.html',

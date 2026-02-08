@@ -3,14 +3,13 @@ import '../styles.css';
 import axios from 'axios';
 
 import { Event } from '../Components/Event';
-import { DashBoard } from "./Dashboard";
+import { DashBoard, DashBoardData } from "./Dashboard";
 import { Header } from '../Components/Header';
 import { KeyManager } from '../Services/KeyManager';
 import { GlobalEvent } from './events';
 
 /**
- * @todo Sidebar und Dashboard anfangen schön zu typisieren und getData() nur einmal deklarieren
- * @todo Typescript professionell einrichten
+ * @todo Hier muss noch ein Fehler gefangen werden, falls kein Name eingegeben wurde oder der Ordnername bereits existiert. Aktuell wird einfach ein Request mit einem leeren Namen abgeschickt, was zu einem Fehler auf dem Server führt, da der Name ein Pflichtfeld ist. Das gleiche gilt für den Fall, dass der Ordnername bereits existiert.
  * @todo Uploadstatus anzeigen lassen, dank axios ist das möglich
  * @todo Backdrop Bug fixen und Scrollen verhindern während des droppens
  * @todo Styling verbessern auch bzgl. der responsivity
@@ -22,7 +21,7 @@ export class App extends Event {
         this.initApp();
     };
 
-    static async getData(): Promise<Record<string, any>> {
+    static async getData(): Promise<DashBoardData> {
         try {
             const response = await axios.get('http://localhost:2000/getJson');
             return response.data;
@@ -32,15 +31,15 @@ export class App extends Event {
         }
     };
 
-    async initApp() {
+    async initApp(): Promise<void> {
 
         KeyManager.getInstance();
 
         const app = document.querySelector('#app');
 
         GlobalEvent.publish('spinner', { action: 'show'});
-        let { folders } = await App.getData();
-
+        let  folders  = await App.getData();
+        console.log(folders);
         const dashBoard = new DashBoard(folders);
         const header = new Header();
 
@@ -55,12 +54,11 @@ export class App extends Event {
                 if(folder.id === folderId) {
                     for(const file of folder.files) {
                         
-                        if(params.inputValue) {
+                        if(params?.inputValue) {
 
                             if(file.title.includes(params.inputValue)) {
                                 this.filteredFiles.push(file);
-                                folder.files = this.filteredFiles;
-                          
+                                folder.files = this.filteredFiles; 
                             };
                         };
                     };

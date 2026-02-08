@@ -1,3 +1,18 @@
 {
-  "folders": []
+  "folders": [
+    {
+      "id": "72f087ec-0ec5-4d12-838c-3a1227933620",
+      "folderName": "cvcvcv",
+      "path": "data\\Folders\\bf6ad494-dea0-4f3f-a52f-43a6e2ddea46",
+      "files": [
+        {
+          "id": "e039c79c-26f5-40cd-aea7-41527f72406f",
+          "title": "task-management-logo.png",
+          "path": "data\\Folders\\bf6ad494-dea0-4f3f-a52f-43a6e2ddea46\\task-management-logo.png",
+          "thumbnailPath": "data\\Thumbnails\\task-management-logo.png",
+          "date": "8.2.2026"
+        }
+      ]
+    }
+  ]
 }
