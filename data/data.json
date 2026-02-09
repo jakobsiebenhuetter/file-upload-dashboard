@@ -1,16 +1,22 @@
 {
   "folders": [
     {
-      "id": "72f087ec-0ec5-4d12-838c-3a1227933620",
-      "folderName": "cvcvcv",
-      "path": "data\\Folders\\bf6ad494-dea0-4f3f-a52f-43a6e2ddea46",
+      "id": "d902266a-9b3a-410a-a6a3-11b119f7cfbd",
+      "folderName": "sdsds",
+      "path": "data\\Folders\\0046b472-0bff-48fc-b4d5-706c319d40ab",
+      "files": []
+    },
+    {
+      "id": "ef1ff90a-7ab1-4d66-95c3-d30a87cbfeef",
+      "folderName": "sdsds",
+      "path": "data\\Folders\\5a98222f-bfad-4ddf-9814-a09eb07e1be5",
       "files": [
         {
-          "id": "e039c79c-26f5-40cd-aea7-41527f72406f",
+          "id": "93f9ef1b-9d1c-4efa-97ef-2a5d22ad60a6",
           "title": "task-management-logo.png",
-          "path": "data\\Folders\\bf6ad494-dea0-4f3f-a52f-43a6e2ddea46\\task-management-logo.png",
+          "path": "data\\Folders\\5a98222f-bfad-4ddf-9814-a09eb07e1be5\\task-management-logo.png",
           "thumbnailPath": "data\\Thumbnails\\task-management-logo.png",
-          "date": "8.2.2026"
+          "date": "9.2.2026"
         }
       ]
     }

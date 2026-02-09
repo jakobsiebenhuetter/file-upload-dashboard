@@ -39,15 +39,13 @@ export class App extends Event {
 
         GlobalEvent.publish('spinner', { action: 'show'});
         let  folders  = await App.getData();
-        console.log(folders);
         const dashBoard = new DashBoard(folders);
         const header = new Header();
 
         header.getFilter.onFilter(async (params) => {
-
+            this.filteredFiles = [];
             GlobalEvent.publish('spinner', { action: 'show'});
 
-            this.filteredFiles = [];
             const folderId = dashBoard.getSidebar().getFocus();
             let { folders } = await App.getData();
             for(const folder of folders) {

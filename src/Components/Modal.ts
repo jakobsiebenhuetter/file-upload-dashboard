@@ -6,7 +6,6 @@ import 'jquery-ui/ui/widgets/draggable';
 import { Event } from './Event';
 import { KeyManager } from '../Services/KeyManager';
 
-
 export class Modal extends Event{
 
     protected props: Record<string, any> = {};
@@ -149,7 +148,7 @@ export class Modal extends Event{
                 }
             );
 
-            this.close();
+            this.close();   
         });
 
         KeyManager.getInstance().addModal(

@@ -8,7 +8,7 @@ import { Modal } from '../Components/Modal';
 import { GlobalEvent } from './events';
 import { DropZone } from '../Components/Dropzone';
 import { lockScreen, unlockScreen } from './globVar';
-import { isImage } from '../Util/util';
+import { isImage, checkResponse, getFolders, getFiles } from '../Util/util';
 
 export type DashBoardData = {
     folders: FolderData[];
@@ -29,27 +29,48 @@ export type FileData = {
     thumbnailPath: string;
 }
 
+type APIResponse = {
+    message: string;
+    data: FolderData[] | FileData[];
+    type: 'success';
+}
 
+type ErrorResponse = {
+    message: string;
+    type: 'error';
+}
+
+type DefaultResponse = {
+    message: string;
+    type: 'default';
+}
+
+export type Response =  APIResponse| DefaultResponse | ErrorResponse;
+
+// type Info = {
+//     type: 'success' | 'error' | 'default';
+//     message: string;
+// }
 
 export class DashBoard extends Event {
      element: HTMLElement = document.createElement('div');
-     sidebar: Sidebar;
      widgetContainer: HTMLElement = document.createElement('div');
      widgetContainerWrapper: HTMLElement = document.createElement('div');
+     sidebar: Sidebar;
      dropzone: DropZone | null = null;
      files: FileData[];
 
      constructor(items: DashBoardData) {
          super();
-         this.files = items.folders[0]?.files || [];
-         const folders: FolderData[] = items.folders || [];
+         this.files = getFiles(items.folders[0]);
+         const folders = getFolders(items.folders);
          this.sidebar = new Sidebar({ listItems: folders, width: 'min-w-[220px]' });
          this.renderSidebar();   
          this.renderGrid(this.files);
          this.addListeners();
         };
 
-     addListeners(): void {
+     private addListeners(): void {
          GlobalEvent.subscribe('renderFiles', (files: FileData[]) => {
             this.files = files;
             this.renderGrid(this.files);
@@ -109,7 +130,7 @@ export class DashBoard extends Event {
             GlobalEvent.publish('spinner', { action: 'show' });
 
             const formData = new FormData();
-            const items = e.dataTransfer.files;
+            const items = e.dataTransfer?.files || [];
 
 
             formData.append('focus', focus);
@@ -139,14 +160,15 @@ export class DashBoard extends Event {
     }
 
     renderSidebar(): void {   
-        this.element.append(this.sidebar.element);
-        this.sidebar.setFocus(this.files[0]?.id || null);    
+        this.element.append(this.getSidebar().element);
+        if(!this.getSidebar().setFocus(this.files[0]?.id)) {
+            console.warn('Kein Fokus für die Sidebar gesetzt');
+        }
     }
 
-    renderGrid(files: FileData[]): void{
+    renderGrid(files: FileData[]): void {
         this.widgetContainer.innerHTML = ``;
         this.element.classList.add('flex');
-
         this.widgetContainerWrapper.append(this.widgetContainer);
         this.widgetContainerWrapper.classList.add('w-full', 'bg-stone-200', 'p-4');
         this.widgetContainer.classList.add('min-h-screen', 'rounded', 'p-[10px]', 'bg-blue-200', 'grid', 'grid-cols-[repeat(auto-fill,minmax(210px,1fr))]', 'auto-rows-[300px]', 'rounded-[12px]');    
@@ -157,8 +179,7 @@ export class DashBoard extends Event {
     createWidgets(files: FileData[]): void {
 
         for (const file of files) {
-            let height = 'h-[800px]';
-            let width = 'w-[1000px]';
+
             const widget = new Widget({ text: file.title, date: file.date, width: 'w-[200px]', height: 230, imgPath: file.thumbnailPath });
             widget.element.setAttribute('data-id', file.id);
 
@@ -166,7 +187,6 @@ export class DashBoard extends Event {
                 // Hier unterscheiden ob Bilddatei oder PDF Datei oder andere Datei
                 let modal: Modal = null;
                 let modalContent: HTMLIFrameElement | HTMLImageElement = null;;
-                let modalContentWidth = 'auto';
                 let modalContentHeight = 'auto';
                 let ext = file.path.split('.').pop();
 
@@ -175,37 +195,41 @@ export class DashBoard extends Event {
                     modalContent = document.createElement('img');
                  
                 } else {
-                    modal = new Modal({ backdropOption: true, height: height, width: width, rounded: true});
+                    modal = new Modal({ backdropOption: true, height: 'h-[800px]', width:' w-[1000px]', rounded: true});
                     modalContent = document.createElement('iframe');
                     modalContentHeight = '95%';
                 }
 
                 modal.element.classList.add('flex', 'flex-col', 'overflow-hidden', 'justify-end');
-                modal.element.append(modalContent);
-                modalContent.classList.add('m-1', 'border-none', 'bg-white', `w-[${modalContentWidth}]`, `h-[${modalContentHeight}]`);
-                document.body.append(modal.element);
+                modalContent.classList.add('m-1', 'border-none', 'bg-white', `w-[auto]`, `h-[${modalContentHeight}]`);
                 modalContent.src = file.path; // PDF oder URL setzen 
+                modal.element.append(modalContent);
+                document.body.append(modal.element);
             });
 
             widget.getDeleteBtn().onclick = async (e) => {
                 e.stopPropagation();
-                GlobalEvent.publish('spinner', { action: 'show' });
                 const folderId = this.getSidebar().getFocus();
-                console.log(folderId);
+                const fileId = widget.element.getAttribute('data-id');
+                GlobalEvent.publish('spinner', { action: 'show' });
                 
                 try { 
-                    // Hier die Daten nach dem löschen wieder holen und im backend checken, ob erfolgreich oder nicht mit
-                    // mit Discriminated Unions arbeiten
-                    await axios.post('delete-file', { fileId: widget.element.getAttribute('data-id'), folderId: folderId })
-                    console.log('Datei gelöscht');
-                    widget.element.remove();
-                    
+                    const response = await axios.post('http://localhost:2000/delete-file', { fileId: fileId, folderId: folderId })
+                    const msg: Response = response.data;
+
+                    if(checkResponse(msg)) {
+                        if(msg.type === 'success') { // eigentlich unnötiger doppelCheck aber TS meckert sonst
+                            GlobalEvent.publish('renderFiles', msg.data);
+                        }
+                    }          
                     GlobalEvent.publish('spinner', { action: 'hide' });
 
                 } catch (error) {
                     console.error('Fehler beim Löschen der Datei:', error);
                 };
             };
+
+
             this.widgetContainer.append(widget.element);
         }
     };

@@ -1,7 +1,7 @@
 export class Event {
     allFunctions: Record<string, any> [] = [];
     // Hier noch einbauen das man es nur einmal verwenden möchte
-    subscribe(name: string, fn: (args: Record<string, any> | Array<any>) => void): void {
+    subscribe(name: string, fn: (args: Record<string, any> | any[]) => void): void {
         this.allFunctions.push({
             [name]: fn
         });

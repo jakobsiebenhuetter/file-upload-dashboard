@@ -53,8 +53,20 @@ app.get('/getJson', async (req, res) => {
 
 app.post('/delete-file', async (req, res) => {
     const { fileId, folderId } = req.body;
-    const data = storage.deleteFile(folderId, fileId);
-    res.json(data);
+    let msg = {
+        data: [],
+        type: '',
+        message: ''
+    };
+    try {
+        msg.data = storage.deleteFile(folderId, fileId);
+        msg.type = 'success';
+        msg.message = 'File erfolgreich gelöscht';
+    } catch(error) {
+        msg.type = 'error';
+        msg.message = `Error deleting file: ${error}`;
+    }
+    res.json(msg);
 });
 
 app.post('/create-folder', (req, res) => {
@@ -98,6 +110,13 @@ app.post('/create-folder', (req, res) => {
 });
 
 app.post('/upload', async (req, res) => {
+    // nur bestimmte Dateitypen erlauben, am besten mit einem Filter in multer
+    // Hier alles abchecken
+    let msg = {
+        type: 'default',
+        message: '',
+        data: null
+    };
 
     let newPath = null;
     const datetime = new Date(); // Hier weiter machen
@@ -107,7 +126,6 @@ app.post('/upload', async (req, res) => {
         // Es muss zuerst der focus im frontend in den body gesetzt werden sonst funktioniert das nicht
         destination: (req, file, cb) => {
             const data = storage.getData();
-            console.log(data);
             const dest = req.body.focus;
 
             for (const folder of data.folders) {
@@ -129,26 +147,14 @@ app.post('/upload', async (req, res) => {
 
     upload(req, res, async (err) => {
         let focus = req.body.focus;
-        let data = null;
-        let msg = {
-            message: '',
-            data: null
-        };
-
         try {
             data = await storage.saveFiles(req.files, focus, date);
-            msg = {
-                message: 'Erfolgreich upgeloadet',
-                data: data
-            };
+            msg.message = 'Erfolgreich upgeloadet';
+            msg.data = data;
 
         } catch (error) {
-            msg = {
-                message: 'Fehler beim speichern' + error,
-                data: data
-            };
+            msg.message = `Fehler beim speichern ${error}`;
         }
-
         res.json(msg);
     })
 });

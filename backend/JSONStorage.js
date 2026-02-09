@@ -2,6 +2,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 
 const TNGenerator = require('./Middlewares/thumbnailGenerator');
+const { type } = require('os');
 
 const jsonPath = '../data/data.json';
 const tnPath = './data/Thumbnails';
@@ -47,6 +48,7 @@ class JSONStorage {
     }
 
     deleteFile(folderId, fileId) {
+        // Hier nur die Daten für den einen Ordner holen, damit nicht das ganze Objekt durchlaufen werden muss
         const data = this.getData();
          for (const folder of data.folders) {
             if (folder.id === folderId) {
@@ -67,7 +69,7 @@ class JSONStorage {
                 }
             }
         
-        return data; 
+        return this.getFiles(folderId); 
     }
 
     deleteFolder(folderId) {
@@ -91,6 +93,17 @@ class JSONStorage {
                 break;
             }
         }
+    }
+
+    getFiles(folderId) {
+        let data = [];
+         try {
+            data = this.getData();
+            data = data.folders.find((folder) => folder.id === folderId);
+        } catch (error) {
+            console.error('Error reading data:', error);
+        }    
+        return data.files;
     }
 }
 

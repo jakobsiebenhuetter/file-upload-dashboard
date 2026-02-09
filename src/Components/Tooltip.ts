@@ -68,11 +68,11 @@ export class Tooltip {
     };
 
     updatePosition(target: HTMLElement) {
+        this.target = target as HTMLElement;
         let top = 0;
         let left = 0;
 
         const rect = this.el.getBoundingClientRect();
-        this.target = target as HTMLElement;
         const targetRect = this.target.getBoundingClientRect();
         
         switch(this.props.position) {
@@ -81,7 +81,6 @@ export class Tooltip {
                 left = targetRect.left + (targetRect.width / 2);
                 break;
             }
-
             default: {
                 console.warn('Position für Tooltip nicht implementiert: ', this.props.position);
                 break;

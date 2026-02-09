@@ -90,6 +90,9 @@ class DatabaseStorage {
         } catch (error) {
             console.error('Error deleting file:', error);
         }
+
+        // Nur die Daten für den einen Ordner zurückgeben
+        return this.getFiles(folderId);
     }
 
     deleteFolder(folderId) {
@@ -109,6 +112,12 @@ class DatabaseStorage {
         } catch (error) {
             console.error('Error deleting folder and its files:', error);
         }
+    }
+    
+    getFiles(folderId) {
+        const data = this.getData();
+        const folder = data.folders.filter((folder) => folder.id === folderId);
+        return folder.length ? folder[0].files : [];
     }
 }
 

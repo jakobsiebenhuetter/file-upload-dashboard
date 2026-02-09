@@ -28,7 +28,7 @@ class StorageInterface {
     }
     
     deleteFile(folderId, fileId) {
-        this.storage.deleteFile(folderId, fileId);
+        return this.storage.deleteFile(folderId, fileId);
     }
 
     deleteFolder(id) {

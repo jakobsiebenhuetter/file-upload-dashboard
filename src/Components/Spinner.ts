@@ -12,9 +12,8 @@ export class Spinner extends Event {
         this.props = { ...defaults, ...props }
         this.renderUI();
     }
-
-
-    renderUI() {
+    
+    renderUI(): void {
         if(this.props.backdropOption) {
             const backdrop = document.createElement('div');
             backdrop.classList.add('w-screen','h-screen', 'absolute', 'z-10','bg-neutral-950/20');
@@ -28,7 +27,7 @@ export class Spinner extends Event {
         this.element = element;
     };
 
-    destroy() {
+    destroy(): void {
         if (this.element) {
             this.element.remove();
             this.element = null;
