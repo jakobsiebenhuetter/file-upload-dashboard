@@ -19,6 +19,7 @@ export type FolderData = {
     folderName: string;
     path: string;
     files: FileData[];
+    focus?: boolean;
 }
 
 export type FileData = {
@@ -65,7 +66,7 @@ export class DashBoard extends Event {
          this.files = getFiles(items.folders[0]);
          const folders = getFolders(items.folders);
          this.sidebar = new Sidebar({ listItems: folders, width: 'min-w-[220px]' });
-         this.renderSidebar();   
+         this.renderSidebar(folders);   
          this.renderGrid(this.files);
          this.addListeners();
         };
@@ -159,9 +160,9 @@ export class DashBoard extends Event {
         return this.sidebar;
     }
 
-    renderSidebar(): void {   
+    renderSidebar(folders: FolderData[]): void {   
         this.element.append(this.getSidebar().element);
-        if(!this.getSidebar().setFocus(this.files[0]?.id)) {
+        if(!this.getSidebar().setFocus(folders[0].id)) {
             console.warn('Kein Fokus für die Sidebar gesetzt');
         }
     }

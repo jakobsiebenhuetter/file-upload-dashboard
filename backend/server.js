@@ -6,6 +6,7 @@ const multer = require('multer');
 const crypto = require('crypto');
 
 const StorageInterface = require('./StorageInterface');
+const {validateInput} = require('./util');
 const storage = new StorageInterface('json');
 
 
@@ -73,15 +74,32 @@ app.post('/create-folder', (req, res) => {
     // Hier noch die richtige id übergeben
     // Ordnernamen übergeben? Gibt es den Namen schon?
     const { text, id } = req.body;
+    let data = storage.getData();
+
+    if(!validateInput(text)) {
+        const msg = {
+            info: 'Ungültiger Ordnername',
+            data: data
+        };
+        return res.json(msg);
+    }
+
+    for(const folder of data.folders) {
+        if(folder.folderName === text.trim()) {
+            const msg = {
+                info: 'Ordnername existiert bereits',
+                data: data
+            };
+            return res.json(msg);
+        }
+    }
+
     const uuidFolderName = crypto.randomUUID();
     const uuid = crypto.randomUUID();
     const newFolderPath = path.join(folderPath, uuidFolderName);
     
-    let data = storage.getData();
-    let msg = {};
-
         if (data.folders.length >= 4) {
-            msg = {
+            const msg = {
                 info: 'Maximale Anzahl an Ordnern erreicht',
                 data: data
             };
@@ -99,10 +117,9 @@ app.post('/create-folder', (req, res) => {
     
     // Hier ist ein Bug
     data = storage.saveFolder(folderObj);
-    console.log(msg)
     // Hier wird der Fokus dynamisch gesetzt und nicht gespeichert  
     data.folders[data.folders.length - 1].focus = true;
-    msg = {
+    const msg = {
         info: 'Ordner erstellt',
         data: data
     };

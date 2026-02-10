@@ -45,16 +45,7 @@ export class Sidebar extends Event {
             let modal = new Modal({ default: true, backdropOption: true, height: 'h-auto', rounded: true });
 
             modal.saveBtnOnClick(async () => {
-                /**
-                 *@todo Hier muss noch ein Fehler gefangen werden, falls kein Name eingegeben wurde oder der Ordnername bereits existiert. Aktuell wird einfach ein Request mit einem leeren Namen abgeschickt, was zu einem Fehler auf dem Server führt, da der Name ein Pflichtfeld ist. Das gleiche gilt für den Fall, dass der Ordnername bereits existiert. 
-                 */
                 let data = null;
-
-                if(!modal.getInputValue()) {
-                    console.warn('Kein Ordnername eingegeben');
-                    return;
-                };
-
                 GlobalEvent.publish('spinner', { action: 'show'});
 
                 let response = await axios.post('http://localhost:2000/create-folder', { text: modal.getInputValue(), id: modal.getInputValue() });

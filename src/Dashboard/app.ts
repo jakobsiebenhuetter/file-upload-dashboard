@@ -9,7 +9,6 @@ import { KeyManager } from '../Services/KeyManager';
 import { GlobalEvent } from './events';
 
 /**
- * @todo Hier muss noch ein Fehler gefangen werden, falls kein Name eingegeben wurde oder der Ordnername bereits existiert. Aktuell wird einfach ein Request mit einem leeren Namen abgeschickt, was zu einem Fehler auf dem Server führt, da der Name ein Pflichtfeld ist. Das gleiche gilt für den Fall, dass der Ordnername bereits existiert.
  * @todo Uploadstatus anzeigen lassen, dank axios ist das möglich
  * @todo Backdrop Bug fixen und Scrollen verhindern während des droppens
  * @todo Styling verbessern auch bzgl. der responsivity
