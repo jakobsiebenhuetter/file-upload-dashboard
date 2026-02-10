@@ -71,6 +71,7 @@ app.post('/delete-file', async (req, res) => {
 
 app.post('/create-folder', (req, res) => {
     // Hier noch die richtige id übergeben
+    // Ordnernamen übergeben? Gibt es den Namen schon?
     const { text, id } = req.body;
     const uuidFolderName = crypto.randomUUID();
     const uuid = crypto.randomUUID();

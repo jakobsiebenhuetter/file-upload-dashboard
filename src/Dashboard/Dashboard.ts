@@ -8,7 +8,7 @@ import { Modal } from '../Components/Modal';
 import { GlobalEvent } from './events';
 import { DropZone } from '../Components/Dropzone';
 import { lockScreen, unlockScreen } from './globVar';
-import { isImage, checkResponse, getFolders, getFiles } from '../Util/util';
+import { isImage, checkResponse, getFolders, getFiles } from '../Util/Util';
 
 export type DashBoardData = {
     folders: FolderData[];

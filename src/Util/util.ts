@@ -11,7 +11,8 @@ export function isFolder(val: unknown): val is FolderData {
         val !== null &&
         'id' in val && 
         'folderName' in val &&
-        'path' in val) {
+        'path' in val && 
+        'files' in val) {
         return true;
     }
     return false;

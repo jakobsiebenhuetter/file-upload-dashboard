@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev:build": "webpack"
+    "dev:build": "npm test && webpack",
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
@@ -29,6 +30,7 @@
     "webpack-dev-server": "^5.2.2"
   },
   "devDependencies": {
+    "@jest/globals": "^30.2.0",
     "@types/jquery": "^3.5.33",
     "@types/jqueryui": "^1.12.24",
     "@types/node": "^25.0.9",
@@ -41,6 +43,7 @@
     "postcss-preset-env": "^10.4.0",
     "style-loader": "^4.0.0",
     "tailwindcss": "^4.1.16",
+    "ts-jest": "^29.4.6",
     "webpack": "^5.102.1",
     "webpack-cli": "^6.0.1"
   }
