@@ -13,7 +13,6 @@ export class KeyManager {
             KeyManager.instance = new KeyManager();
             return KeyManager.instance;
         }
-
         return KeyManager.instance;
     }
 
@@ -22,11 +21,10 @@ export class KeyManager {
         
         this.handlers.push(elementHandler)
     }
-
+    
     removeModal(): void {
         this.handlers.pop();
     }
-
 
     private handleKeydown = (event: KeyboardEvent) => {
         if(this.handlers[this.handlers.length -1]?.[event.key]){

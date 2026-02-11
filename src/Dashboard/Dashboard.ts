@@ -46,7 +46,7 @@ type DefaultResponse = {
     type: 'default';
 }
 
-export type Response =  APIResponse| DefaultResponse | ErrorResponse;
+export type Response =  APIResponse | DefaultResponse | ErrorResponse;
 
 // type Info = {
 //     type: 'success' | 'error' | 'default';
@@ -160,14 +160,16 @@ export class DashBoard extends Event {
         return this.sidebar;
     }
 
-    renderSidebar(folders: FolderData[]): void {   
+    private renderSidebar(folders: FolderData[]): void {   
         this.element.append(this.getSidebar().element);
-        if(!this.getSidebar().setFocus(folders[0].id)) {
-            console.warn('Kein Fokus für die Sidebar gesetzt');
+        if(folders.length !== 0) {
+            if(!this.getSidebar().setFocus(folders[0].id)) {
+                console.warn('Kein Fokus für die Sidebar gesetzt');
+            }
         }
     }
 
-    renderGrid(files: FileData[]): void {
+    private renderGrid(files: FileData[]): void {
         this.widgetContainer.innerHTML = ``;
         this.element.classList.add('flex');
         this.widgetContainerWrapper.append(this.widgetContainer);
@@ -177,7 +179,7 @@ export class DashBoard extends Event {
         this.createWidgets(files);
     };
 
-    createWidgets(files: FileData[]): void {
+    private createWidgets(files: FileData[]): void {
 
         for (const file of files) {
 
@@ -188,21 +190,21 @@ export class DashBoard extends Event {
                 // Hier unterscheiden ob Bilddatei oder PDF Datei oder andere Datei
                 let modal: Modal = null;
                 let modalContent: HTMLIFrameElement | HTMLImageElement = null;;
-                let modalContentHeight = 'auto';
+                let modalContentHeight = 'h-[auto]';
                 let ext = file.path.split('.').pop();
 
                 if(isImage(ext)) {
-                    modal = new Modal({ backdropOption: true, height: '', width: '', rounded: true});
+                    modal = new Modal({ backdropOption: true, width: '',height:'h-[750px]' , rounded: true});
                     modalContent = document.createElement('img');
                  
                 } else {
-                    modal = new Modal({ backdropOption: true, height: 'h-[800px]', width:' w-[1000px]', rounded: true});
+                    modal = new Modal({ backdropOption: true, width:'w-[1000px]', height: 'h-[800px]' ,rounded: true});
                     modalContent = document.createElement('iframe');
-                    modalContentHeight = '95%';
+                    modalContentHeight = 'h-full';
                 }
 
-                modal.element.classList.add('flex', 'flex-col', 'overflow-hidden', 'justify-end');
-                modalContent.classList.add('m-1', 'border-none', 'bg-white', `w-[auto]`, `h-[${modalContentHeight}]`);
+                modal.element.classList.add('flex','flex-col','overflow-hidden','justify-end');
+                modalContent.classList.add('m-1', 'border-none', 'bg-white', `w-[auto]`, `${modalContentHeight}`);
                 modalContent.src = file.path; // PDF oder URL setzen 
                 modal.element.append(modalContent);
                 document.body.append(modal.element);

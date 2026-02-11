@@ -4,8 +4,11 @@ import $ from 'jquery';
 import 'jquery-ui/ui/widgets/draggable';
 
 import { Event } from './Event';
-import { KeyManager } from '../Services/KeyManager';
+import { KeyManager } from '../Dashboard/KeyManager';
 
+/**
+ *@todo besseres TS
+ */
 export class Modal extends Event{
 
     protected props: Record<string, any> = {};
@@ -97,7 +100,7 @@ export class Modal extends Event{
 
         if (this.props.backdropOption) {
 
-            this.backdrop.classList.add('w-screen', 'h-screen', 'absolute', 'z-10', 'bg-neutral-950/20');
+            this.backdrop.classList.add('w-screen','h-screen','absolute','z-10','bg-neutral-950/20');
             document.body.append(this.backdrop);
             this.backdrop.onclick = () => {
                 this.close();

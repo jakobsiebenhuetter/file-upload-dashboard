@@ -5,10 +5,12 @@ import axios from 'axios';
 import { Event } from '../Components/Event';
 import { DashBoard, DashBoardData } from "./Dashboard";
 import { Header } from '../Components/Header';
-import { KeyManager } from '../Services/KeyManager';
+import { KeyManager } from './KeyManager';
 import { GlobalEvent } from './events';
 
 /**
+ * @todo Filter -> hier muss auch auf ein backend first Ansatz gesetzt werden, ein Bug wenn man ein Widget versucht zu droppen
+ * @todo Eine Button Klasse erstellen, mit JQuery, für den create Folder Button
  * @todo Uploadstatus anzeigen lassen, dank axios ist das möglich
  * @todo Backdrop Bug fixen und Scrollen verhindern während des droppens
  * @todo Styling verbessern auch bzgl. der responsivity
@@ -55,14 +57,13 @@ export class App extends Event {
 
                             if(file.title.includes(params.inputValue)) {
                                 this.filteredFiles.push(file);
-                                folder.files = this.filteredFiles; 
-                            };
+                            } 
                         };
                     };
                 };
             };
 
-            GlobalEvent.publish('renderFiles', { folders: folders });
+            GlobalEvent.publish('renderFiles', this.filteredFiles.length ? this.filteredFiles : folders.find((folder) => folder.id === folderId)[0].files);
             GlobalEvent.publish('spinner', { action: 'hide'});
         });
 
