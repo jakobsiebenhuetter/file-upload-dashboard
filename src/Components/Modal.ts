@@ -100,7 +100,9 @@ export class Modal extends Event{
 
         if (this.props.backdropOption) {
 
-            this.backdrop.classList.add('w-screen','h-screen','absolute','z-10','bg-neutral-950/20');
+            this.backdrop.classList.add('w-screen','min-h-screen','fixed','inset-0','z-10','bg-neutral-950/20');
+            document.body.classList.remove('overflow-auto');
+            document.body.classList.add('overflow-hidden');
             document.body.append(this.backdrop);
             this.backdrop.onclick = () => {
                 this.close();
@@ -175,9 +177,7 @@ export class Modal extends Event{
         
     };
 
-    
     getInputValue() {
-
         if (this.$input[0]) {
             const input = this.$input[0] as HTMLInputElement;
             return input.value;
@@ -196,6 +196,8 @@ export class Modal extends Event{
         KeyManager.getInstance().removeModal();
 
         if (this.props.backdropOption) {
+            document.body.classList.add('overflow-hidden');
+            document.body.classList.add('overflow-auto');
             this.backdrop.remove();
             this._cleaned = true;
         }

@@ -34,6 +34,14 @@ class StorageInterface {
     deleteFolder(id) {
         this.storage.deleteFolder(id);
     }
+
+    getFiles(folderId) {
+        return this.storage.getFiles(folderId);
+    }
+
+    getFilteredFiles(folderId, char) {
+        return this.storage.getFilteredFiles(folderId, char);
+    }
 }
 
 

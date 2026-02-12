@@ -38,7 +38,7 @@ export class Header {
 
 
     renderUI() {
-        this.element.classList.add('w-screen', 'bg-stone-200', 'flex', 'flex-row', 'justify-center', 'p-6');
+        this.element.classList.add('bg-stone-200', 'flex', 'flex-row', 'justify-center', 'p-6');
         this.element.append(this.filter.element);
     }
 

@@ -105,6 +105,20 @@ class JSONStorage {
         }    
         return data.files;
     }
+
+    getFilteredFiles(folderId, char) {
+        let files = [];
+        try {
+            const data = this.getData();
+            const folder = data.folders.filter((folder) => folder.id === folderId);
+            if(folder.length) {
+                files = folder[0].files.filter((file) => file.title.includes(char));
+            }
+        } catch (error) {
+            console.error('Error reading data:', error);
+        }
+        return files;
+    }
 }
 
 module.exports = JSONStorage;

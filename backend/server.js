@@ -7,6 +7,7 @@ const crypto = require('crypto');
 
 const StorageInterface = require('./StorageInterface');
 const {validateInput} = require('./util');
+const { type } = require('os');
 const storage = new StorageInterface('json');
 
 
@@ -47,7 +48,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../dist', 'index.html'));
 });
 
-app.get('/getJson', async (req, res) => {
+app.get('/getData', async (req, res) => {
     const data = storage.getData();
     res.json(data);
 });
@@ -186,6 +187,37 @@ app.post('/delete-folder', (req, res) => {
         info: 'Folder entfernt'
     };
     res.json(message);
+})
+
+app.post('/get-filtered-files', (req, res) => {
+    const { folderId, char } = req.body;
+    
+    if(!validateInput(folderId)) {
+        const msg = {
+            info: 'Ungültige OrdnerId',
+            files: [],
+            type: 'error'
+        };
+        return res.json(msg);
+    }
+
+    if(char.trim() === '') {
+        const data = storage.getFiles(folderId);
+        const msg = {
+            info: 'Kein Suchbegriff',
+            files: data,
+            type: 'info'
+        };
+        return res.json(msg);
+    }
+    
+    const files = storage.getFilteredFiles(folderId, char);
+    const msg = {
+        info: 'Gefilterte Dateien',
+        files: files,
+        type: 'success'
+    };
+    res.json(msg);
 })
 
 app.listen(2000, () => console.log('Server listen on Port 2000'));

@@ -9,6 +9,8 @@ import { Tooltip } from './Tooltip';
 import { GlobalEvent } from '../Dashboard/events';
 import { FileData, FolderData } from '../Dashboard/Dashboard';
 import { App } from '../Dashboard/app';
+import { API } from '../Config';
+import { Button } from './Button';
 
 
 export class Sidebar extends Event {
@@ -36,19 +38,20 @@ export class Sidebar extends Event {
     }
 
     renderUI(): void {
-        const createFolderBtn: HTMLElement = document.createElement('div');
-        createFolderBtn.classList.add('mb-4', 'hover:cursor-pointer');
-        createFolderBtn.setAttribute('id', 'create-folder');
-        createFolderBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" /></svg>`;
+   
+        this.element.classList.add('min-h-screen', 'bg-stone-200', 'p-2', 'w-[220px]', 'w-1/6');
+        const icon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" /></svg>`
+        const createFolderBtn = new Button({ text: 'Ordner erstellen', width: 'w-full', height: 'h-[40px]', color: 'bg-green-500', hoverColor: 'hover:bg-green-600', icon });
+        createFolderBtn.element.setAttribute('id', 'create-folder');
 
-        createFolderBtn.onclick = async (e) => {
+        createFolderBtn.onClick(async (e) => {
             let modal = new Modal({ default: true, backdropOption: true, height: 'h-auto', rounded: true });
 
             modal.saveBtnOnClick(async () => {
                 let data = null;
                 GlobalEvent.publish('spinner', { action: 'show'});
 
-                let response = await axios.post('http://localhost:2000/create-folder', { text: modal.getInputValue(), id: modal.getInputValue() });
+                let response = await axios.post(API.CREATE_FOLDER, { text: modal.getInputValue(), id: modal.getInputValue() });
                 data = response.data;
                 console.log('Antwort vom Server:', data);
 
@@ -73,10 +76,11 @@ export class Sidebar extends Event {
         });
         
         document.body.append(modal.element);
-    };
+        console.log('Create Folder Button Clicked', e);
+    });
     
-    this.element.append(createFolderBtn, this.listElement);
-    this.element.classList.add('bg-stone-200', 'p-2', this.props.width, 'min-h-screen', 'w-[100px]', 'p-2');
+    this.element.append(createFolderBtn.element, this.listElement);
+    
     this.listElement.classList.add('flex', 'flex-col', 'justify-center');
     this.renderListElements();
 
@@ -132,7 +136,7 @@ export class Sidebar extends Event {
                     GlobalEvent.publish('spinner', {action: 'show'});
                     try {
                         // Hier die Daten nach dem löschen wieder holen
-                        const data = await axios.post('http://localhost:2000/delete-folder', { id: deleteBtn.getAttribute('btn-id') });
+                        const data = await axios.post(API.DELETE_FOLDER, { id: deleteBtn.getAttribute('btn-id') });
                         
                     
                     } catch(error) {

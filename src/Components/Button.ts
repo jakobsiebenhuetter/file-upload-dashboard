@@ -1,4 +1,65 @@
 
+import { Event } from './Event';
+
+
+type ButtonProps = {
+    shape?: 'circle' | 'rounded';
+    text?: string;
+    icon?: string;
+    width?: string;
+    height?: string;
+    color?: string;
+    hoverColor?: string;
+}
+
+export class Button extends Event {
+    element = document.createElement('div');
+    private props: ButtonProps;
+
+    constructor(props?: ButtonProps) {
+        super();
+        const defaults: ButtonProps = {
+            shape: 'rounded',
+            text: 'Klick mich',
+            icon: '',
+            width: 'w-[100px]',
+            height: 'h-[100px]',
+            color: 'bg-gray-200',
+            hoverColor: 'hover:bg-gray-300',
+        };
+
+        this.props = { ...defaults, ...props };
+        this.renderUI();
+        this.addListerner();
+    }
+
+    private addListerner(): void {
+        this.element.onclick = (e) => {
+            this.publish('click', {
+                event: e,
+                button: this,
+                text: this.props.text 
+            });
+        }
+    }
+
+    private renderUI(): void {
+        this.element.classList.add('flex','items-center','justify-center','cursor-pointer','rounded',this.props.width,this.props.height,this.props.color, this.props.hoverColor);
+        if(this.props.text) {
+            this.element.textContent = this.props.text;
+        }
+
+        if(this.props.icon) {
+            const iconElement = document.createElement('span');
+            iconElement.innerHTML = this.props.icon;
+            this.element.appendChild(iconElement);
+        }
+    }
+
+    onClick(handler: (e) => void): void {
+        this.subscribe('click', handler);
+    }
+}
 
 
 

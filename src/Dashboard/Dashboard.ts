@@ -1,6 +1,7 @@
 import '../styles.css';
 import axios from 'axios';
 
+import { Header } from '../Components/Header';
 import { Widget } from '../Components/Widget';
 import { Event } from '../Components/Event';
 import { Sidebar } from '../Components/Sidebar';
@@ -9,6 +10,8 @@ import { GlobalEvent } from './events';
 import { DropZone } from '../Components/Dropzone';
 import { lockScreen, unlockScreen } from './globVar';
 import { isImage, checkResponse, getFolders, getFiles } from '../Util/Util';
+import { API } from '../Config';
+import { App } from './app';
 
 export type DashBoardData = {
     folders: FolderData[];
@@ -55,6 +58,7 @@ export type Response =  APIResponse | DefaultResponse | ErrorResponse;
 
 export class DashBoard extends Event {
      element: HTMLElement = document.createElement('div');
+     header: Header;
      widgetContainer: HTMLElement = document.createElement('div');
      widgetContainerWrapper: HTMLElement = document.createElement('div');
      sidebar: Sidebar;
@@ -65,11 +69,20 @@ export class DashBoard extends Event {
          super();
          this.files = getFiles(items.folders[0]);
          const folders = getFolders(items.folders);
+         this.header = new Header();
          this.sidebar = new Sidebar({ listItems: folders, width: 'min-w-[220px]' });
          this.renderSidebar(folders);   
-         this.renderGrid(this.files);
+         this.renderHeroPage();
          this.addListeners();
         };
+
+    private renderHeroPage(): void {
+        const heroPage = document.createElement('div');
+        heroPage.classList.add('bg-stone-100', 'w-full');
+        heroPage.append(this.header.element, this.widgetContainerWrapper);
+        this.element.append(heroPage);
+        this.renderGrid(this.files);
+     };
 
      private addListeners(): void {
          GlobalEvent.subscribe('renderFiles', (files: FileData[]) => {
@@ -86,6 +99,14 @@ export class DashBoard extends Event {
             }
         });
 
+          this.header.getFilter.onFilter(async (params) => {
+            
+            GlobalEvent.publish('spinner', { action: 'show'});
+            const folderId = this.getSidebar().getFocus();
+            const filteredFiles = await App.getFilteredFiles(folderId, params.inputValue);
+            GlobalEvent.publish('renderFiles', filteredFiles);
+            GlobalEvent.publish('spinner', { action: 'hide'});
+        });
 
         this.widgetContainerWrapper.addEventListener('dragover', (e: DragEvent) => {
             e.preventDefault();
@@ -140,7 +161,7 @@ export class DashBoard extends Event {
             };
 
             try {
-                response = await axios.post('http://localhost:2000/upload', formData);
+                response = await axios.post(API.UPLOAD_FILES, formData);
             } catch (error) {
                 console.warn('Fehler beim Hochladen der Datei', error);
             }
@@ -160,10 +181,12 @@ export class DashBoard extends Event {
         return this.sidebar;
     }
 
-    private renderSidebar(folders: FolderData[]): void {   
-        this.element.append(this.getSidebar().element);
+    private renderSidebar(folders: FolderData[]): void { 
+
+        this.element.append(this.sidebar.element);
+
         if(folders.length !== 0) {
-            if(!this.getSidebar().setFocus(folders[0].id)) {
+            if(!this.sidebar.setFocus(folders[0].id)) {
                 console.warn('Kein Fokus für die Sidebar gesetzt');
             }
         }
@@ -171,11 +194,11 @@ export class DashBoard extends Event {
 
     private renderGrid(files: FileData[]): void {
         this.widgetContainer.innerHTML = ``;
-        this.element.classList.add('flex');
+        this.element.classList.add('flex', 'min-h-screen');
         this.widgetContainerWrapper.append(this.widgetContainer);
         this.widgetContainerWrapper.classList.add('w-full', 'bg-stone-200', 'p-4');
         this.widgetContainer.classList.add('min-h-screen', 'rounded', 'p-[10px]', 'bg-blue-200', 'grid', 'grid-cols-[repeat(auto-fill,minmax(210px,1fr))]', 'auto-rows-[300px]', 'rounded-[12px]');    
-        this.element.append(this.widgetContainerWrapper);
+  
         this.createWidgets(files);
     };
 
@@ -217,7 +240,7 @@ export class DashBoard extends Event {
                 GlobalEvent.publish('spinner', { action: 'show' });
                 
                 try { 
-                    const response = await axios.post('http://localhost:2000/delete-file', { fileId: fileId, folderId: folderId })
+                    const response = await axios.post(API.DELETE_FILE, { fileId: fileId, folderId: folderId })
                     const msg: Response = response.data;
 
                     if(checkResponse(msg)) {

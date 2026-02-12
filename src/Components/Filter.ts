@@ -72,4 +72,5 @@ export class Filter extends Event {
     onFilter(handler: (params?: Record<string, any>) => void): void {
         this.subscribe('filter', handler);
     }
+
 }

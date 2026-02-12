@@ -1,51 +1,93 @@
 {
   "folders": [
     {
-      "id": "b83f3996-46c7-4dac-9523-ecadf0f98784",
-      "folderName": "sdsdsd",
-      "path": "data\\Folders\\db547ee7-9ada-43fc-b8d9-61f956c9a106",
+      "id": "afa286e0-87b1-4b82-81c9-5164ba406543",
+      "folderName": "sfffdfd",
+      "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840",
       "files": [
         {
-          "id": "a4026429-d1bb-4752-a628-c675edafe2b0",
-          "title": "s00203-024-03981-x-1.pdf",
-          "path": "data\\Folders\\db547ee7-9ada-43fc-b8d9-61f956c9a106\\s00203-024-03981-x-1.pdf",
-          "thumbnailPath": "./data/Thumbnails/b67d7f0b-e168-46c2-8ea7-83a3fdc422c6.png",
-          "date": "10.2.2026"
-        },
-        {
-          "id": "11c33777-e9ea-440e-a53e-3a7a96a524ce",
+          "id": "e8aefecf-ef87-428a-87b1-6bdb149e4b9d",
           "title": "icons8-folder-16.png",
-          "path": "data\\Folders\\db547ee7-9ada-43fc-b8d9-61f956c9a106\\icons8-folder-16.png",
+          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\icons8-folder-16.png",
           "thumbnailPath": "data\\Thumbnails\\icons8-folder-16.png",
-          "date": "10.2.2026"
+          "date": "12.2.2026"
         },
         {
-          "id": "d7401043-a9a1-44d5-981c-11e96e6b12fc",
+          "id": "5910c820-2193-4315-8cbd-92c527182127",
           "title": "task-management-logo.png",
-          "path": "data\\Folders\\db547ee7-9ada-43fc-b8d9-61f956c9a106\\task-management-logo.png",
+          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\task-management-logo.png",
           "thumbnailPath": "data\\Thumbnails\\task-management-logo.png",
-          "date": "10.2.2026"
+          "date": "12.2.2026"
         },
         {
-          "id": "26b00539-b14a-4c19-ae8d-d774f9080daa",
+          "id": "f7680b16-28a9-4862-ba15-d0b3bc48a81c",
           "title": "1769859548026-839797435-1769857794986-712562568-s00203-024-03981-x-1.pdf",
-          "path": "data\\Folders\\db547ee7-9ada-43fc-b8d9-61f956c9a106\\1769859548026-839797435-1769857794986-712562568-s00203-024-03981-x-1.pdf",
-          "thumbnailPath": "./data/Thumbnails/18fb4eb2-9391-4964-b777-fe43f288eb7a.png",
-          "date": "10.2.2026"
+          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\1769859548026-839797435-1769857794986-712562568-s00203-024-03981-x-1.pdf",
+          "thumbnailPath": "./data/Thumbnails/a31260c1-2548-4468-8daa-52a12896bd38.png",
+          "date": "12.2.2026"
         },
         {
-          "id": "a678dc3a-95b9-4e83-80d0-c18a931d2451",
-          "title": "duck-9868154_640.jpg",
-          "path": "data\\Folders\\db547ee7-9ada-43fc-b8d9-61f956c9a106\\duck-9868154_640.jpg",
-          "thumbnailPath": "data\\Thumbnails\\duck-9868154_640.jpg",
-          "date": "10.2.2026"
+          "id": "88547bfd-633c-4434-bd07-2faacb27a965",
+          "title": "s00203-024-03981-x-1.pdf",
+          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\s00203-024-03981-x-1.pdf",
+          "thumbnailPath": "./data/Thumbnails/4e03c2c3-f4bd-4ae1-b553-0ba197742067.png",
+          "date": "12.2.2026"
+        },
+        {
+          "id": "00966b47-21c8-4a5b-a849-7fcbd9965446",
+          "title": "s00203-024-03981-x.pdf",
+          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\s00203-024-03981-x.pdf",
+          "thumbnailPath": "./data/Thumbnails/cd44a021-26be-4b77-8b52-9d3c8414c326.png",
+          "date": "12.2.2026"
+        },
+        {
+          "id": "26f4917b-a3a4-4986-bc49-c522eab2fab4",
+          "title": "WhatsApp Image 2026-02-11 at 10.18.54.jpeg",
+          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\WhatsApp Image 2026-02-11 at 10.18.54.jpeg",
+          "thumbnailPath": "data\\Thumbnails\\WhatsApp Image 2026-02-11 at 10.18.54.jpeg",
+          "date": "12.2.2026"
+        },
+        {
+          "id": "5014a3ab-bd62-4093-b1be-f638fc0eef00",
+          "title": "KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026-2.pdf",
+          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026-2.pdf",
+          "thumbnailPath": "./data/Thumbnails/5c5e60ea-d88a-47cc-a961-6fa172e94db6.png",
+          "date": "12.2.2026"
+        },
+        {
+          "id": "fb274b73-4fb1-4113-b3fd-9506000dbe8c",
+          "title": "n-14_2009-1.pdf",
+          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\n-14_2009-1.pdf",
+          "thumbnailPath": "./data/Thumbnails/c0a886b4-609b-47ad-9c06-99566eb9c105.png",
+          "date": "12.2.2026"
+        },
+        {
+          "id": "c8626aa5-df5d-4e07-9f3a-e169cf6687f3",
+          "title": "KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026-1.pdf",
+          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026-1.pdf",
+          "thumbnailPath": "./data/Thumbnails/c963455f-effd-4630-8626-fd116ab8a80c.png",
+          "date": "12.2.2026"
+        },
+        {
+          "id": "ecf2c81d-9375-480d-a546-96de519331c1",
+          "title": "KRUS_SR-12_Wniosek_o_rentÄ_rodzinnÄ_wraz_z_informacjÄ_2026.pdf",
+          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\KRUS_SR-12_Wniosek_o_rentÄ_rodzinnÄ_wraz_z_informacjÄ_2026.pdf",
+          "thumbnailPath": "./data/Thumbnails/de7e5777-78af-43ec-a200-4a1f9bc2df09.png",
+          "date": "12.2.2026"
+        },
+        {
+          "id": "0318f72b-ef83-430b-a5be-4fcc96c8496a",
+          "title": "KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026.pdf",
+          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026.pdf",
+          "thumbnailPath": "./data/Thumbnails/14f6fd53-26d2-46a7-ae35-f1e3f9eb716d.png",
+          "date": "12.2.2026"
         }
       ]
     },
     {
-      "id": "54d7223a-dc8b-42e3-bcdf-c0f17affe19e",
-      "folderName": "fbfbgbfgbbfgb",
-      "path": "data\\Folders\\6d96a25a-5974-4d57-8045-fcc3f3426046",
+      "id": "5c9c1b7d-fbf6-42dc-80a3-05b41496b680",
+      "folderName": "sds",
+      "path": "data\\Folders\\f3afc410-3dd3-447c-ae9e-5f38c04c2bff",
       "files": []
     }
   ]
