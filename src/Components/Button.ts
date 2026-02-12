@@ -1,4 +1,3 @@
-
 import { Event } from './Event';
 
 
@@ -10,6 +9,7 @@ type ButtonProps = {
     height?: string;
     color?: string;
     hoverColor?: string;
+    activeColor?: string;
 }
 
 export class Button extends Event {
@@ -26,6 +26,7 @@ export class Button extends Event {
             height: 'h-[100px]',
             color: 'bg-gray-200',
             hoverColor: 'hover:bg-gray-300',
+            // activeColor: 'active:bg-gray-400',
         };
 
         this.props = { ...defaults, ...props };
@@ -35,6 +36,7 @@ export class Button extends Event {
 
     private addListerner(): void {
         this.element.onclick = (e) => {
+            e.stopPropagation();
             this.publish('click', {
                 event: e,
                 button: this,
@@ -44,7 +46,7 @@ export class Button extends Event {
     }
 
     private renderUI(): void {
-        this.element.classList.add('flex','items-center','justify-center','cursor-pointer','rounded',this.props.width,this.props.height,this.props.color, this.props.hoverColor);
+        this.element.classList.add('select-none','flex','items-center','justify-center','cursor-pointer',this.props.width,this.props.height,this.props.color, this.props.hoverColor, this.props.shape === 'circle' ? 'rounded-full' : 'rounded', this.props.activeColor ? this.props.activeColor : 'no-active-color');
         if(this.props.text) {
             this.element.textContent = this.props.text;
         }

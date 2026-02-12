@@ -233,8 +233,8 @@ export class DashBoard extends Event {
                 document.body.append(modal.element);
             });
 
-            widget.getDeleteBtn().onclick = async (e) => {
-                e.stopPropagation();
+            widget.getDeleteBtn().onClick(async (e) => {
+                
                 const folderId = this.getSidebar().getFocus();
                 const fileId = widget.element.getAttribute('data-id');
                 GlobalEvent.publish('spinner', { action: 'show' });
@@ -253,7 +253,7 @@ export class DashBoard extends Event {
                 } catch (error) {
                     console.error('Fehler beim Löschen der Datei:', error);
                 };
-            };
+            });
 
 
             this.widgetContainer.append(widget.element);
