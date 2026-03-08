@@ -3,19 +3,21 @@ import '../styles.css';
 import axios from 'axios';
 
 import { Event } from '../Components/Event';
-import { DashBoard, DashBoardData, FileData } from "./Dashboard";
+import { DashBoard, DashBoardData } from "./Dashboard";
 import { KeyManager } from './KeyManager';
-import { GlobalEvent } from './events';
-import { API } from '../Config';
-import { Toast } from '../Components/Toast';
+import { API } from '../API';
 
 /**
+ * @todo Pagination hinzufügen; zuerst checken das previous zuerst bei init disabled ist, ( backend is the source of truth, also immer von dort die Daten holen) -> Es gibt Probleme Daten zu holen, Daten solten konsistent geholt werden, beim init und pagiination
  * @todo Es gibt mit dem lockscreen, bzw. backdrop noch Probleme, overflow ist auf auto gesetzt beim body
- * @todo ein Bug wenn man ein Widget versucht zu droppen
- * @todo Eine Button Klasse erstellen, mit JQuery, für den create Folder Button
- * @todo Uploadstatus anzeigen lassen, dank axios ist das möglich
  * @todo Backdrop Bug fixen und Scrollen verhindern während des droppens
+ * @todo automatisches herunterladen von videos im Edge Browser verhindern
+ * @todo KI integrieren um pdf Dokumente zusammenzufassen.
+ * @todo Event member als Objekt verwenden damit man nicht immer die Funktion durchgehen muss, sondern direkt auf die Funktion zugreifen kann, z.B. this.events['openModal']() anstatt this.events.forEach(fn => { if(fn.name === 'openModal') fn() })
+ * @todo ein Bug wenn man ein Widget versucht zu droppen
+ * @todo Uploadstatus anzeigen lassen, dank axios ist das möglich
  * @todo Styling verbessern auch bzgl. der responsivity
+ * 
  */
 export class App extends Event {
     constructor() {
@@ -33,34 +35,15 @@ export class App extends Event {
         }
     };
 
-    // Hier noch einen Fehler zurückgeben, falls im Server etwas nicht funktioniert hat
-    static async getFilteredFiles(folderId: string, char: string): Promise<FileData[]> {
-        let files: FileData[] = [];
-        try {
-            const response = await axios.post(API.GET_FILTER_FILES, {folderId, char});
-            files = response.data.files;
-        } catch (error) {
-            new Toast({ text: 'Fehler beim Filtern der Dateien', icon: 'error', backdrop: true });
-            return files;
-        }
-        return files;
-    }
-
     async initApp(): Promise<void> {
-
         KeyManager.getInstance();
-
         const app = document.querySelector('#app');
-
-        GlobalEvent.publish('spinner', { action: 'show'});
         let  folders  = await App.getData();
         const dashBoard = new DashBoard(folders);
-
         if (app instanceof HTMLElement) {
-            app.append(dashBoard.element);
+            app.append(dashBoard.el);
         };
 
-        GlobalEvent.publish('spinner', { action: 'hide'});
     };
 };
 

@@ -43,10 +43,6 @@ class JSONStorage {
         // ...
     }
 
-    getFiles() {
-        // ...
-    }
-
     deleteFile(folderId, fileId) {
         // Hier nur die Daten für den einen Ordner holen, damit nicht das ganze Objekt durchlaufen werden muss
         const data = this.getData();
@@ -95,15 +91,42 @@ class JSONStorage {
         }
     }
 
-    getFiles(folderId) {
-        let data = [];
+    getFiles(folderId, page = 1) {
+        // ... hier weiter machen
+        let files = [];
+        let maxPages = 1;
          try {
-            data = this.getData();
-            data = data.folders.find((folder) => folder.id === folderId);
+            const data = this.getData();
+            files = data.folders.find((folder) => folder.id === folderId);
         } catch (error) {
             console.error('Error reading data:', error);
-        }    
-        return data.files;
+        }
+        
+
+        let firstFile = (page - 1) * 5;
+        let lastFile = firstFile + 4;
+
+
+        maxPages = files.files.length ? Math.ceil(files.files.length / 5) : 1;
+        console.log('Max Pages', maxPages);
+        if(files.files.length < lastFile + 1) {
+            lastFile = files.files.length;
+        }
+        
+        let filesForPage = files.files.slice(firstFile, lastFile);
+        console.log('Alles', filesForPage);
+        return {filesForPage, maxPages};
+    }
+
+    getFolders() {
+        let folders = [];
+        try {
+            const data = this.getData();
+            folders = data.folders;
+        } catch (error) {
+            console.error('Error reading data:', error);
+        }
+        return folders;
     }
 
     getFilteredFiles(folderId, char) {

@@ -19,7 +19,7 @@ export class Widget extends Event {
     private status: number = 0;
     private disabled: boolean = false;
     dateLabel: HTMLElement;
-    element: HTMLElement;
+    el: HTMLElement;
     deleteBtn: Button;
     width: string = 'w-[100px]';
     height: number = 100;
@@ -31,7 +31,7 @@ export class Widget extends Event {
     constructor(props?: IWidgetProps) {
         super();
         const icon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" class="w-[22px] h-[22px]" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>';
-        this.element = document.createElement('div') as HTMLElement;
+        this.el = document.createElement('div') as HTMLElement;
         this.deleteBtn = new Button({shape:'circle', text: '', icon: icon, width: 'w-[30px]', height: 'h-[30px]', color: 'bg-red-200', hoverColor: 'hover:bg-red-500' });
 
         const defaults = {
@@ -50,7 +50,7 @@ export class Widget extends Event {
             ...props
         };
 
-        this.element.onclick = (e) => {
+        this.el.onclick = (e) => {
 
             this.publish('click', { 
                 event: e,
@@ -61,6 +61,7 @@ export class Widget extends Event {
         this.renderUI();
         this.setDeleteBtn();
         this.addImage();
+        this.addContextMenu();
     };
 
     async addImage() {
@@ -68,13 +69,13 @@ export class Widget extends Event {
         // imgContainer.src = 'https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fhintergrundbild.org%2Fwallpaper%2Ffull%2F9%2Fa%2Fd%2F35623-popular-tiere-hintergrundbilder-1920x1200.jpg&f=1&nofb=1&ipt=e9d41e369609327f6a261f0a5fc39e583defcfb35065b097d55b8a600872b301';
         imgContainer.src = this.props.imgPath;
         imgContainer.classList.add('w-full', 'h-8/10');
-        this.element.insertAdjacentElement('afterbegin', imgContainer);
+        this.el.insertAdjacentElement('afterbegin', imgContainer);
     }
 
     renderUI(): void {
         if(this.props.text) {
             const pTag = document.createElement('p');
-            this.element.append(pTag);
+            this.el.append(pTag);
             pTag.innerText = this.props.text;
             
             pTag.onmousemove = () => {
@@ -92,12 +93,12 @@ export class Widget extends Event {
             const dateLabel = document.createElement('span');
             dateLabel.classList.add('text-sm', 'text-gray-700', 'pl-2');
             dateLabel.innerText = this.props.date;
-            this.element.append(dateLabel);
+            this.el.append(dateLabel);
 
         }        
         
-        this.element.style.height = this.props.height + 'px';
-        this.element.classList.add(
+        this.el.style.height = this.props.height + 'px';
+        this.el.classList.add(
             'widget',
             `${this.props.width}`,
             'm-2',
@@ -132,7 +133,7 @@ export class Widget extends Event {
     
 
     setDeleteBtn(): void {
-        this.deleteBtn.element.classList.add(
+        this.deleteBtn.el.classList.add(
             'absolute',
             'top-1',
             'right-1',
@@ -145,18 +146,18 @@ export class Widget extends Event {
             'hover:bg-red-500',
             'p-1'
         );
-        this.element.append(this.deleteBtn.element);
+        this.el.append(this.deleteBtn.el);
     };
 
     getDeleteBtn(): Button {
         return this.deleteBtn;
     }
 
-    setElement(element: any): void {
+    setElement(el: any): void {
         const footer: HTMLElement = document.createElement('div');
-        footer.append(element);
+        footer.append(el);
         footer.classList.add('w-[100%]', 'h-[50px]','p-2', 'flex', 'flex-row', 'justify-end');
-        this.element.appendChild(footer);
+        this.el.appendChild(footer);
     };
 
     getText(): string {
@@ -167,4 +168,10 @@ export class Widget extends Event {
         this.subscribe('click', handler);
     }
 
+    // Muss noch implementiert werden mit einer eigenen Komponente für das Kontextmenü
+    addContextMenu(): void {
+        this.el.oncontextmenu = (e) => {
+            e.preventDefault();
+        }
+    }
 };

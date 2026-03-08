@@ -25,22 +25,15 @@ export function getFolders(val: unknown): FolderData[] {
     }
     return [];
 }
-export function getFiles(val: unknown): FileData[]{
-    if(isFolder(val)) {
-        console.log('Val ist vom Typ FolderData: ', val);
-        return val.files;
-    }
-    return []
-}
 
-export function checkResponse(response: Response): boolean {
-        if(response.type === 'error') {
-            const toast = new Toast({ text: response.message, icon: 'error', backdrop: true });
-        } else if (response.type === 'success') {
-            const toast = new Toast({ text: response.message, icon: 'success', backdrop: true });
-            return true;
-        } else {
-            const toast = new Toast({ text: response.message, icon: 'info', backdrop: true });
-        }
-        return false;
+export function checkResponse<T extends Response>(response: T, triggerToast?: boolean): boolean {
+    let flag = false;
+    if (response.type === 'success' || response.type === 'info') {     
+        flag = true;
     }
+
+    if(triggerToast) {
+        const toast = new Toast({ text: response.message, icon: response.type, backdrop: true });
+    }
+    return flag;
+}

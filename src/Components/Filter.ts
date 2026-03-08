@@ -3,10 +3,11 @@ import { Event } from './Event';
 
 export class Filter extends Event {
     protected props: Record<string, any> = {};
-    element: HTMLElement = document.createElement('div');
+    el: HTMLElement = document.createElement('div');
     filterInput: HTMLInputElement = document.createElement('input');
     filterButton: HTMLButtonElement = document.createElement('button');
-    width: string = 'w-[700px]';
+    // width: string = 'md:max-w-[700px]';
+    
     height: number = 40;
     placeholder: string = 'Suchen...';
     buttonText: string = '';
@@ -15,7 +16,7 @@ export class Filter extends Event {
         super();
 
         const defaults = {
-            width: this.width,
+            // width: this.width,
             height: this.height,
             placeholder: this.placeholder,
             buttonText: this.buttonText,
@@ -30,7 +31,7 @@ export class Filter extends Event {
     }
 
     renderUI(): void {
-        this.element.classList.add('flex', 'flex-row', 'justify-between', 'bg-white', 'rounded-4xl', 'p-1');
+        this.el.classList.add('flex', 'flex-row', 'bg-white', 'rounded-4xl', 'p-1', 'min-w-[100px]', this.props.width ? this.props.width : 'max-w-[500px]');
         
         this.filterInput.type = 'text';
         this.filterInput.placeholder = this.props.placeholder;
@@ -38,7 +39,7 @@ export class Filter extends Event {
         
         this.filterButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>`;
         this.filterButton.classList.add('w-[50px]', 'flex', 'justify-center', 'items-center', 'cursor-pointer');     
-        this.element.append(this.filterButton, this.filterInput);
+        this.el.append(this.filterButton, this.filterInput);
 
         this.filterButton.onclick = (e) => {
             this.publish('filter', {
@@ -58,7 +59,7 @@ export class Filter extends Event {
     }
 
     getElement(): HTMLElement {
-        return this.element;
+        return this.el;
     }
 
     getValue(): string {

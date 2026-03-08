@@ -5,4 +5,6 @@ export const API = {
     DELETE_FOLDER: 'http://localhost:2000/delete-folder',
     DELETE_FILE: 'http://localhost:2000/delete-file',
     UPLOAD_FILES: 'http://localhost:2000/upload',
-}
+    GET_FILES: 'http://localhost:2000/get-files',
+    GET_FOLDERS: 'http://localhost:2000/get-folders',
+};

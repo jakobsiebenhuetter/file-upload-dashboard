@@ -7,13 +7,14 @@ type ButtonProps = {
     icon?: string;
     width?: string;
     height?: string;
+    disabled?: boolean;
     color?: string;
     hoverColor?: string;
     activeColor?: string;
 }
 
 export class Button extends Event {
-    element = document.createElement('div');
+    el = document.createElement('div');
     private props: ButtonProps;
 
     constructor(props?: ButtonProps) {
@@ -22,6 +23,7 @@ export class Button extends Event {
             shape: 'rounded',
             text: 'Klick mich',
             icon: '',
+            disabled: false,
             width: 'w-[100px]',
             height: 'h-[100px]',
             color: 'bg-gray-200',
@@ -31,12 +33,14 @@ export class Button extends Event {
 
         this.props = { ...defaults, ...props };
         this.renderUI();
-        this.addListerner();
+        this.addListener();
     }
 
-    private addListerner(): void {
-        this.element.onclick = (e) => {
+    private addListener(): void {
+        this.el.onclick = (e) => {
             e.stopPropagation();
+            if(this.props.disabled) return;
+
             this.publish('click', {
                 event: e,
                 button: this,
@@ -46,20 +50,44 @@ export class Button extends Event {
     }
 
     private renderUI(): void {
-        this.element.classList.add('select-none','flex','items-center','justify-center','cursor-pointer',this.props.width,this.props.height,this.props.color, this.props.hoverColor, this.props.shape === 'circle' ? 'rounded-full' : 'rounded', this.props.activeColor ? this.props.activeColor : 'no-active-color');
+        this.el.classList.add('select-none','flex','items-center','justify-center','cursor-pointer',this.props.width,this.props.height,this.props.color, this.props.hoverColor, this.props.shape === 'circle' ? 'rounded-full' : 'rounded', this.props.activeColor ? this.props.activeColor : 'no-active-color');
         if(this.props.text) {
-            this.element.textContent = this.props.text;
+            this.el.textContent = this.props.text;
         }
 
-        if(this.props.icon) {
-            const iconElement = document.createElement('span');
-            iconElement.innerHTML = this.props.icon;
-            this.element.appendChild(iconElement);
+        if(this.constainsIcon()) {
+            if(this.props.text.length) {
+                this.el.classList.add('justify-between', 'px-4');
+                this.el.classList.remove('justify-center');
+            }
         }
     }
 
     onClick(handler: (e) => void): void {
         this.subscribe('click', handler);
+    }
+
+    private constainsIcon(): boolean {
+        const iconElement = document.createElement('span');
+        iconElement.innerHTML = this.props.icon;
+        this.el.appendChild(iconElement);
+        return this.props.icon.length > 0;
+    }
+
+    disable(): void {
+        this.props.disabled = true;
+        this.el.classList.remove('cursor-pointer');
+        this.el.classList.add('opacity-50', 'cursor-not-allowed');
+    }
+
+    enable(): void {
+        this.props.disabled = false;
+        this.el.classList.remove('opacity-50', 'cursor-not-allowed');
+        this.el.classList.add('cursor-pointer');
+    }
+
+    isDisabled(): boolean {
+        return this.props.disabled;
     }
 }
 
@@ -89,7 +117,7 @@ export class Button extends Event {
 
 // export class Button {
 //     protected props: ButtonProps;
-//     private $element: JQuery<HTMLButtonElement>;
+//     private $el: JQuery<HTMLButtonElement>;
 
 //     private static variantClasses: Record<ButtonVariant, string> = {
 //         primary: 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600',
@@ -116,16 +144,16 @@ export class Button extends Event {
 //         };
 
 //         this.props = { ...defaults, ...props };
-//         this.$element = $('<button></button>') as JQuery<HTMLButtonElement>;
+//         this.$el = $('<button></button>') as JQuery<HTMLButtonElement>;
 //         this.renderUI();
 //     }
 
 //     getElement(): HTMLButtonElement {
-//         return this.$element[0];
+//         return this.$el[0];
 //     }
 
 //     get $el(): JQuery<HTMLButtonElement> {
-//         return this.$element;
+//         return this.$el;
 //     }
 
 //     getText(): string {
@@ -147,34 +175,34 @@ export class Button extends Event {
 //     setVariant(variant: ButtonVariant): this {
 //         // Remove old variant classes
 //         Object.values(Button.variantClasses).forEach((cls) => {
-//             this.$element.removeClass(cls);
+//             this.$el.removeClass(cls);
 //         });
         
 //         this.props.variant = variant;
-//         this.$element.addClass(Button.variantClasses[variant]);
+//         this.$el.addClass(Button.variantClasses[variant]);
 //         return this;
 //     }
 
 //     setSize(size: ButtonSize): this {
 //         // Remove old size classes
 //         Object.values(Button.sizeClasses).forEach((cls) => {
-//             this.$element.removeClass(cls);
+//             this.$el.removeClass(cls);
 //         });
         
 //         this.props.size = size;
-//         this.$element.addClass(Button.sizeClasses[size]);
+//         this.$el.addClass(Button.sizeClasses[size]);
 //         return this;
 //     }
 
 //     enable(): this {
 //         this.props.disabled = false;
-//         this.$element.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
+//         this.$el.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
 //         return this;
 //     }
 
 //     disable(): this {
 //         this.props.disabled = true;
-//         this.$element.prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
+//         this.$el.prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
 //         return this;
 //     }
 
@@ -183,20 +211,20 @@ export class Button extends Event {
 //     }
 
 //     private updateContent(): void {
-//         this.$element.empty();
+//         this.$el.empty();
 
 //         const { text, icon, iconPosition } = this.props;
 
 //         if (icon && iconPosition === 'left') {
-//             this.$element.append($('<span></span>').addClass('mr-2').html(icon));
+//             this.$el.append($('<span></span>').addClass('mr-2').html(icon));
 //         }
 
 //         if (text) {
-//             this.$element.append($('<span></span>').text(text));
+//             this.$el.append($('<span></span>').text(text));
 //         }
 
 //         if (icon && iconPosition === 'right') {
-//             this.$element.append($('<span></span>').addClass('ml-2').html(icon));
+//             this.$el.append($('<span></span>').addClass('ml-2').html(icon));
 //         }
 //     }
 
@@ -205,14 +233,14 @@ export class Button extends Event {
 
 //         const baseClasses = 'inline-flex items-center justify-center rounded border font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500';
 
-//         this.$element
+//         this.$el
 //             .attr('type', type || 'button')
 //             .addClass(baseClasses)
 //             .addClass(Button.variantClasses[variant || 'primary'])
 //             .addClass(Button.sizeClasses[size || 'md']);
 
 //         if (className) {
-//             this.$element.addClass(className);
+//             this.$el.addClass(className);
 //         }
 
 //         if (disabled) {
@@ -223,7 +251,7 @@ export class Button extends Event {
 //     }
 
 //     onClick(handler: (e) => void): this {
-//         this.$element.on('click', (e) => {
+//         this.$el.on('click', (e) => {
 //             if (!this.props.disabled) {
 //                 handler(e);
 //             }
@@ -232,12 +260,12 @@ export class Button extends Event {
 //     }
 
 //     offClick(): this {
-//         this.$element.off('click');
+//         this.$el.off('click');
 //         return this;
 //     }
 
 //     destroy(): void {
-//         this.$element.off();
-//         this.$element.remove();
+//         this.$el.off();
+//         this.$el.remove();
 //     }
 // }

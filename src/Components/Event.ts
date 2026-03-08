@@ -1,13 +1,13 @@
 export class Event {
     allFunctions: Record<string, any> [] = [];
     // Hier noch einbauen das man es nur einmal verwenden möchte
-    subscribe(name: string, fn: (args: Record<string, any> | any[]) => void): void {
+    subscribe(name: string, fn: (args: Record<string, any> | any[] | any) => void): void {
         this.allFunctions.push({
             [name]: fn
         });
     };
 
-    publish(name: string, args?: Record<string, any>): void {
+    publish(name: string, args?: Record<string, any> | any): void {
         this.allFunctions.forEach(fnObject => {
             if(name === Object.keys(fnObject)[0]) {
                 fnObject[name](args);

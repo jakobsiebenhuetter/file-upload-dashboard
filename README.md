@@ -68,5 +68,3 @@ cd backend && node server.js
 - `POST /delete-file` — Datei löschen (body: `{ fileId, folderId }`)
 - `POST /create-folder` — Ordner erstellen (body: `{ text, id }`)
 - `POST /delete-folder` — Ordner löschen (body: `{ id }`)
-
----

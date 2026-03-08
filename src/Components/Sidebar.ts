@@ -9,14 +9,14 @@ import { Tooltip } from './Tooltip';
 import { GlobalEvent } from '../Dashboard/events';
 import { FileData, FolderData } from '../Dashboard/Dashboard';
 import { App } from '../Dashboard/app';
-import { API } from '../Config';
+import { API } from '../API';
 import { Button } from './Button';
 
 
 export class Sidebar extends Event {
     private focus: string | null = null;
     protected props: Record<string, any> = {};
-    element: HTMLElement = document.createElement('div');
+    el: HTMLElement = document.createElement('div');
     listElement: HTMLElement = document.createElement('ul');
     listItems: FolderData[] | null = null;
 
@@ -39,10 +39,10 @@ export class Sidebar extends Event {
 
     renderUI(): void {
    
-        this.element.classList.add('min-h-screen', 'bg-stone-200', 'p-2', 'w-[220px]', 'w-1/6');
+        this.el.classList.add('min-h-screen', 'bg-stone-200', 'p-2', 'min-w-[270px]');
         const icon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" /></svg>`
         const createFolderBtn = new Button({ text: 'Ordner erstellen', width: 'w-full', height: 'h-[40px]', color: 'bg-green-500', hoverColor: 'hover:bg-green-600', icon: icon, activeColor: 'active:bg-green-700' });
-        createFolderBtn.element.setAttribute('id', 'create-folder');
+        createFolderBtn.el.setAttribute('id', 'create-folder');
 
         createFolderBtn.onClick(async (e) => {
             let modal = new Modal({ default: true, backdropOption: true, height: 'h-auto', rounded: true });
@@ -53,7 +53,6 @@ export class Sidebar extends Event {
 
                 let response = await axios.post(API.CREATE_FOLDER, { text: modal.getInputValue(), id: modal.getInputValue() });
                 data = response.data;
-                console.log('Antwort vom Server:', data);
 
             if (data.info) {
                 GlobalEvent.publish('spinner', { action: 'hide'});
@@ -63,23 +62,15 @@ export class Sidebar extends Event {
             this.props.listItems = data.data.folders;
             this.renderListElements();
             
-            const {folders} = await App.getData();
-            
-            for(const folder of folders) {
-
-                if(folder.id === this.getFocus()) {
-                    GlobalEvent.publish('renderFiles', folder.files);
-                    break;
-                }
-            }
+            GlobalEvent.publish('folderFocusChanged:renderFiles', this.getFocus());
+         
             GlobalEvent.publish('spinner', { action: 'hide'});
         });
         
-        document.body.append(modal.element);
-        console.log('Create Folder Button Clicked', e);
+        document.body.append(modal.el);
     });
     
-    this.element.append(createFolderBtn.element, this.listElement);
+    this.el.append(createFolderBtn.el, this.listElement);
     
     this.listElement.classList.add('flex', 'flex-col', 'justify-center');
     this.renderListElements();
@@ -117,28 +108,23 @@ export class Sidebar extends Event {
                 if(!this.setFocus(id)) return;
 
                 GlobalEvent.publish('spinner', { action: 'show'});
-                      
-                const { folders } = await App.getData();
-                for(const folder of folders) {
-                    if(folder.id === this.getFocus()) {
-                        GlobalEvent.publish('renderFiles', folder.files);
-                        break;
-                    }
+                
+                if(this.getFocus()) {
+                    GlobalEvent.publish('folderFocusChanged:renderFiles', this.getFocus());
                 }
+                
                 GlobalEvent.publish('spinner', { action: 'hide'});
             };
 
             deleteBtn.onclick = async (e) => {
-                let confirmModal: Modal | null = new Modal({ default: false, confirmModal: true, backdropOption: true, height: 'h-auto', width:'w-[200px]', rounded: true, text: 'Möchten Sie den Ordner wirklich löschen?' });
-                document.body.append(confirmModal.element);
+                let confirmModal: Modal | null = new Modal({ default: false, confirmModal: true, backdropOption: true, height: 'h-auto', rounded: true, text: 'Möchten Sie den Ordner wirklich löschen?' });
+                document.body.append(confirmModal.el);
                 // KI wegen Confirmmodal befragen
                 confirmModal.saveBtnOnClick( async (e) => {     
                     GlobalEvent.publish('spinner', {action: 'show'});
                     try {
                         // Hier die Daten nach dem löschen wieder holen
-                        const data = await axios.post(API.DELETE_FOLDER, { id: deleteBtn.getAttribute('btn-id') });
-                        
-                    
+                        const data = await axios.post(API.DELETE_FOLDER, { id: deleteBtn.getAttribute('btn-id') });  
                     } catch(error) {
                         console.warn(error);
                     };
@@ -165,7 +151,8 @@ export class Sidebar extends Event {
                             break;
                         }
                     }
-                    GlobalEvent.publish('renderFiles', data);
+                    // GlobalEvent.publish('renderFiles', data);
+                    GlobalEvent.publish('folderFocusChanged:renderFiles', this.getFocus());
                 });
             };
 

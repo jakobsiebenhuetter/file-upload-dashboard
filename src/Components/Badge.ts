@@ -1,4 +1,4 @@
-import $ from 'jquery';
+// import $ from 'jquery';
 import '../styles.css';
 
 // using JQuery

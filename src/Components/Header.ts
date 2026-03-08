@@ -1,14 +1,16 @@
 import '../styles.css';
 import { Filter } from './Filter';
+import { Pagination } from './Pagination';
 
 
 export class Header {
     protected props: Record<string, any> = {};
     private status: number = 0;
     private disabled: boolean = false;
-    element: HTMLElement = document.createElement('div');
+    el: HTMLElement = document.createElement('div');
     filter: Filter;
-    width: string = 'w-[100px]';
+    pagination: Pagination;
+    width: string = 'w-[200px]';
     height: number = 100;
     color: string = 'lightgray';
     text: string = '';
@@ -17,6 +19,7 @@ export class Header {
     constructor(props?: Record<string, any>) {
 
         this.filter = new Filter();
+        this.pagination = new Pagination();
         
         const defaults = {
             width: this.width,
@@ -38,11 +41,15 @@ export class Header {
 
 
     renderUI() {
-        this.element.classList.add('bg-stone-200', 'flex', 'flex-row', 'justify-center', 'p-6');
-        this.element.append(this.filter.element);
+        this.el.classList.add('bg-stone-200', 'flex', 'flex-row', 'items-center', 'justify-center', 'p-6');
+        this.el.append(this.filter.el, this.pagination.el);
     }
 
     get getFilter(): Filter {
         return this.filter;
+    }
+
+    get getPagination(): Pagination {
+        return this.pagination;
     }
 }

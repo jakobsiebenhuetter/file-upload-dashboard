@@ -53,6 +53,76 @@ app.get('/getData', async (req, res) => {
     res.json(data);
 });
 
+app.get('/get-folders', (req, res) => {
+    // const user?
+    let msg = {
+        message: '',
+        type: 'info',
+        folders: []
+    }
+
+    try {
+        msg.folders = storage.getFolders();
+        msg.type = 'success';
+        msg.message = 'Ordner erfolgreich geladen';
+    } catch (error) {
+        msg.message = `Fehler beim laden der Ordner: ${error}`;
+        msg.type = 'error';
+    }
+    res.json(msg);
+});
+
+
+
+app.post('/get-files', (req, res) => {
+    // Hier prev und next berechnen
+    let { folderId, page } = req.body;
+    page = parseInt(page);
+    let msg = {
+        message: '',
+        type: 'info',
+        files: [],
+        currentPage: 1,
+        maxPages: 1,
+        hasNextPage: false,
+        hasPreviousPage: false
+    };
+
+    if(page < 1) {
+        msg.message = 'Ungültige Seitennummer';
+        msg.type = 'error';
+        return res.json(msg);
+    }
+    
+    try {
+        const { filesForPage, maxPages } = storage.getFiles(folderId, page);
+        
+        msg.currentPage = page;
+
+        if(page > maxPages) {
+            msg.message = 'Ungültige Seitennummer';
+            msg.type = 'error';
+            return res.json(msg);
+        }
+
+        if(page > 1) {
+            msg.hasPreviousPage = true;
+        }
+        if(page < maxPages) {
+            msg.hasNextPage = true;
+        }
+
+        msg.files = filesForPage;
+        msg.maxPages = maxPages;
+        msg.type = 'success';
+        msg.message = 'Dateien erfolgreich geladen';
+    } catch (error) {
+        msg.message = `Error getting files: ${error}`;
+        msg.type = 'error';
+    }
+    res.json(msg);
+});
+
 app.post('/delete-file', async (req, res) => {
     const { fileId, folderId } = req.body;
     let msg = {
@@ -132,7 +202,7 @@ app.post('/upload', async (req, res) => {
     // nur bestimmte Dateitypen erlauben, am besten mit einem Filter in multer
     // Hier alles abchecken
     let msg = {
-        type: 'default',
+        type: 'info',
         message: '',
         data: null
     };
