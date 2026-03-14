@@ -139,6 +139,7 @@ export class Modal extends Event{
         this.el.style.position = 'absolute';
         this.el.style.zIndex = '1000';
         this.el.style.top = '10%';
+        this.el.style.left = '50%';
 
         $(this.el).draggable({
             containment: 'window'

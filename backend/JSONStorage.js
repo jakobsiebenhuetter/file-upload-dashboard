@@ -97,12 +97,11 @@ class JSONStorage {
         let maxPages = 1;
          try {
             const data = this.getData();
-            files = data.folders.find((folder) => folder.id === folderId);
+            files = data.folders.find((folder) => folder.id === folderId) || {files: []};
         } catch (error) {
             console.error('Error reading data:', error);
         }
-        
-
+        console.log('Alle Dateien im Ordner: ', files);
         let firstFile = (page - 1) * 5;
         let lastFile = firstFile + 4;
 

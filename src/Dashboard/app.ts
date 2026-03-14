@@ -8,7 +8,8 @@ import { KeyManager } from './KeyManager';
 import { API } from '../API';
 
 /**
- * @todo Pagination hinzufügen; zuerst checken das previous zuerst bei init disabled ist, ( backend is the source of truth, also immer von dort die Daten holen) -> Es gibt Probleme Daten zu holen, Daten solten konsistent geholt werden, beim init und pagiination
+ * @todo Upload umbauen
+ * @FIXME Pagination Bug bei mehreren Seiten
  * @todo Es gibt mit dem lockscreen, bzw. backdrop noch Probleme, overflow ist auf auto gesetzt beim body
  * @todo Backdrop Bug fixen und Scrollen verhindern während des droppens
  * @todo automatisches herunterladen von videos im Edge Browser verhindern

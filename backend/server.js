@@ -7,7 +7,6 @@ const crypto = require('crypto');
 
 const StorageInterface = require('./StorageInterface');
 const {validateInput} = require('./util');
-const { type } = require('os');
 const storage = new StorageInterface('json');
 
 

@@ -70,14 +70,14 @@ export class Toast extends Event {
         document.body.append(this.element);
 
 
-        if (this.props.backdrop) {
-            this.backdrop.classList.add('w-screen', 'h-screen', 'absolute', 'z-10', 'bg-neutral-950/20');
-            document.body.append(this.backdrop);
-            this.backdrop.onclick = (e) => {
-                this.element.remove();
-                this.backdrop.remove();
-            }
-        }
+        // if (this.props.backdrop) {
+        //     this.backdrop.classList.add('w-screen', 'h-screen', 'absolute', 'z-10', 'bg-neutral-950/20');
+        //     document.body.append(this.backdrop);
+        //     this.backdrop.onclick = (e) => {
+        //         this.element.remove();
+        //         this.backdrop.remove();
+        //     }
+        // }
 
         this.destroy();
     };

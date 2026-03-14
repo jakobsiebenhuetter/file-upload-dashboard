@@ -13,6 +13,7 @@ import { isImage, checkResponse } from '../Util/Util';
 import { API } from '../API';
 import { Toast } from '../Components/Toast';
 import { PaginationEventData } from '../Components/Pagination';
+import { Spinner } from '../Components/Spinner';
 
 export type DashBoardData = {
     folders: FolderData[];
@@ -76,6 +77,8 @@ export class DashBoard extends Event {
 
      constructor(items: DashBoardData) {
          super();
+         const spinner = new Spinner({ backdropOption: true });
+       
          this.header = new Header();
          this.getData().getFolders().then((folders) => {
             this.renderSidebar(folders);   
@@ -87,6 +90,8 @@ export class DashBoard extends Event {
             });
             this.addListeners();
         });
+             
+        spinner.destroy();
     };
 
      private addListeners(): void {
@@ -111,6 +116,7 @@ export class DashBoard extends Event {
             GlobalEvent.publish('change:page', params);
         });
 
+        // upload:renderFiles ???
          GlobalEvent.subscribe('renderFiles', (data: FilesData) => {
             this.files = data.files;
             this.header.getPagination.updatePagination(data.currentPage, this.files.length, data.hasNextPage, data.hasPreviousPage);
@@ -195,6 +201,7 @@ export class DashBoard extends Event {
             const folders = response.data.data.folders;
             for(const folder of folders) {
                 if(folder.id === this.getSidebar().getFocus()) {
+                    // Hier umbauen
                     GlobalEvent.publish('renderFiles', folder.files);
                 }
             }
@@ -302,9 +309,8 @@ export class DashBoard extends Event {
         try {
             const response = await axios.post(API.GET_FILES, {folderId, page});
             // oder hier einen weiteren Paramter für Trigger Toast übergeben
-            if(checkResponse<Response>(response.data, true)) {
-                data = response.data;
-            }
+            checkResponse<Response>(response.data, true) 
+            data = response.data;
         } catch (error) {
             console.warn('Fehler beim Laden der Dateien', error); // Hier ein Toast einbauen, statt immer neue Toasts zu übergeben  PS checkResponse
         }

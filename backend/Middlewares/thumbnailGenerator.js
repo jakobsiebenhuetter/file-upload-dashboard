@@ -1,5 +1,4 @@
 const puppeteer = require('puppeteer-core');
-
 const ffmpegPath = require('ffmpeg-static');
 const ffmpeg = require('fluent-ffmpeg');
 const ffprobePath = require('ffprobe-static');
@@ -7,6 +6,7 @@ const crypto = require('crypto');
 
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config();
 
 ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfprobePath(ffprobePath.path);
@@ -26,6 +26,7 @@ async function pdfConverter(pdfPath) {
 };
 
 // Puppeteer browser middleware
+console.log(process.env.BROWSER_PATH);
 async function startPuppeteerBrowser(filePath) {
     const browser = await puppeteer.launch({ headless: true,
         // Hier wurde der Pfad zur ausführbaren Chrome-Datei angepasst, damit es auf meinem System funktioniert. Auf anderen Systemen muss dieser Pfad ggf. angepasst werden.

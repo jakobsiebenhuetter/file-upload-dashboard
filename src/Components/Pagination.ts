@@ -118,7 +118,6 @@ export class Pagination extends Event{
                     event: e,
                     action: 'next',
                     nextPage: this.currentPage,
-            
                 }
             );
             this.updatePagination(this.currentPage, this.totalPages, this.hasNextPage, this.hasPreviousPage);

@@ -1,113 +1,84 @@
 {
   "folders": [
     {
-      "id": "afa286e0-87b1-4b82-81c9-5164ba406543",
-      "folderName": "sfffdfd",
-      "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840",
+      "id": "1c91afa5-436a-4408-bdfa-79545dc8a438",
+      "folderName": "sdfsdf",
+      "path": "data\\Folders\\273d8f1b-7d30-484a-991c-4fe61e179ada",
       "files": [
         {
-          "id": "5910c820-2193-4315-8cbd-92c527182127",
-          "title": "task-management-logo.png",
-          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\task-management-logo.png",
-          "thumbnailPath": "data\\Thumbnails\\task-management-logo.png",
-          "date": "12.2.2026"
-        },
-        {
-          "id": "f7680b16-28a9-4862-ba15-d0b3bc48a81c",
-          "title": "1769859548026-839797435-1769857794986-712562568-s00203-024-03981-x-1.pdf",
-          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\1769859548026-839797435-1769857794986-712562568-s00203-024-03981-x-1.pdf",
-          "thumbnailPath": "./data/Thumbnails/a31260c1-2548-4468-8daa-52a12896bd38.png",
-          "date": "12.2.2026"
-        },
-        {
-          "id": "00966b47-21c8-4a5b-a849-7fcbd9965446",
-          "title": "s00203-024-03981-x.pdf",
-          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\s00203-024-03981-x.pdf",
-          "thumbnailPath": "./data/Thumbnails/cd44a021-26be-4b77-8b52-9d3c8414c326.png",
-          "date": "12.2.2026"
-        },
-        {
-          "id": "26f4917b-a3a4-4986-bc49-c522eab2fab4",
-          "title": "WhatsApp Image 2026-02-11 at 10.18.54.jpeg",
-          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\WhatsApp Image 2026-02-11 at 10.18.54.jpeg",
-          "thumbnailPath": "data\\Thumbnails\\WhatsApp Image 2026-02-11 at 10.18.54.jpeg",
-          "date": "12.2.2026"
-        },
-        {
-          "id": "5014a3ab-bd62-4093-b1be-f638fc0eef00",
+          "id": "f3e767e1-07e4-42f3-99c2-d98aaf2f4864",
           "title": "KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026-2.pdf",
-          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026-2.pdf",
-          "thumbnailPath": "./data/Thumbnails/5c5e60ea-d88a-47cc-a961-6fa172e94db6.png",
-          "date": "12.2.2026"
+          "path": "data\\Folders\\273d8f1b-7d30-484a-991c-4fe61e179ada\\KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026-2.pdf",
+          "thumbnailPath": "./data/Thumbnails/6d2e97d2-a25c-4fab-a4ca-8c2f7178674f.png",
+          "date": "14.3.2026"
         },
         {
-          "id": "fb274b73-4fb1-4113-b3fd-9506000dbe8c",
-          "title": "n-14_2009-1.pdf",
-          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\n-14_2009-1.pdf",
-          "thumbnailPath": "./data/Thumbnails/c0a886b4-609b-47ad-9c06-99566eb9c105.png",
-          "date": "12.2.2026"
+          "id": "fd1422bb-ee79-4a76-bfc3-44c883095465",
+          "title": "KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026-1.pdf",
+          "path": "data\\Folders\\273d8f1b-7d30-484a-991c-4fe61e179ada\\KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026-1.pdf",
+          "thumbnailPath": "./data/Thumbnails/7469c2af-aa1e-49ae-81e3-0177a92cc4df.png",
+          "date": "14.3.2026"
         },
         {
-          "id": "ecf2c81d-9375-480d-a546-96de519331c1",
+          "id": "b9182e76-3b17-4374-abe5-4d409a09ed95",
+          "title": "Informacja_do_wniosku_o_emeryturÄ_rolniczÄ_2026.pdf",
+          "path": "data\\Folders\\273d8f1b-7d30-484a-991c-4fe61e179ada\\Informacja_do_wniosku_o_emeryturÄ_rolniczÄ_2026.pdf",
+          "thumbnailPath": "./data/Thumbnails/161cf8f0-a689-4f9b-9793-ce5525487978.png",
+          "date": "14.3.2026"
+        },
+        {
+          "id": "0ce670bb-070f-4fa5-b31c-eb3f8ecc39e3",
           "title": "KRUS_SR-12_Wniosek_o_rentÄ_rodzinnÄ_wraz_z_informacjÄ_2026.pdf",
-          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\KRUS_SR-12_Wniosek_o_rentÄ_rodzinnÄ_wraz_z_informacjÄ_2026.pdf",
-          "thumbnailPath": "./data/Thumbnails/de7e5777-78af-43ec-a200-4a1f9bc2df09.png",
-          "date": "12.2.2026"
+          "path": "data\\Folders\\273d8f1b-7d30-484a-991c-4fe61e179ada\\KRUS_SR-12_Wniosek_o_rentÄ_rodzinnÄ_wraz_z_informacjÄ_2026.pdf",
+          "thumbnailPath": "./data/Thumbnails/8388ae1f-84fb-4ed6-bed9-026746e80fe6.png",
+          "date": "14.3.2026"
         },
         {
-          "id": "0318f72b-ef83-430b-a5be-4fcc96c8496a",
-          "title": "KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026.pdf",
-          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026.pdf",
-          "thumbnailPath": "./data/Thumbnails/14f6fd53-26d2-46a7-ae35-f1e3f9eb716d.png",
-          "date": "12.2.2026"
+          "id": "96b50127-8267-474a-b90f-e7f0ed0ee776",
+          "title": "WhatsApp Image 2026-02-11 at 10.18.54.jpeg",
+          "path": "data\\Folders\\273d8f1b-7d30-484a-991c-4fe61e179ada\\WhatsApp Image 2026-02-11 at 10.18.54.jpeg",
+          "thumbnailPath": "data\\Thumbnails\\WhatsApp Image 2026-02-11 at 10.18.54.jpeg",
+          "date": "14.3.2026"
         },
         {
-          "id": "337f6c13-0aed-4471-8887-392466ecc468",
-          "title": "Meine Erstes Elektron Programm _-) 2025-12-08 11-44-14.mp4",
-          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\Meine Erstes Elektron Programm _-) 2025-12-08 11-44-14.mp4",
-          "thumbnailPath": "data\\Thumbnails\\Meine Erstes Elektron Programm _-) 2025-12-08 11-44-14.png",
-          "date": "12.2.2026"
+          "id": "40bd86e0-732b-458b-ae29-edfa1da0262a",
+          "title": "KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026-2.pdf",
+          "path": "data\\Folders\\273d8f1b-7d30-484a-991c-4fe61e179ada\\KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026-2.pdf",
+          "thumbnailPath": "./data/Thumbnails/8d842b58-7374-4826-8956-6efdb5e05b06.png",
+          "date": "14.3.2026"
         },
         {
-          "id": "16d2ee56-d988-4ab1-a795-f2dc759a2470",
-          "title": "modal_cursor.txt",
-          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\modal_cursor.txt",
-          "thumbnailPath": null,
-          "date": "22.2.2026"
+          "id": "292e3ad9-6b3d-48b3-af4d-2258004925d7",
+          "title": "n-14_2009-1.pdf",
+          "path": "data\\Folders\\273d8f1b-7d30-484a-991c-4fe61e179ada\\n-14_2009-1.pdf",
+          "thumbnailPath": "./data/Thumbnails/3ba78d15-2a49-4a28-af4c-a97f9f5b6ac5.png",
+          "date": "14.3.2026"
         },
         {
-          "id": "9fce2168-d4ae-45e4-876e-1f67895dbec4",
-          "title": "meso883sql.tst.txt",
-          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\meso883sql.tst.txt",
-          "thumbnailPath": null,
-          "date": "22.2.2026"
-        },
-        {
-          "id": "00c9d6e0-ae2b-43d7-8ffc-c5b8d3cfef88",
-          "title": "meso883sql.tst.txt",
-          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\meso883sql.tst.txt",
-          "thumbnailPath": null,
-          "date": "22.2.2026"
-        },
-        {
-          "id": "b003d168-a99e-45fb-9ee0-10647e90d2e2",
-          "title": "meso883sql.tst.txt",
-          "path": "data\\Folders\\38e7af48-6d98-45c4-9bfa-49f5fc98e840\\meso883sql.tst.txt",
-          "thumbnailPath": "./data/Thumbnails/054e47bc-21ae-4c6d-9bc3-7edd5ce9ecb6.png",
-          "date": "22.2.2026"
+          "id": "eb4276f6-1890-4b20-a89b-7a393b82548b",
+          "title": "WhatsApp Image 2026-02-11 at 10.18.54.jpeg",
+          "path": "data\\Folders\\273d8f1b-7d30-484a-991c-4fe61e179ada\\WhatsApp Image 2026-02-11 at 10.18.54.jpeg",
+          "thumbnailPath": "data\\Thumbnails\\WhatsApp Image 2026-02-11 at 10.18.54.jpeg",
+          "date": "14.3.2026"
         }
       ]
     },
     {
-      "id": "5c9c1b7d-fbf6-42dc-80a3-05b41496b680",
-      "folderName": "sds",
-      "path": "data\\Folders\\f3afc410-3dd3-447c-ae9e-5f38c04c2bff",
+      "id": "a5ca29dd-2a62-4360-945c-3aaf3a3ba175",
+      "folderName": "hghghjhgh",
+      "path": "data\\Folders\\e8294d38-206d-4f55-8acc-3aab2cd4a3e8",
       "files": []
     },
     {
-      "id": "b80bc627-8da6-4915-85e3-2a04424682de",
-      "folderName": "df",
-      "path": "data\\Folders\\53cfc1e2-103e-4e98-ba7f-9a393723a26f",
+      "id": "419c4911-aeda-4de6-925c-d1eff9dfde20",
+      "folderName": "khkjhk",
+      "path": "data\\Folders\\bd9452fd-3250-4dc7-84c8-df8c5f541c5b",
+      "files": []
+    },
+    {
+      "id": "03284d92-d977-492e-a040-465ce8e3319a",
+      "folderName": "hkjhjkh",
+      "path": "data\\Folders\\607eecda-5d18-4474-aaa8-d940d94bd1d7",
       "files": []
     }
   ]
