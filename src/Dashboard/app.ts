@@ -8,8 +8,9 @@ import { KeyManager } from './KeyManager';
 import { API } from '../API';
 
 /**
+ * @todo Toast Komponente sollte ein Singleton sein
+ * @todo Modal noch positionieren
  * @todo Upload umbauen
- * @todo Es gibt mit dem lockscreen, bzw. backdrop noch Probleme, overflow ist auf auto gesetzt beim body
  * @todo automatisches herunterladen von videos im Edge Browser verhindern
  * @todo KI integrieren um pdf Dokumente zusammenzufassen.
  * @todo Event member als Objekt verwenden damit man nicht immer die Funktion durchgehen muss, sondern direkt auf die Funktion zugreifen kann, z.B. this.events['openModal']() anstatt this.events.forEach(fn => { if(fn.name === 'openModal') fn() })

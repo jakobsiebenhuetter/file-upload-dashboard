@@ -326,7 +326,7 @@ export class DashBoard extends Event {
         try {
             const response = await axios.post(API.GET_FILES, {folderId, page});
             // oder hier einen weiteren Paramter für Trigger Toast übergeben
-            checkResponse<Response>(response.data, true) 
+            // checkResponse<Response>(response.data, true) 
             data = response.data;
         } catch (error) {
             console.warn('Fehler beim Laden der Dateien', error); // Hier ein Toast einbauen, statt immer neue Toasts zu übergeben  PS checkResponse

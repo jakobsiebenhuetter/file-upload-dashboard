@@ -28,7 +28,7 @@ export class Button extends Event {
             width: 'w-[100px]',
             height: 'h-[100px]',
             color: 'bg-gray-200',
-            hoverColor: 'hover:bg-gray-300',
+            // hoverColor: 'hover:bg-gray-300',
             // activeColor: 'active:bg-gray-400',
         };
 

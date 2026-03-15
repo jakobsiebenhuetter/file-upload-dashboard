@@ -53,8 +53,21 @@
           "path": "data\\Folders\\273d8f1b-7d30-484a-991c-4fe61e179ada\\WhatsApp Image 2026-02-11 at 10.18.54.jpeg",
           "thumbnailPath": "data\\Thumbnails\\WhatsApp Image 2026-02-11 at 10.18.54.jpeg",
           "date": "14.3.2026"
+        },
+        {
+          "id": "2445d66b-4bac-4385-8bd1-38dec06b6816",
+          "title": "Meine Erstes Elektron Programm _-) 2025-12-08 11-46-52.mp4",
+          "path": "data\\Folders\\273d8f1b-7d30-484a-991c-4fe61e179ada\\Meine Erstes Elektron Programm _-) 2025-12-08 11-46-52.mp4",
+          "thumbnailPath": "data\\Thumbnails\\Meine Erstes Elektron Programm _-) 2025-12-08 11-46-52.png",
+          "date": "15.3.2026"
         }
       ]
+    },
+    {
+      "id": "b3d186c2-306d-4df1-a685-04fa135901e6",
+      "folderName": "weeweww",
+      "path": "data\\Folders\\9767dcb5-fe48-4354-b4bf-eeadb8370718",
+      "files": []
     }
   ]
 }

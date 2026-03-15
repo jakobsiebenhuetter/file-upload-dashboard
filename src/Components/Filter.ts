@@ -31,14 +31,14 @@ export class Filter extends Event {
     }
 
     renderUI(): void {
-        this.el.classList.add('flex', 'flex-row', 'bg-white', 'rounded-4xl', 'p-1', 'min-w-[100px]', this.props.width ? this.props.width : 'max-w-[500px]');
+        this.el.classList.add('flex', 'flex-row', 'bg-white', 'rounded-4xl', 'p-1', 'mr-1.5', 'min-w-[200px]', this.props.width ? this.props.width : 'max-w-[500px]');
         
         this.filterInput.type = 'text';
         this.filterInput.placeholder = this.props.placeholder;
         this.filterInput.classList.add(this.props.width, 'h-[40px]', 'focus:outline-none', 'text-xl');
         
         this.filterButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>`;
-        this.filterButton.classList.add('w-[50px]', 'flex', 'justify-center', 'items-center', 'cursor-pointer');     
+        this.filterButton.classList.add('w-[50px]','flex', 'justify-center', 'items-center', 'cursor-pointer');     
         this.el.append(this.filterButton, this.filterInput);
 
         this.filterButton.onclick = (e) => {
