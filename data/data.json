@@ -6,13 +6,6 @@
       "path": "data\\Folders\\273d8f1b-7d30-484a-991c-4fe61e179ada",
       "files": [
         {
-          "id": "f3e767e1-07e4-42f3-99c2-d98aaf2f4864",
-          "title": "KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026-2.pdf",
-          "path": "data\\Folders\\273d8f1b-7d30-484a-991c-4fe61e179ada\\KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026-2.pdf",
-          "thumbnailPath": "./data/Thumbnails/6d2e97d2-a25c-4fab-a4ca-8c2f7178674f.png",
-          "date": "14.3.2026"
-        },
-        {
           "id": "fd1422bb-ee79-4a76-bfc3-44c883095465",
           "title": "KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026-1.pdf",
           "path": "data\\Folders\\273d8f1b-7d30-484a-991c-4fe61e179ada\\KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026-1.pdf",
@@ -62,24 +55,6 @@
           "date": "14.3.2026"
         }
       ]
-    },
-    {
-      "id": "a5ca29dd-2a62-4360-945c-3aaf3a3ba175",
-      "folderName": "hghghjhgh",
-      "path": "data\\Folders\\e8294d38-206d-4f55-8acc-3aab2cd4a3e8",
-      "files": []
-    },
-    {
-      "id": "419c4911-aeda-4de6-925c-d1eff9dfde20",
-      "folderName": "khkjhk",
-      "path": "data\\Folders\\bd9452fd-3250-4dc7-84c8-df8c5f541c5b",
-      "files": []
-    },
-    {
-      "id": "03284d92-d977-492e-a040-465ce8e3319a",
-      "folderName": "hkjhjkh",
-      "path": "data\\Folders\\607eecda-5d18-4474-aaa8-d940d94bd1d7",
-      "files": []
     }
   ]
 }

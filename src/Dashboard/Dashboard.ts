@@ -13,7 +13,6 @@ import { isImage, checkResponse } from '../Util/Util';
 import { API } from '../API';
 import { Toast } from '../Components/Toast';
 import { PaginationEventData } from '../Components/Pagination';
-import { Spinner } from '../Components/Spinner';
 
 export type DashBoardData = {
     folders: FolderData[];
@@ -77,35 +76,34 @@ export class DashBoard extends Event {
 
      constructor(items: DashBoardData) {
          super();
-         const spinner = new Spinner({ backdropOption: true });
-       
          this.header = new Header();
-         this.getData().getFolders().then((folders) => {
+         this.getFolders().then((folders) => {
             this.renderSidebar(folders);   
-            this.getData().getFilesData(this.sidebar.getFocus()).then((data) => {
+            this.getFilesData(this.sidebar.getFocus()).then((data) => {
                 const files = data.files;
                 this.header.getPagination.setPaginationData(1, data.maxPages, data.hasNextPage, false);
                 this.files = files;
                 this.renderHeroPage(this.files);
             });
             this.addListeners();
-        });
-             
-        spinner.destroy();
+        });        
+    
     };
 
      private addListeners(): void {
         GlobalEvent.subscribe('folderFocusChanged:renderFiles', (folderId) => {
-            this.getData().getFilesData(folderId).then((data) => {
-                this.files = data.files;
-                // this.setPaginationData(data.currentPage, data.totalPages, data.hasNextPage, data.hasPreviousPage);
-                this.renderGrid(this.files);
+            this.getFilesData(folderId).then((data) => {
+                if(data.files) {
+                    this.files = data.files;
+                    // this.setPaginationData(data.currentPage, data.totalPages, data.hasNextPage, data.hasPreviousPage);
+                    this.renderGrid(this.files);
+                }
             });
         });
 
         GlobalEvent.subscribe('change:page', (paginationData: PaginationEventData) => {
             const { nextPage } = paginationData;
-            this.getData().getFilesData(this.sidebar.getFocus(), nextPage).then((paginationData) => {
+            this.getFilesData(this.sidebar.getFocus(), nextPage).then((paginationData) => {
                 this.files = paginationData.files;  
                 this.header.getPagination.updatePagination(paginationData.currentPage, this.files.length, paginationData.hasNextPage, paginationData.hasPreviousPage);
                 this.renderGrid(this.files);
@@ -117,10 +115,29 @@ export class DashBoard extends Event {
         });
 
         // upload:renderFiles ???
+        // Es gibt eine strukturelle diskrepanz, beim filtern und ohne filtern rendering
          GlobalEvent.subscribe('renderFiles', (data: FilesData) => {
-            this.files = data.files;
-            this.header.getPagination.updatePagination(data.currentPage, this.files.length, data.hasNextPage, data.hasPreviousPage);
-            this.renderGrid(this.files);
+            console.log('Daten im Dashboard erhalten: ', data);
+            if(data.files){
+                this.files = data.files;
+                this.header.getPagination.updatePagination(data.currentPage, this.files.length, data.hasNextPage, data.hasPreviousPage);
+                this.renderGrid(this.files);
+            } else {
+                console.warn('Keine Dateien zum Rendern übergeben');
+                console.warn('Daten:', data);
+            }
+        });
+
+        GlobalEvent.subscribe('filter:renderFiles', (data: FileData[]) => {
+            if(data.length > 0) {
+                this.files = data;
+                this.renderGrid(this.files);
+                // Hier Pagination noch anpassen, jetzt erstmal komplett disablen
+                this.header.getPagination.updatePagination(1, 1, false, false);
+            } else {
+                console.warn('Keine Dateien zum Rendern übergeben');
+                console.warn('Daten:', data);
+            }
         });
 
          GlobalEvent.subscribe('spinner', (data: Record<string, any>) => {
@@ -136,7 +153,7 @@ export class DashBoard extends Event {
             GlobalEvent.publish('spinner', { action: 'show'});
             const folderId = this.getSidebar().getFocus();
             const filteredFiles = await this.getFilteredFiles(folderId, params.inputValue);
-            GlobalEvent.publish('renderFiles', filteredFiles);
+            GlobalEvent.publish('filter:renderFiles', filteredFiles);
             GlobalEvent.publish('spinner', { action: 'hide'});
         });
 
@@ -329,10 +346,6 @@ export class DashBoard extends Event {
             console.warn('Fehler beim Laden der Ordner', error);
         }
         return data;
-    }
-
-    getData(): this {
-        return this;
     }
 
     async getFilteredFiles(folderId: string, char: string): Promise<FileData[]> {

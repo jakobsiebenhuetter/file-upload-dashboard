@@ -9,9 +9,7 @@ import { API } from '../API';
 
 /**
  * @todo Upload umbauen
- * @FIXME Pagination Bug bei mehreren Seiten
  * @todo Es gibt mit dem lockscreen, bzw. backdrop noch Probleme, overflow ist auf auto gesetzt beim body
- * @todo Backdrop Bug fixen und Scrollen verhindern während des droppens
  * @todo automatisches herunterladen von videos im Edge Browser verhindern
  * @todo KI integrieren um pdf Dokumente zusammenzufassen.
  * @todo Event member als Objekt verwenden damit man nicht immer die Funktion durchgehen muss, sondern direkt auf die Funktion zugreifen kann, z.B. this.events['openModal']() anstatt this.events.forEach(fn => { if(fn.name === 'openModal') fn() })

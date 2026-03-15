@@ -41,7 +41,7 @@ export class Sidebar extends Event {
    
         this.el.classList.add('min-h-screen', 'bg-stone-200', 'p-2', 'min-w-[270px]');
         const icon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" /></svg>`
-        const createFolderBtn = new Button({ text: 'Ordner erstellen', width: 'w-full', height: 'h-[40px]', color: 'bg-green-500', hoverColor: 'hover:bg-green-600', icon: icon, activeColor: 'active:bg-green-700' });
+        const createFolderBtn = new Button({ text: 'Ordner erstellen', width: 'w-full', height: 'h-[40px]', color: 'bg-yellow-50', hoverColor: 'hover:bg-green-600', icon: icon, activeColor: 'active:bg-green-700' });
         createFolderBtn.el.setAttribute('id', 'create-folder');
 
         createFolderBtn.onClick(async (e) => {
@@ -72,7 +72,7 @@ export class Sidebar extends Event {
     
     this.el.append(createFolderBtn.el, this.listElement);
     
-    this.listElement.classList.add('flex', 'flex-col', 'justify-center');
+    this.listElement.classList.add('flex', 'flex-col', 'justify-center', 'mt-4');
     this.renderListElements();
 
     };
@@ -117,6 +117,7 @@ export class Sidebar extends Event {
             };
 
             deleteBtn.onclick = async (e) => {
+                e.stopPropagation();
                 let confirmModal: Modal | null = new Modal({ default: false, confirmModal: true, backdropOption: true, height: 'h-auto', rounded: true, text: 'Möchten Sie den Ordner wirklich löschen?' });
                 document.body.append(confirmModal.el);
                 // KI wegen Confirmmodal befragen

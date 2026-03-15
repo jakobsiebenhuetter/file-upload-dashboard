@@ -1,10 +1,11 @@
 import { Event } from './Event';
 
-
+type Position = 'left' | 'right';
 type ButtonProps = {
     shape?: 'circle' | 'rounded';
     text?: string;
     icon?: string;
+    iconPosition?: Position;
     width?: string;
     height?: string;
     disabled?: boolean;
@@ -55,11 +56,8 @@ export class Button extends Event {
             this.el.textContent = this.props.text;
         }
 
-        if(this.constainsIcon()) {
-            if(this.props.text.length) {
-                this.el.classList.add('justify-between', 'px-4');
-                this.el.classList.remove('justify-center');
-            }
+        if(this.hasIcon()) {
+            this.setIcon();
         }
     }
 
@@ -67,11 +65,24 @@ export class Button extends Event {
         this.subscribe('click', handler);
     }
 
-    private constainsIcon(): boolean {
+    private hasIcon(): boolean {
+        return this.props.icon && this.props.icon.length > 0;
+    }
+
+    private setIcon(): void {
         const iconElement = document.createElement('span');
         iconElement.innerHTML = this.props.icon;
+        
+        if(this.props.text.length) {
+            this.el.classList.add('justify-between', 'px-4');
+            this.el.classList.remove('justify-center');
+            if(this.props.iconPosition === 'left') {
+                this.el.textContent = this.props.text;
+                this.el.insertAdjacentElement('afterbegin', iconElement);
+                return;
+            }
+        }  
         this.el.appendChild(iconElement);
-        return this.props.icon.length > 0;
     }
 
     disable(): void {

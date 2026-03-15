@@ -32,9 +32,9 @@ export class Pagination extends Event{
             <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
         </svg>`;
     el: HTMLElement = document.createElement('div');
-    heroElement = new Button({ text: '1', width: 'w-[40px]', height: 'h-[40px]', color: 'bg-gray-300', hoverColor: 'hover:bg-gray-400' });
-    leftArrow = new Button({ text: 'Zurück', icon: this.leftArrowIcon, width: 'w-[auto]', height: 'h-[40px]', color: 'bg-gray-300', hoverColor: 'hover:bg-gray-400' });
-    rightArrow = new Button({ text: 'Weiter',  icon: this.rightArrowIcon , width: 'w-[auto]', height: 'h-[40px]', color: 'bg-gray-300', hoverColor: 'hover:bg-gray-400'});
+    leftArrow = new Button({shape: 'circle', text: 'Zurück', icon: this.leftArrowIcon, iconPosition: 'left', width: 'w-[auto]', height: 'h-[40px]', color: 'bg-gray-300', hoverColor: 'hover:bg-gray-400' });
+    heroElement = new Button({ shape: 'circle', text: '1', width: 'w-[40px]', height: 'h-[40px]', color: 'bg-gray-300', hoverColor: 'hover:bg-gray-400' });
+    rightArrow = new Button({ shape: 'circle', text: 'Weiter',  icon: this.rightArrowIcon , width: 'w-[auto]', height: 'h-[40px]', color: 'bg-gray-300', hoverColor: 'hover:bg-gray-400'});
 
     protected props: PaginationProps;
     currentPage: number;
@@ -72,7 +72,7 @@ export class Pagination extends Event{
         $(this.leftArrow.el).addClass('flex justify-center items-center cursor-pointer bg-gray-400 m-2');
         $(this.heroElement.el).addClass('flex justify-center items-center cursor-pointer bg-gray-400 m-2');
         $(this.rightArrow.el).addClass('flex justify-center items-center cursor-pointer bg-gray-400 m-2');
-        $(this.el).addClass('flex flex-row justify-center items-center cursor-pointer select-none bg-green-400 rounded');
+        $(this.el).addClass('flex flex-row justify-center items-center cursor-pointer select-none bg-yellow-50 rounded-full');
         this.el.append(this.leftArrow.el, this.heroElement.el, this.rightArrow.el);
 
     }
