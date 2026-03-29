@@ -65,11 +65,12 @@ export class Widget extends Event {
     };
 
     async addImage() {
-        const imgContainer = document.createElement('img');
+        const img = document.createElement('img');
         // imgContainer.src = 'https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fhintergrundbild.org%2Fwallpaper%2Ffull%2F9%2Fa%2Fd%2F35623-popular-tiere-hintergrundbilder-1920x1200.jpg&f=1&nofb=1&ipt=e9d41e369609327f6a261f0a5fc39e583defcfb35065b097d55b8a600872b301';
-        imgContainer.src = this.props.imgPath;
-        imgContainer.classList.add('w-full', 'h-8/10');
-        this.el.insertAdjacentElement('afterbegin', imgContainer);
+        img.src = this.props.imgPath;
+        img.classList.add('w-full', 'h-8/10');
+        this.el.insertAdjacentElement('afterbegin', img);
+        this.blockImgdrag(img);
     }
 
     renderUI(): void {
@@ -131,6 +132,11 @@ export class Widget extends Event {
         );
     };
     
+    blockImgdrag(img: HTMLImageElement): void {
+        img.addEventListener('dragstart', (e) => {
+            e.preventDefault();
+        });
+    }
 
     setDeleteBtn(): void {
         this.deleteBtn.el.classList.add(

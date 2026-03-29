@@ -1,4 +1,4 @@
-import { Response, FolderData, FileData } from '../Dashboard/Dashboard';
+import { Response, Folder, File } from '../Dashboard/Dashboard';
 import { Toast } from '../Components/Toast';
 
 export function isImage(ext: string): boolean {
@@ -6,7 +6,7 @@ export function isImage(ext: string): boolean {
     return ext === 'jpg' || ext === 'jpeg' || ext === 'png' || ext === 'gif' || ext === 'bmp';
 }
 
-export function isFolder(val: unknown): val is FolderData {
+export function isFolder(val: unknown): val is Folder {
     if(typeof val === 'object' &&
         val !== null &&
         'id' in val && 
@@ -18,7 +18,7 @@ export function isFolder(val: unknown): val is FolderData {
     return false;
 }
 
-export function getFolders(val: unknown): FolderData[] {
+export function getFolders(val: unknown): Folder[] {
     if(Array.isArray(val) && val.every((item) => isFolder(item))) {
         console.log('Val ist ein Array von FolderData: ', val);
         return val;

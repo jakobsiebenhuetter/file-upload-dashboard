@@ -14,27 +14,24 @@ import { API } from '../API';
 import { Toast } from '../Components/Toast';
 import { PaginationEventData } from '../Components/Pagination';
 
-export type DashBoardData = {
-    folders: FolderData[];
-}
 
-export type FolderData = {
+export type Folder = {
     id: string;
     folderName: string;
     path: string;
-    files: FileData[];
+    files: File[];
     focus?: boolean;
 }
 
-export type FilesData = {
+export type Page = {
     currentPage: number;
     maxPages: number;
-    files: FileData[];
+    files: File[];
     hasNextPage: boolean,
     hasPreviousPage: boolean
 }
 
-export type FileData = {
+export type File = {
     id: string;
     title: string;
     date: string;
@@ -44,7 +41,7 @@ export type FileData = {
 
 type APIResponse = {
     message: string;
-    data: FolderData[] | FileData[] | FilesData;
+    data: Folder[] | File[] | Page;
     type: 'success';
 }
 
@@ -72,27 +69,38 @@ export class DashBoard extends Event {
      widgetContainerWrapper: HTMLElement = document.createElement('div');
      sidebar: Sidebar;
      dropzone: DropZone | null = null;
-     files: FileData[];
+     files: File[];
 
-     constructor(items: DashBoardData) {
+     constructor() {
          super();
          this.header = new Header();
-         this.getFolders().then((folders) => {
-            this.renderSidebar(folders);   
-            this.getFilesData(this.sidebar.getFocus()).then((data) => {
-                const files = data.files;
-                this.header.getPagination.setPaginationData(1, data.maxPages, data.hasNextPage, false);
-                this.files = files;
-                this.renderHeroPage(this.files);
-            });
-            this.addListeners();
-        });        
-    
+         this.addListeners();
+         this.initApp();
     };
 
+    initApp(): void {
+        DashBoard.getFolders().then((folders) => {
+            this.renderSidebar(folders);
+            let folderId = folders[0].id;
+
+            GlobalEvent.publish('folder:setFokus', folderId);   
+            DashBoard.getFiles(folderId).then((data) => {
+                this.files = data.files;
+                // this.header.getPagination.updatePagination(data.currentPage, data.files.length, data.hasNextPage, data.hasPreviousPage);
+                this.header.getPagination.setPaginationData(1, data.maxPages, data.hasNextPage, false);
+                this.renderHeroPage(this.files);
+            });     
+        });        
+    }
+
      private addListeners(): void {
+
+        GlobalEvent.subscribe('folder:setFokus',(folderId) => {
+            this.sidebar.setFocus(folderId);  
+        });
+
         GlobalEvent.subscribe('folderFocusChanged:renderFiles', (folderId) => {
-            this.getFilesData(folderId).then((data) => {
+            DashBoard.getFiles(folderId).then((data) => {
                 if(data.files) {
                     this.files = data.files;
                     // this.setPaginationData(data.currentPage, data.totalPages, data.hasNextPage, data.hasPreviousPage);
@@ -103,7 +111,7 @@ export class DashBoard extends Event {
 
         GlobalEvent.subscribe('change:page', (paginationData: PaginationEventData) => {
             const { nextPage } = paginationData;
-            this.getFilesData(this.sidebar.getFocus(), nextPage).then((paginationData) => {
+            DashBoard.getFiles(this.sidebar.getFocus(), nextPage).then((paginationData) => {
                 this.files = paginationData.files;  
                 this.header.getPagination.updatePagination(paginationData.currentPage, this.files.length, paginationData.hasNextPage, paginationData.hasPreviousPage);
                 this.renderGrid(this.files);
@@ -116,7 +124,7 @@ export class DashBoard extends Event {
 
         // upload:renderFiles ???
         // Es gibt eine strukturelle diskrepanz, beim filtern und ohne filtern rendering
-         GlobalEvent.subscribe('renderFiles', (data: FilesData) => {
+         GlobalEvent.subscribe('renderFiles', (data: Page) => {
             console.log('Daten im Dashboard erhalten: ', data);
             if(data.files){
                 this.files = data.files;
@@ -128,12 +136,13 @@ export class DashBoard extends Event {
             }
         });
 
-        GlobalEvent.subscribe('filter:renderFiles', (data: FileData[]) => {
-            if(data.length > 0) {
-                this.files = data;
+        GlobalEvent.subscribe('filter:renderFiles', (data: Page) => {
+            if(data.files.length > 0) {
+                this.files = data.files;
                 this.renderGrid(this.files);
                 // Hier Pagination noch anpassen, jetzt erstmal komplett disablen
-                this.header.getPagination.updatePagination(1, 1, false, false);
+                // Das muss bearbeitet werden mit zusätzlicher info für Anzahl der gefilterten Dokumente und Pagination update
+                this.header.getPagination.updatePagination(1, 1, data.hasNextPage, data.hasPreviousPage);
             } else {
                 console.warn('Keine Dateien zum Rendern übergeben');
                 console.warn('Daten:', data);
@@ -231,18 +240,12 @@ export class DashBoard extends Event {
         return this.sidebar;
     }
 
-    private renderSidebar(folders: FolderData[]): void {
+    private renderSidebar(folders: Folder[]): void {
         this.sidebar = new Sidebar({ listItems: folders, width: 'min-w-[220px]' });
-        this.el.append(this.sidebar.el);
-
-        if(folders.length > 0) {
-            if(this.sidebar.setFocus(folders[0].id)) {
-                console.warn('Kein Fokus für die Sidebar gesetzt');
-            }
-        }
+        this.el.append(this.sidebar.el);    
     }
     
-    private renderHeroPage(files: FileData[]): void {
+    private renderHeroPage(files: File[]): void {
         const heroPage = document.createElement('div');
         heroPage.classList.add('bg-stone-100', 'w-full');
         heroPage.append(this.header.el, this.widgetContainerWrapper);
@@ -250,7 +253,7 @@ export class DashBoard extends Event {
         this.renderGrid(files);
      };
 
-    private renderGrid(files: FileData[]): void {
+    private renderGrid(files: File[]): void {
         this.widgetContainer.innerHTML = ``;
         this.el.classList.add('flex', 'min-h-screen');
         this.widgetContainerWrapper.append(this.widgetContainer);
@@ -260,7 +263,7 @@ export class DashBoard extends Event {
         this.createWidgets(files);
     };
 
-    private createWidgets(files: FileData[]): void {
+    private createWidgets(files: File[]): void {
 
         for (const file of files) {
 
@@ -275,11 +278,11 @@ export class DashBoard extends Event {
                 let ext = file.path.split('.').pop();
 
                 if(isImage(ext)) {
-                    modal = new Modal({ backdropOption: true, width: '',height:'h-[750px]' , rounded: true});
+                    modal = new Modal({ text: file.title ,backdropOption: true, width: '',height:'h-[750px]' , rounded: true});
                     modalContent = document.createElement('img');
                  
                 } else {
-                    modal = new Modal({ backdropOption: true, width:'w-[1000px]', height: 'h-[800px]' ,rounded: true});
+                    modal = new Modal({text: file.title,  backdropOption: true, width:'w-[1000px]', height: 'h-[800px]' ,rounded: true});
                     modalContent = document.createElement('iframe');
                     // modalContent.setAttribute('sandbox', 'allow-same-origin allow-forms allow-popups allow-scripts');
                     // modalContent.setAttribute('allow', 'autoplay; fullscreen');
@@ -320,9 +323,8 @@ export class DashBoard extends Event {
         }
     };
 
-    public async getFilesData(folderId: string, page: number = 1): Promise<FilesData> {
-        let data: FilesData;
-       
+    public static async getFiles(folderId: string, page: number = 1): Promise<Page> {
+        let data: Page;      
         try {
             const response = await axios.post(API.GET_FILES, {folderId, page});
             // oder hier einen weiteren Paramter für Trigger Toast übergeben
@@ -331,12 +333,11 @@ export class DashBoard extends Event {
         } catch (error) {
             console.warn('Fehler beim Laden der Dateien', error); // Hier ein Toast einbauen, statt immer neue Toasts zu übergeben  PS checkResponse
         }
-        this.header.getPagination.updatePagination(data.currentPage, data.files.length, data.hasNextPage, data.hasPreviousPage);
         return data;
     }
     
-    private async getFolders(): Promise<FolderData[]> {
-        let data: FolderData[] = [];
+    public static async getFolders(): Promise<Folder[]> {
+        let data: Folder[] = [];
         try {
             const response = await axios.get(API.GET_FOLDERS);
             if(checkResponse<Response>(response.data)) {
@@ -348,11 +349,11 @@ export class DashBoard extends Event {
         return data;
     }
 
-    async getFilteredFiles(folderId: string, char: string): Promise<FileData[]> {
-        let files: FileData[] = [];
+    async getFilteredFiles(folderId: string, char: string): Promise<Page> {
+        let files: Page;
         try {
             const response = await axios.post(API.GET_FILTER_FILES, {folderId, char});
-            files = response.data.files;
+            files = response.data;
         } catch (error) {
             new Toast({ text: 'Fehler beim Filtern der Dateien', icon: 'error', backdrop: true });
         }

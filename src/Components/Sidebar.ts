@@ -7,8 +7,7 @@ import { Modal } from './Modal';
 import { Toast } from './Toast';
 import { Tooltip } from './Tooltip';
 import { GlobalEvent } from '../Dashboard/events';
-import { FileData, FolderData } from '../Dashboard/Dashboard';
-import { App } from '../Dashboard/app';
+import { DashBoard, File, Folder } from '../Dashboard/Dashboard';
 import { API } from '../API';
 import { Button } from './Button';
 
@@ -18,7 +17,7 @@ export class Sidebar extends Event {
     protected props: Record<string, any> = {};
     el: HTMLElement = document.createElement('div');
     listElement: HTMLElement = document.createElement('ul');
-    listItems: FolderData[] | null = null;
+    listItems: Folder[] | null = null;
 
     constructor(props?: Record<string, any>) {
         super();
@@ -50,6 +49,12 @@ export class Sidebar extends Event {
             let data = null;
 
             modal.saveBtnOnClick(async () => {
+                
+                if(!modal.getInputValue()) {
+                    const toast = new Toast({ text: 'Der Ordnername darf nicht leer sein', icon: 'error', color: 'bg-red-500', width: '' });
+                    return;
+                }
+                
                 GlobalEvent.publish('spinner', { action: 'show'});
 
                 let response = await axios.post(API.CREATE_FOLDER, { text: modal.getInputValue(), id: modal.getInputValue() });
@@ -131,8 +136,8 @@ export class Sidebar extends Event {
                         console.warn(error);
                     };
 
-                    let data: FileData[] = [];
-                    const { folders } = await App.getData();
+                    let data: File[] = [];
+                    const folders = await DashBoard.getFolders();
                     this.props.listItems = folders;
                     GlobalEvent.publish('spinner', {action: 'hide'});
                     const toast = new Toast({text: 'Ordner gelöscht', icon: 'success', backdrop: true});

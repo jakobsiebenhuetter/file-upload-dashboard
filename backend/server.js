@@ -269,22 +269,33 @@ app.post('/get-filtered-files', (req, res) => {
         };
         return res.json(msg);
     }
+    
+     const { filesForPage, maxPages } = storage.getFiles(folderId);
 
     if(char.trim() === '') {
-        const data = storage.getFiles(folderId);
+        // Hier filesForPage, maxPages mitliefern, für die Pagination
         const msg = {
             info: 'Kein Suchbegriff',
-            files: data,
-            type: 'info'
+            files: data.filesForPage,
+            maxPages: maxPages,
+            hasPreviousPage: data.hasPreviousPage,
+            hasNextPage: data.hasNextPage,
+            type: 'info',
+            state: 'no-filter'
         };
         return res.json(msg);
     }
     
     const files = storage.getFilteredFiles(folderId, char);
+      // Hier filesForPage, maxPages mitliefern, für die Pagination und state
     const msg = {
         info: 'Gefilterte Dateien',
         files: files,
-        type: 'success'
+        maxPages: maxPages,
+        // hasPreviousPage: ,
+        // hasNextPage:,
+        type: 'success',
+        state: 'filter'
     };
     res.json(msg);
 })

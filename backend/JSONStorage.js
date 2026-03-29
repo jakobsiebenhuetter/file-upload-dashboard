@@ -2,7 +2,6 @@ const fs = require('fs');
 const crypto = require('crypto');
 
 const TNGenerator = require('./Middlewares/thumbnailGenerator');
-const { type } = require('os');
 
 const jsonPath = '../data/data.json';
 const tnPath = './data/Thumbnails';
@@ -128,14 +127,20 @@ class JSONStorage {
         return folders;
     }
 
-    getFilteredFiles(folderId, char) {
+    getFilteredFiles(folderId, char, page = 1) {
+        // Maxpages mit prev und nextPage hier berechnen
+
         let files = [];
+        let maxPages = 1;
+        let previousPage = false;
+        let hasNextPage = false;
         try {
             const data = this.getData();
             const folder = data.folders.filter((folder) => folder.id === folderId);
             if(folder.length) {
                 files = folder[0].files.filter((file) => file.title.includes(char));
             }
+
         } catch (error) {
             console.error('Error reading data:', error);
         }

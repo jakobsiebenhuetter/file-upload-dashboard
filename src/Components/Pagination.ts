@@ -2,7 +2,7 @@ import $ from 'jquery';
 
 import { Button } from "./Button";
 import { Event } from "./Event";
-import { FileData } from "../Dashboard/Dashboard";
+import { File } from "../Dashboard/Dashboard";
 
 
 
@@ -10,7 +10,7 @@ type PaginationProps = {
     currentPage: number;
     hasPreviousPage: boolean;
     hasNextPage: boolean;
-    currentFiles?: FileData[];
+    currentFiles?: File[];
     totalPages: number;
     filesPerPage: number;
     folderId: string;
@@ -40,7 +40,7 @@ export class Pagination extends Event{
     currentPage: number;
     hasNextPage: boolean;
     hasPreviousPage: boolean;
-    currentFiles: FileData[];
+    currentFiles: File[];
     totalPages: number;
     filesPerPage: number;
     folderId: string = '';
