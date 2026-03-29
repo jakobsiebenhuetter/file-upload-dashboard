@@ -1,11 +1,8 @@
 import '../styles.css';
 
-import axios from 'axios';
-
 import { Event } from '../Components/Event';
-import { DashBoard, Folder } from "./Dashboard";
+import { DashBoard } from "./Dashboard";
 import { KeyManager } from './KeyManager';
-import { API } from '../API';
 
 /**
  * @BUGFIXES Es müssen jetzt mal klare Typen für die API Schnittstellen definiert werden, für den Anfang
@@ -33,7 +30,6 @@ export class App extends Event {
         if (app instanceof HTMLElement) {
             app.append(dashBoard.el);
         };
-
     };
 };
 
