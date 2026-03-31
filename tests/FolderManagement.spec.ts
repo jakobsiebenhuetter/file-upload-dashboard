@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 
+// Wenn zu viele Folder (4) vorhanden sind dann müssen diese gelöscht werden, aber es muss mindestens ein Ordner vorhanden sein
 test('create folder', async ({ page }) => {
   await page.goto('http://localhost:2000');
   page.click('#create-folder');
@@ -18,3 +19,10 @@ test('create folder', async ({ page }) => {
   await expect(newFolder).toBeVisible();
 
 });
+
+test('delete folder', async ({ page }) => {
+  await page.goto('http://localhost:2000');
+})
+
+// Ordner Modal schließen bzw. abbrechen mit ESC. und Button click
+// Backdrop muss auch synchron mitagieren wie geplannt

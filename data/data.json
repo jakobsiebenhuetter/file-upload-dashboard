@@ -27,13 +27,6 @@
           "date": "14.3.2026"
         },
         {
-          "id": "96b50127-8267-474a-b90f-e7f0ed0ee776",
-          "title": "WhatsApp Image 2026-02-11 at 10.18.54.jpeg",
-          "path": "data\\Folders\\273d8f1b-7d30-484a-991c-4fe61e179ada\\WhatsApp Image 2026-02-11 at 10.18.54.jpeg",
-          "thumbnailPath": "data\\Thumbnails\\WhatsApp Image 2026-02-11 at 10.18.54.jpeg",
-          "date": "14.3.2026"
-        },
-        {
           "id": "40bd86e0-732b-458b-ae29-edfa1da0262a",
           "title": "KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026-2.pdf",
           "path": "data\\Folders\\273d8f1b-7d30-484a-991c-4fe61e179ada\\KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026-2.pdf",
@@ -67,13 +60,33 @@
           "path": "data\\Folders\\273d8f1b-7d30-484a-991c-4fe61e179ada\\Jakob-W11.mesonic.com - Remotedesktopverbindung 2025-10-27 11-08-37.mp4",
           "thumbnailPath": "data\\Thumbnails\\Jakob-W11.png",
           "date": "21.3.2026"
+        },
+        {
+          "id": "f171c827-7e81-4749-b3fe-76a3760e4174",
+          "title": "full-stack-developer-wmx-inserat.pdf",
+          "path": "data\\Folders\\273d8f1b-7d30-484a-991c-4fe61e179ada\\full-stack-developer-wmx-inserat.pdf",
+          "thumbnailPath": "./data/Thumbnails/4d7efdc1-8c04-42c7-9720-a20cb6f5ea98.png",
+          "date": "31.3.2026"
+        },
+        {
+          "id": "155e1597-fa9d-4b54-a9b7-3ece1319d223",
+          "title": "full-stack-developer-wmx-inserat.pdf",
+          "path": "data\\Folders\\273d8f1b-7d30-484a-991c-4fe61e179ada\\full-stack-developer-wmx-inserat.pdf",
+          "thumbnailPath": "./data/Thumbnails/5cbad6a4-3619-48cd-b504-dd1dc06ded89.png",
+          "date": "31.3.2026"
         }
       ]
     },
     {
-      "id": "e5226981-7d25-499c-aa76-7a24679fdfc3",
-      "folderName": "Testordner",
-      "path": "data\\Folders\\2a4bb0c7-b612-4608-ac01-7d3337c3a853",
+      "id": "5c42a82b-a0c1-4947-b4af-ef16c00ed973",
+      "folderName": "hgjhjhgj",
+      "path": "data\\Folders\\338029f2-cb29-4a53-9ffc-928a7f11bc89",
+      "files": []
+    },
+    {
+      "id": "550348d0-e0ee-4202-acc5-f461bc535d10",
+      "folderName": "gh",
+      "path": "data\\Folders\\88e57c2a-2854-45be-870b-346717c8336a",
       "files": []
     }
   ]

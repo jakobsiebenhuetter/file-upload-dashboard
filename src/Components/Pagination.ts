@@ -11,7 +11,6 @@ type PaginationProps = {
     hasPreviousPage: boolean;
     hasNextPage: boolean;
     currentFiles?: File[];
-    totalPages: number;
     filesPerPage: number;
     folderId: string;
 };
@@ -20,6 +19,7 @@ export type PaginationEventData = {
     event: MouseEvent;
     action: 'next' | 'prev';
     nextPage: number;
+    state?: 'filter' | 'no-filter';
 }
 
 
@@ -41,7 +41,6 @@ export class Pagination extends Event{
     hasNextPage: boolean;
     hasPreviousPage: boolean;
     currentFiles: File[];
-    totalPages: number;
     filesPerPage: number;
     folderId: string = '';
     
@@ -53,7 +52,6 @@ export class Pagination extends Event{
             currentPage: 1,
             hasPreviousPage: false,
             hasNextPage: false,
-            totalPages: 1,  
             filesPerPage: 10,     
         };
 
@@ -61,7 +59,6 @@ export class Pagination extends Event{
         this.hasPreviousPage = this.props.hasPreviousPage;
         this.currentPage = this.props.currentPage;
         this.hasNextPage = this.props.hasNextPage;
-        this.totalPages = this.props.totalPages;
         this.filesPerPage = this.props.filesPerPage;
         this.renderUI();
         this.addListeners();
@@ -94,7 +91,7 @@ export class Pagination extends Event{
 
     private addListeners(): void {
 
-        this.leftArrow.onClick(async (e) => {
+        this.leftArrow.onClick((e) => {
             if(!this.hasPreviousPage) return;
             this.currentPage = this.currentPage - 1;
 
@@ -105,10 +102,10 @@ export class Pagination extends Event{
                     nextPage: this.currentPage 
                 }
             );
-            this.updatePagination(this.currentPage, this.totalPages, this.hasNextPage, this.hasPreviousPage);
+            this.updatePagination(this.currentPage, this.hasNextPage, this.hasPreviousPage);
         });
 
-        this.rightArrow.onClick(async (e) => {
+        this.rightArrow.onClick((e) => {
             if(!this.hasNextPage) return;
             this.currentPage = this.currentPage + 1;
 
@@ -119,7 +116,7 @@ export class Pagination extends Event{
                     nextPage: this.currentPage,
                 }
             );
-            this.updatePagination(this.currentPage, this.totalPages, this.hasNextPage, this.hasPreviousPage);
+            this.updatePagination(this.currentPage,  this.hasNextPage, this.hasPreviousPage);
         });
     }
 
@@ -155,20 +152,16 @@ export class Pagination extends Event{
         }
 
 
-    setPaginationData(currentPage: number, totalPages: number, hasNextPage: boolean, hasPreviousPage: boolean): void {
+    setPaginationData(currentPage: number, hasNextPage: boolean, hasPreviousPage: boolean): void {
         this.currentPage = currentPage;
-        this.totalPages = totalPages;
         this.hasNextPage = hasNextPage;
         this.hasPreviousPage = hasPreviousPage;
-        this.updatePagination(currentPage, totalPages, hasNextPage, hasPreviousPage);
+        this.updatePagination(currentPage, hasNextPage, hasPreviousPage);
     }
     // Validiert wird im Backend, hier wird nur die Anfrage gesendet und die UI aktualisiert
    
-    updatePagination(page: number, totalPages: number, hasnextPage = false, hasPreviousPage = false): void {
-        this.totalPages = totalPages;
-        if(page < 1 || page > this.totalPages) return;
+    updatePagination(page: number, hasnextPage = false, hasPreviousPage = false): void {
         this.currentPage = page;
-        this.totalPages = totalPages;
         this.hasNextPage = hasnextPage;
         this.hasPreviousPage = hasPreviousPage;
         this.update();

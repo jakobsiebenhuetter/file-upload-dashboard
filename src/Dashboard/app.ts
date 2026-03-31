@@ -3,10 +3,11 @@ import '../styles.css';
 import { Event } from '../Components/Event';
 import { DashBoard } from "./Dashboard";
 import { KeyManager } from './KeyManager';
+import { lockScreen, unlockScreen } from './globVar';
 
 /**
+ * @BUGFIXES Response muss Toast triggern und beim löschen eines Widgets auch Pagination und Dashboard updaten
  * @BUGFIXES Es müssen jetzt mal klare Typen für die API Schnittstellen definiert werden, für den Anfang
- * @BUGFIXES Wenn man beim filtern nichts eingibt dann wird die Pagination nicht richtig aktualisiert
  * @BUGFIXES Wenn es gar keine files gibt, muss hierbei die Pagination auch gleich upgedated werden. Bei filtered-files muss, auch die Pagination upgedated werden. Upload der Pagination verbessern
  * @todo Modal noch positionieren
  * @todo Upload umbauen, und beim upload die Daten neu holen, damit die Pagination auch direkt upgedated wird
@@ -20,7 +21,11 @@ import { KeyManager } from './KeyManager';
 export class App extends Event {
     constructor() {
         super();
+        lockScreen();
         this.initApp();
+        setTimeout(() => {
+            unlockScreen();
+        }, 1000);
     };
 
     async initApp(): Promise<void> {

@@ -87,15 +87,13 @@ export class Sidebar extends Event {
         this.listElement.innerHTML = '';
  
         this.props.listItems.forEach((item: any) => {
-
             const listItemElement: HTMLElement = document.createElement('li');
             listItemElement.classList.add('listElement');
             listItemElement.dataset.id = item.id;
-     
-            const deleteBtn: HTMLElement = document.createElement('div');
+            const deleteBtn = new Button({ shape: 'circle', text: '', width: 'w-[30px]', height: 'h-[30px]', color: 'bg-red-200', hoverColor: 'hover:bg-red-600', activeColor: 'active:bg-red-700' });
             const span: HTMLElement = document.createElement('span');
 
-            deleteBtn.setAttribute('btn-id', item.id);
+            deleteBtn.el.setAttribute('btn-id', item.id);
 
             if(item.focus) {
                 const observer = new MutationObserver((mutations, observe) => {
@@ -106,8 +104,8 @@ export class Sidebar extends Event {
                  observer.observe(this.listElement, { childList: true, subtree: true });
             };
 
-            deleteBtn.classList.add('hover:cursor-pointer');
-            deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" class="w-[22px] h-[22px]" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>`;
+            deleteBtn.el.classList.add('hover:cursor-pointer');
+            deleteBtn.el.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" class="w-[22px] h-[22px]" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>`;
             
             listItemElement.onclick = async (e) => {
                 let id = listItemElement.dataset.id as string;
@@ -122,16 +120,20 @@ export class Sidebar extends Event {
                 GlobalEvent.publish('spinner', { action: 'hide'});
             };
 
-            deleteBtn.onclick = async (e) => {
-                e.stopPropagation();
+            deleteBtn.el.addEventListener('click', (e) => {
+                // e.stopPropagation();
+                let target = e.target as HTMLElement;
+                const folderId = target.closest('.listElement')?.getAttribute('data-id');
+                this.setFocus(folderId);
+                
                 let confirmModal: Modal | null = new Modal({ default: false, confirmModal: true, backdropOption: true, height: 'h-auto', rounded: true, text: 'Möchten Sie den Ordner wirklich löschen?' });
                 document.body.append(confirmModal.el);
-                // KI wegen Confirmmodal befragen
+    
                 confirmModal.saveBtnOnClick( async (e) => {     
                     GlobalEvent.publish('spinner', {action: 'show'});
                     try {
                         // Hier die Daten nach dem löschen wieder holen
-                        const data = await axios.post(API.DELETE_FOLDER, { id: deleteBtn.getAttribute('btn-id') });  
+                        const data = await axios.post(API.DELETE_FOLDER, { id: deleteBtn.el.getAttribute('btn-id') });  
                     } catch(error) {
                         console.warn(error);
                     };
@@ -161,7 +163,7 @@ export class Sidebar extends Event {
                     // GlobalEvent.publish('renderFiles', data);
                     GlobalEvent.publish('folderFocusChanged:renderFiles', this.getFocus());
                 });
-            };
+            });
 
             span.innerText = item.folderName;
             span.onmouseover = () => {
@@ -174,7 +176,7 @@ export class Sidebar extends Event {
 
             span.classList.add('select-none', 'truncate');
 
-            listItemElement.append(span, deleteBtn)
+            listItemElement.append(span, deleteBtn.el)
             listItemElement.classList.add('show-tooltip','flex', 'flex-row', 'justify-between', 'm-2', 'hover:bg-stone-500','p-1', 'rounded');
             this.listElement.append(listItemElement);
         })

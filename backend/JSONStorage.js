@@ -129,22 +129,31 @@ class JSONStorage {
 
     getFilteredFiles(folderId, char, page = 1) {
         // Maxpages mit prev und nextPage hier berechnen
-
+        // !!!! genauso wie bei getFiles, nur dass hier vorher, und hier eventuell auch den state setzen, muss aber noch überlegt werden
+        
         let files = [];
         let maxPages = 1;
-        let previousPage = false;
-        let hasNextPage = false;
+        console.log(folderId, char, page);
+
         try {
             const data = this.getData();
             const folder = data.folders.filter((folder) => folder.id === folderId);
             if(folder.length) {
-                files = folder[0].files.filter((file) => file.title.includes(char));
+              console.log('Gefundener Ordner: ', folder);
+                files = folder[0].files;
+                if(files.length) {
+                    files = files.filter((file) => file.title.includes(char));
+                }
             }
-
         } catch (error) {
             console.error('Error reading data:', error);
         }
-        return files;
+
+        maxPages = files.length ? Math.ceil(files.length / 5) : 1;
+        let firstFile = (page - 1) * 5;
+        let lastFile = firstFile + 4;
+        let filesForPage = files.slice(firstFile, lastFile);
+        return {filesForPage, maxPages};
     }
 }
 

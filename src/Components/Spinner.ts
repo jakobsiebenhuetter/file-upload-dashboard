@@ -1,12 +1,14 @@
-import { Event } from './Event';
+type BackdropStyle = 'grey-transparent' | 'white';
+type SpinnerProps = {
+    // ...
+}
 
-export class Spinner extends Event {
+export class Spinner {
     props: Record<string, any> = {};
     element: HTMLElement | null = null;
     backdrop: HTMLElement | null = null;
-    constructor(props?: Record<string, any>) {
-        super();
 
+    constructor(props?: Record<string, any>) {
         const defaults: Record<string, any> = {};
 
         this.props = { ...defaults, ...props }

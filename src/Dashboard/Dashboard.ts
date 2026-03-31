@@ -23,7 +23,7 @@ export type Folder = {
     focus?: boolean;
 }
 
-export type Page = {
+export type PageData = {
     currentPage: number;
     maxPages: number;
     files: File[];
@@ -41,7 +41,7 @@ export type File = {
 
 type APIResponse = {
     message: string;
-    data: Folder[] | File[] | Page;
+    data: Folder[] | File[] | PageData;
     type: 'success';
 }
 
@@ -70,6 +70,8 @@ export class DashBoard extends Event {
      sidebar: Sidebar;
      dropzone: DropZone | null = null;
      files: File[];
+     filterState: 'filter' | 'no-filter' = 'no-filter';
+     filterValue?: string = '';
 
      constructor() {
          super();
@@ -87,7 +89,7 @@ export class DashBoard extends Event {
             DashBoard.getFiles(folderId).then((data) => {
                 this.files = data.files;
                 // this.header.getPagination.updatePagination(data.currentPage, data.files.length, data.hasNextPage, data.hasPreviousPage);
-                this.header.getPagination.setPaginationData(1, data.maxPages, data.hasNextPage, false);
+                this.header.getPagination.setPaginationData(1, data.hasNextPage, false);
                 this.renderHeroPage(this.files);
             });     
         });        
@@ -100,22 +102,31 @@ export class DashBoard extends Event {
         });
 
         GlobalEvent.subscribe('folderFocusChanged:renderFiles', (folderId) => {
+            this.filterState = 'no-filter';
             DashBoard.getFiles(folderId).then((data) => {
                 if(data.files) {
                     this.files = data.files;
-                    // this.setPaginationData(data.currentPage, data.totalPages, data.hasNextPage, data.hasPreviousPage);
+                    // Pagination updaten und filter clearen im backend
+                    console.log('Daten im Dashboard erhalten: ', data);
+                    this.header.getPagination.updatePagination(1 , data.hasNextPage, false);
                     this.renderGrid(this.files);
                 }
             });
         });
 
+        // Hier weiter machen Schritt für Schritt, sonst werde ich verrückt :-)
         GlobalEvent.subscribe('change:page', (paginationData: PaginationEventData) => {
             const { nextPage } = paginationData;
+            if(this.filterState === 'no-filter') {
+            // Hier muss noch unterschieden werden ob gefiltert wird oder nicht, da es sonst zu Problemen mit der Pagination
             DashBoard.getFiles(this.sidebar.getFocus(), nextPage).then((paginationData) => {
                 this.files = paginationData.files;  
-                this.header.getPagination.updatePagination(paginationData.currentPage, this.files.length, paginationData.hasNextPage, paginationData.hasPreviousPage);
+                this.header.getPagination.updatePagination(paginationData.currentPage, paginationData.hasNextPage, paginationData.hasPreviousPage);
                 this.renderGrid(this.files);
             })
+            } else {
+                 //... 
+            }
         });
 
         this.header.getPagination.onPageChange(async (params) => {
@@ -124,28 +135,26 @@ export class DashBoard extends Event {
 
         // upload:renderFiles ???
         // Es gibt eine strukturelle diskrepanz, beim filtern und ohne filtern rendering
-         GlobalEvent.subscribe('renderFiles', (data: Page) => {
+         GlobalEvent.subscribe('renderFiles', (data: PageData) => {
+            this.filterState = 'no-filter';
             console.log('Daten im Dashboard erhalten: ', data);
             if(data.files){
                 this.files = data.files;
-                this.header.getPagination.updatePagination(data.currentPage, this.files.length, data.hasNextPage, data.hasPreviousPage);
+                this.header.getPagination.updatePagination(data.currentPage, data.hasNextPage, data.hasPreviousPage);
                 this.renderGrid(this.files);
             } else {
-                console.warn('Keine Dateien zum Rendern übergeben');
-                console.warn('Daten:', data);
+                console.error('Daten:', data);
             }
         });
 
-        GlobalEvent.subscribe('filter:renderFiles', (data: Page) => {
-            if(data.files.length > 0) {
+        GlobalEvent.subscribe('filter:renderFiles', (data: PageData) => {
+            this.filterState = 'filter';
+            if(data.files) {
                 this.files = data.files;
                 this.renderGrid(this.files);
-                // Hier Pagination noch anpassen, jetzt erstmal komplett disablen
-                // Das muss bearbeitet werden mit zusätzlicher info für Anzahl der gefilterten Dokumente und Pagination update
-                this.header.getPagination.updatePagination(1, 1, data.hasNextPage, data.hasPreviousPage);
+                this.header.getPagination.updatePagination(data.currentPage, data.hasNextPage, data.hasPreviousPage);
             } else {
-                console.warn('Keine Dateien zum Rendern übergeben');
-                console.warn('Daten:', data);
+                console.error('Daten:', data);
             }
         });
 
@@ -158,11 +167,24 @@ export class DashBoard extends Event {
             }
         });
 
-          this.header.getFilter.onFilter(async (params) => {     
+          this.header.getFilter.onFilter(async (params) => {
             GlobalEvent.publish('spinner', { action: 'show'});
             const folderId = this.getSidebar().getFocus();
-            const filteredFiles = await this.getFilteredFiles(folderId, params.inputValue);
-            GlobalEvent.publish('filter:renderFiles', filteredFiles);
+
+            if(params.inputValue === '') {
+                //Hier mit der API die Page Daten holen für renderfiles
+                DashBoard.getFiles(folderId).then((data) => {
+                    this.files = data.files;
+                    GlobalEvent.publish('renderFiles', data); // Hier gleich immer das andere Event aufrufen, und Pagination updaten       
+                    // this.renderGrid(this.files);
+                });
+
+            } else {    
+
+                const page = this.header.getPagination.getPage.currentPage;
+                const pageData = await this.getFilteredFiles(folderId, params.inputValue, page);
+                GlobalEvent.publish('filter:renderFiles', pageData);
+            };
             GlobalEvent.publish('spinner', { action: 'hide'});
         });
 
@@ -219,7 +241,15 @@ export class DashBoard extends Event {
             };
 
             try {
-                response = await axios.post(API.UPLOAD_FILES, formData);
+                // Response muss Toast triggern und beim löschen eines Widgets auch Pagination und Dashboard updaten
+                response = await axios.post(API.UPLOAD_FILES, formData);      
+                DashBoard.getFiles(this.sidebar.getFocus(), this.header.getPagination.currentPage).then((paginationData) => {
+                this.files = paginationData.files;  
+                this.header.getPagination.updatePagination(paginationData.currentPage, paginationData.hasNextPage, paginationData.hasPreviousPage);
+                GlobalEvent.publish('renderFiles', this.files);
+            });
+
+                
             } catch (error) {
                 console.warn('Fehler beim Hochladen der Datei', error);
             }
@@ -323,8 +353,8 @@ export class DashBoard extends Event {
         }
     };
 
-    public static async getFiles(folderId: string, page: number = 1): Promise<Page> {
-        let data: Page;      
+    public static async getFiles(folderId: string, page: number = 1): Promise<PageData> {
+        let data: PageData;      
         try {
             const response = await axios.post(API.GET_FILES, {folderId, page});
             // oder hier einen weiteren Paramter für Trigger Toast übergeben
@@ -349,14 +379,14 @@ export class DashBoard extends Event {
         return data;
     }
 
-    async getFilteredFiles(folderId: string, char: string): Promise<Page> {
-        let files: Page;
+    async getFilteredFiles(folderId: string, char: string, pageNumber: number): Promise<PageData> {
+        let page: PageData;
         try {
-            const response = await axios.post(API.GET_FILTER_FILES, {folderId, char});
-            files = response.data;
+            const response = await axios.post(API.GET_FILTER_FILES, {folderId, char, pageNumber});
+            page = response.data;
         } catch (error) {
             new Toast({ text: 'Fehler beim Filtern der Dateien', icon: 'error', backdrop: true });
         }
-        return files;
+        return page;
     }
 }

@@ -84,7 +84,8 @@ app.post('/get-files', (req, res) => {
         currentPage: 1,
         maxPages: 1,
         hasNextPage: false,
-        hasPreviousPage: false
+        hasPreviousPage: false,
+        state: 'no-filter'
     };
 
     if(page < 1) {
@@ -259,41 +260,61 @@ app.post('/delete-folder', (req, res) => {
 })
 
 app.post('/get-filtered-files', (req, res) => {
-    const { folderId, char } = req.body;
-    
-    if(!validateInput(folderId)) {
-        const msg = {
-            info: 'Ungültige OrdnerId',
-            files: [],
-            type: 'error'
-        };
-        return res.json(msg);
-    }
-    
-     const { filesForPage, maxPages } = storage.getFiles(folderId);
+    let { folderId, char, pageNumber } = req.body;
+    let page = parseInt(pageNumber);
 
-    if(char.trim() === '') {
-        // Hier filesForPage, maxPages mitliefern, für die Pagination
-        const msg = {
-            info: 'Kein Suchbegriff',
-            files: data.filesForPage,
-            maxPages: maxPages,
-            hasPreviousPage: data.hasPreviousPage,
-            hasNextPage: data.hasNextPage,
-            type: 'info',
-            state: 'no-filter'
-        };
+    let msg = {
+        message: '',
+        type: 'info',
+        files: [],
+        currentPage: 1,
+        maxPages: 1,
+        hasNextPage: false,
+        hasPreviousPage: false,
+        state: 'filter'
+    };
+
+    if(!validateInput(folderId)) {
+        msg.info = 'Ungültige OrdnerId';
+        msg.files = [];
+        msg.type = 'error';
         return res.json(msg);
     }
     
-    const files = storage.getFilteredFiles(folderId, char);
+     const unfilteredFiles = storage.getFiles(folderId);
+
+    if(char.trim() === '') {      
+        msg.info = 'Kein Suchbegriff';
+        msg.maxPages = unfilteredFiles.maxPages;
+        msg.currentPage = 1;
+        msg.filesForPage = unfilteredFiles.filesForPage;
+        msg.hasNextPage = false;
+        msg.hasPreviousPage = false;
+        msg.type = 'info';
+        msg.state = 'no-filter';
+        return res.json(msg);
+    }
+    
+    const {filesForPage, maxPages} = storage.getFilteredFiles(folderId, char, page);
       // Hier filesForPage, maxPages mitliefern, für die Pagination und state
-    const msg = {
+      let previous = false;
+      let nextPage = false;
+
+      if(page < maxPages) {
+        nextPage = true;
+      }
+
+      if(page > 1) {
+        previous = true;
+      }
+
+     msg = {
         info: 'Gefilterte Dateien',
-        files: files,
+        files: filesForPage,
         maxPages: maxPages,
-        // hasPreviousPage: ,
-        // hasNextPage:,
+        currentPage: page,
+        hasPreviousPage: previous,
+        hasNextPage: nextPage,
         type: 'success',
         state: 'filter'
     };
