@@ -9,7 +9,7 @@ import { Modal } from '../Components/Modal';
 import { GlobalEvent } from './events';
 import { DropZone } from '../Components/Dropzone';
 import { lockScreen, unlockScreen } from './globVar';
-import { isImage, checkResponse } from '../Util/Util';
+import { isImage, checkResponse } from '../Util/util';
 import { API } from '../API';
 import { Toast } from '../Components/Toast';
 import { PaginationEventData } from '../Components/Pagination';
@@ -244,7 +244,8 @@ export class DashBoard extends Event {
                 response = await axios.post(API.UPLOAD_FILES, formData);
                 const toast = new Toast({ text: response.data.message, icon: response.data.type === 'success' ? 'success' : 'error' });   
                 DashBoard.getFiles(this.sidebar.getFocus(), this.header.getPagination.currentPage).then((paginationData) => {
-                GlobalEvent.publish('renderFiles', paginationData);
+
+                GlobalEvent.publish('renderFiles', this.files);
             });
         
             } catch (error) {

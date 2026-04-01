@@ -1,6 +1,6 @@
 import { test, expect } from '@jest/globals';
 import { Folder } from '../../Dashboard/Dashboard';
-import { isFolder} from '../Util';
+import { isFolder} from '../util';
 
 test('soll überprüfen, ob es sich um einen Folder handelt', () => {
     const folderData: Folder = {
