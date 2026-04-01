@@ -47,7 +47,6 @@ class JSONStorage {
         const data = this.getData();
          for (const folder of data.folders) {
             if (folder.id === folderId) {
-                console.log('Zu löschende Datei: ', fileId);
                 for (const file of folder.files) {
                     if (fileId === file.id) {
                         try {

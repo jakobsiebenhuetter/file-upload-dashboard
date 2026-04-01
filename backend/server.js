@@ -74,7 +74,7 @@ app.get('/get-folders', (req, res) => {
 
 
 app.post('/get-files', (req, res) => {
-    // Hier prev und next berechnen
+    // Hier prev und next bestimmen
     let { folderId, page } = req.body;
     page = parseInt(page);
     let msg = {
@@ -108,8 +108,7 @@ app.post('/get-files', (req, res) => {
         if(page > 1) {
             msg.hasPreviousPage = true;
         }
-        console.log('MaxPages', maxPages);
-        console.log('Page', page);
+
         if(page < maxPages) {
             msg.hasNextPage = true;
         }
