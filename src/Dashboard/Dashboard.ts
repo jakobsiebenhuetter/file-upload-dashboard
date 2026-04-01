@@ -245,7 +245,7 @@ export class DashBoard extends Event {
                 const toast = new Toast({ text: response.data.message, icon: response.data.type === 'success' ? 'success' : 'error' });   
                 DashBoard.getFiles(this.sidebar.getFocus(), this.header.getPagination.currentPage).then((paginationData) => {
 
-                GlobalEvent.publish('renderFiles', this.files);
+                GlobalEvent.publish('renderFiles', paginationData);
             });
         
             } catch (error) {
