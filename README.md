@@ -63,6 +63,8 @@ cd backend && node server.js
 
 ## 📡 Relevante API-Endpunkte (Express)
 
+## info -> SQLite wird nicht vollständig unterstützt
+
 - `GET /getJson` — Metadaten (Ordner, Dateien)
 - `POST /upload` — Datei hochladen (FormData, Feldname `file`)
 - `POST /delete-file` — Datei löschen (body: `{ fileId, folderId }`)
