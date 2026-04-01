@@ -149,7 +149,7 @@ class JSONStorage {
             console.error('Error reading data:', error);
         }
 
-        maxPages = files.length ? Math.ceil(files.length / 5) : 1;
+        maxPages = files.length ? Math.ceil(files.length / 4) : 1;
         let firstFile = (page - 1) * 5;
         let lastFile = firstFile + 4;
         let filesForPage = files.slice(firstFile, lastFile);

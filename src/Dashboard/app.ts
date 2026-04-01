@@ -6,7 +6,7 @@ import { KeyManager } from './KeyManager';
 import { lockScreen, unlockScreen } from './globVar';
 
 /**
- * @BUGFIXES Response muss Toast triggern und beim löschen eines Widgets auch Pagination und Dashboard updaten
+ * @BUGFIXES Beim löschen eines Widgets auch Pagination und Dashboard updaten, hier nochmal Logik im Backend der Pagination anschauen, wenn man das letzt Element löscht dann gibt es einen Bug4
  * @BUGFIXES Es müssen jetzt mal klare Typen für die API Schnittstellen definiert werden, für den Anfang
  * @BUGFIXES Wenn es gar keine files gibt, muss hierbei die Pagination auch gleich upgedated werden. Bei filtered-files muss, auch die Pagination upgedated werden. Upload der Pagination verbessern
  * @todo Modal noch positionieren

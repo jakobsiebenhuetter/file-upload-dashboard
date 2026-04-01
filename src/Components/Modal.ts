@@ -136,17 +136,17 @@ export class Modal extends Event{
             this.el.classList.remove('cursor-grabbing');
         });
 
-        this.el.style.position = 'absolute';
+        this.el.style.position = 'fixed';
         this.el.style.zIndex = '1000';
         this.el.style.top = '10%';
         this.el.style.left = '50%';
 
+        this.el.style.left = `calc(50% - ${this.extractNumber(this.props.width)/2}px)`;
+
         $(this.el).draggable({
             containment: 'window'
         });
-        // this.el.style.left = '50%';
-        this.el.style.left = `calc(50% - ${this.props.width / 2}px)`;
-        
+    
         this.$saveBtn.on('click', () => {
             this.publish('click',
                 {
@@ -202,6 +202,11 @@ export class Modal extends Event{
             this.backdrop.remove();
             this._cleaned = true;
         }
+    }
+
+    private extractNumber(str: string): number {
+        const match = str.match(/\d+/);
+        return parseInt(match[0], 10);
     }
 
     saveBtnOnClick(fn: (e?: any) => void) {
