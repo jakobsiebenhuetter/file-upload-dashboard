@@ -108,6 +108,8 @@ app.post('/get-files', (req, res) => {
         if(page > 1) {
             msg.hasPreviousPage = true;
         }
+        console.log('MaxPages', maxPages);
+        console.log('Page', page);
         if(page < maxPages) {
             msg.hasNextPage = true;
         }
@@ -298,7 +300,6 @@ app.post('/get-filtered-files', (req, res) => {
     }
     
     const {filesForPage, maxPages} = storage.getFilteredFiles(folderId, char, page);
-      // Hier filesForPage, maxPages mitliefern, für die Pagination und state
       let previous = false;
       let nextPage = false;
 

@@ -47,6 +47,7 @@ class JSONStorage {
         const data = this.getData();
          for (const folder of data.folders) {
             if (folder.id === folderId) {
+                console.log('Zu löschende Datei: ', fileId);
                 for (const file of folder.files) {
                     if (fileId === file.id) {
                         try {
@@ -101,17 +102,18 @@ class JSONStorage {
             console.error('Error reading data:', error);
         }
         console.log('Alle Dateien im Ordner: ', files);
-        let firstFile = (page - 1) * 5;
+        let firstFile = (page - 1) * 4;
         let lastFile = firstFile + 4;
 
 
-        maxPages = files.files.length ? Math.ceil(files.files.length / 5) : 1;
+        maxPages = files.files.length ? Math.ceil(files.files.length / 4)  : 1;
         console.log('Max Pages', maxPages);
         if(files.files.length < lastFile + 1) {
             lastFile = files.files.length;
         }
         
         let filesForPage = files.files.slice(firstFile, lastFile);
+
         console.log('Alles', filesForPage);
         return {filesForPage, maxPages};
     }
@@ -150,7 +152,7 @@ class JSONStorage {
         }
 
         maxPages = files.length ? Math.ceil(files.length / 4) : 1;
-        let firstFile = (page - 1) * 5;
+        let firstFile = (page - 1) * 4;
         let lastFile = firstFile + 4;
         let filesForPage = files.slice(firstFile, lastFile);
         return {filesForPage, maxPages};
