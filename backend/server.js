@@ -239,10 +239,12 @@ app.post('/upload', async (req, res) => {
         try {
             data = await storage.saveFiles(req.files, focus, date);
             msg.message = 'Erfolgreich upgeloadet';
+            msg.type = 'success';
             msg.data = data;
 
         } catch (error) {
             msg.message = `Fehler beim speichern ${error}`;
+            msg.type = 'error';
         }
         res.json(msg);
     })

@@ -241,27 +241,16 @@ export class DashBoard extends Event {
             };
 
             try {
-                // Response muss Toast triggern und beim löschen eines Widgets auch Pagination und Dashboard updaten
-                response = await axios.post(API.UPLOAD_FILES, formData);      
+                response = await axios.post(API.UPLOAD_FILES, formData);
+                const toast = new Toast({ text: response.data.message, icon: response.data.type === 'success' ? 'success' : 'error' });   
                 DashBoard.getFiles(this.sidebar.getFocus(), this.header.getPagination.currentPage).then((paginationData) => {
-                this.files = paginationData.files;  
-                this.header.getPagination.updatePagination(paginationData.currentPage, paginationData.hasNextPage, paginationData.hasPreviousPage);
-                GlobalEvent.publish('renderFiles', this.files);
+                GlobalEvent.publish('renderFiles', paginationData);
             });
-
-                
+        
             } catch (error) {
                 console.warn('Fehler beim Hochladen der Datei', error);
             }
 
-            const folders = response.data.data.folders;
-            for(const folder of folders) {
-                if(folder.id === this.getSidebar().getFocus()) {
-                    // Hier umbauen
-                    GlobalEvent.publish('renderFiles', folder.files);
-                }
-            }
-           
             GlobalEvent.publish('spinner', { action: 'hide' });
         });
     };
@@ -335,14 +324,20 @@ export class DashBoard extends Event {
                 GlobalEvent.publish('spinner', { action: 'show' });
                 
                 try { 
-                    const response = await axios.post(API.DELETE_FILE, { fileId: fileId, folderId: folderId })
+                    const response = await axios.post(API.DELETE_FILE, { fileId: fileId, folderId: folderId });
                     const msg: Response = response.data;
+                    checkResponse(msg);
+                        
+                    if(this.files.length === 1 && this.header.getPagination.currentPage > 1) {
+                        this.header.getPagination.currentPage - 1;
+                    }
 
-                    if(checkResponse(msg)) {
-                        if(msg.type === 'success') { // eigentlich unnötiger doppelCheck aber TS meckert sonst
-                            GlobalEvent.publish('renderFiles', msg.data);
-                        }
-                    }          
+                    DashBoard.getFiles(this.sidebar.getFocus(), this.header.getPagination.currentPage).then((paginationData) => {
+                        this.files = paginationData.files;  
+                        this.header.getPagination.updatePagination(paginationData.currentPage, paginationData.hasNextPage, paginationData.hasPreviousPage);
+                        GlobalEvent.publish('renderFiles', paginationData); // Hier gleich immer das andere Event aufrufen, und Pagination updaten       
+                    });
+                  
                     GlobalEvent.publish('spinner', { action: 'hide' });
 
                 } catch (error) {
