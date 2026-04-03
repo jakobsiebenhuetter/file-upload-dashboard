@@ -82,9 +82,13 @@ export class DashBoard extends Event {
 
     initApp(): void {
         DashBoard.getFolders().then((folders) => {
+            
+            let folderId = null;
+            if(folders.length > 0) {
+                folderId = folders[0].id;
+            }
+            
             this.renderSidebar(folders);
-            let folderId = folders[0].id;
-
             GlobalEvent.publish('folder:setFokus', folderId);   
             DashBoard.getFiles(folderId).then((data) => {
                 this.files = data.files;
