@@ -2,6 +2,7 @@ import '../styles.css';
 import { Button } from './Button';
 import { Event } from './Event';
 import { Tooltip } from './Tooltip';
+import { ContextMenu, TContextMenu, TContextMenuEvent } from './Contextmenu';
 
 // Titel vom Widget eingeben und ein icon vom Format
 interface IWidgetProps {
@@ -27,6 +28,7 @@ export class Widget extends Event {
     text: string | null = null;
     date: string | null = null;
     imgPath: string = '';
+    contextMenu?: ContextMenu = null;
 
     constructor(props?: IWidgetProps) {
         super();
@@ -61,7 +63,6 @@ export class Widget extends Event {
         this.renderUI();
         this.setDeleteBtn();
         this.addImage();
-        this.addContextMenu();
     };
 
     async addImage() {
@@ -153,10 +154,14 @@ export class Widget extends Event {
             'p-1'
         );
         this.el.append(this.deleteBtn.el);
+
+        this.deleteBtn.onClick(() => {
+            this.deleteWidget();
+        });
     };
 
-    getDeleteBtn(): Button {
-        return this.deleteBtn;
+    onDelete(handler: (params?: Record<string, any>) => void): void {
+        this.subscribe('delete', handler);
     }
 
     setElement(el: any): void {
@@ -174,10 +179,31 @@ export class Widget extends Event {
         this.subscribe('click', handler);
     }
 
-    // Muss noch implementiert werden mit einer eigenen Komponente für das Kontextmenü
-    addContextMenu(): void {
+    // Muss noch implementiert werden mit einer eigenen Komponente für das Contextmenü
+    addContextMenu(contexMenuData: TContextMenu, eventData?: TContextMenuEvent): void {
+        ContextMenu.handleContextMenu();
+        
         this.el.oncontextmenu = (e) => {
             e.preventDefault();
+            if(this.contextMenu) {
+                this.contextMenu.destroy();
+            }
+            contexMenuData.eventData = eventData;
+            this.contextMenu = new ContextMenu(contexMenuData);
+            this.contextMenu.show(e.pageX, e.pageY);
         }
+    }
+
+    deleteWidget(): void {        
+        this.publish('delete', {
+            widget: this
+        });
+
+        if(this.contextMenu) {
+            this.contextMenu.destroy();
+        }
+        
+        this.el.remove();
+        this.el = null;
     }
 };

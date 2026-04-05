@@ -13,6 +13,7 @@ import { isImage, checkResponse } from '../Util/util';
 import { API } from '../API';
 import { Toast } from '../Components/Toast';
 import { PaginationEventData } from '../Components/Pagination';
+import { Button } from '../Components/Button';
 
 
 export type Folder = {
@@ -322,34 +323,27 @@ export class DashBoard extends Event {
                 document.body.append(modal.el);
             });
 
-            widget.getDeleteBtn().onClick(async (e) => {
-                
+            widget.onDelete(async (e) => {    
                 const folderId = this.getSidebar().getFocus();
                 const fileId = widget.el.getAttribute('data-id');
-                GlobalEvent.publish('spinner', { action: 'show' });
-                
-                try { 
-                    const response = await axios.post(API.DELETE_FILE, { fileId: fileId, folderId: folderId });
-                    const msg: Response = response.data;
-                    checkResponse(msg);
-                        
-                    if(this.files.length === 1 && this.header.getPagination.currentPage > 1) {
-                        this.header.getPagination.currentPage - 1;
-                    }
-
-                    DashBoard.getFiles(this.sidebar.getFocus(), this.header.getPagination.currentPage).then((paginationData) => {
-                        this.files = paginationData.files;  
-                        this.header.getPagination.updatePagination(paginationData.currentPage, paginationData.hasNextPage, paginationData.hasPreviousPage);
-                        GlobalEvent.publish('renderFiles', paginationData); // Hier gleich immer das andere Event aufrufen, und Pagination updaten       
-                    });
-                  
-                    GlobalEvent.publish('spinner', { action: 'hide' });
-
-                } catch (error) {
-                    console.error('Fehler beim Löschen der Datei:', error);
-                };
+                GlobalEvent.publish('spinner', { action: 'show' });      
+                await this.deleteWidget(folderId, widget, fileId);   
+                GlobalEvent.publish('spinner', { action: 'hide' });
             });
+
             this.widgetContainer.append(widget.el);
+
+            widget.addContextMenu(
+                {
+                    items: [
+                        new Button({ text: 'Datei löschen', color: 'bg-red-500', hoverColor: 'hover:bg-red-600', id: 'deleteFileBtn', width: 'w-[200px]', height: 'h-[30px]' }),
+                        new Button({ text: 'Dokumenten-Assistent', color: 'bg-red-500', hoverColor: 'hover:bg-red-600', id: 'assistant', width: 'w-[200px]', height: 'h-[30px]' })
+                    ]
+                },
+                {
+                    deleteFileBtn: () => widget.deleteWidget(),
+                }
+            );
         }
     };
 
@@ -388,5 +382,26 @@ export class DashBoard extends Event {
             new Toast({ text: 'Fehler beim Filtern der Dateien', icon: 'error', backdrop: true });
         }
         return page;
+    }
+
+    private async deleteWidget(folderId: string, widget: Widget, fileId: string) {
+        try { 
+            const response = await axios.post(API.DELETE_FILE, { fileId: fileId, folderId: folderId });
+            const msg: Response = response.data;
+            checkResponse(msg);
+            
+            if(this.files.length === 1 && this.header.getPagination.currentPage > 1) {
+                this.header.getPagination.currentPage - 1;
+            }
+            
+            DashBoard.getFiles(this.sidebar.getFocus(), this.header.getPagination.currentPage).then((paginationData) => {
+                this.files = paginationData.files;  
+                this.header.getPagination.updatePagination(paginationData.currentPage, paginationData.hasNextPage, paginationData.hasPreviousPage);
+                GlobalEvent.publish('renderFiles', paginationData);
+            });
+        
+        } catch (error) {
+            console.error('Fehler beim Löschen der Datei:', error);
+        };
     }
 }

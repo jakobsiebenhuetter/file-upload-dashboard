@@ -126,23 +126,7 @@ export class Pagination extends Event{
             files: this.currentFiles,
         }
     }
-
-    // set setNextPage(isNext: boolean) {
-    //     this.hasNextPage = isNext;
-    // }
-
-    // set setPreviousPage(isPrevious: boolean) {
-    //     this.hasPreviousPage = isPrevious;
-    // }
-
-    // set setTotalPage(totalPages: number) {
-    //     this.totalPages = totalPages;
-    // }
-
-    // set setCurrentPage(currentPage: number) {
-    //     this.currentPage = currentPage;
-    // }
-
+    
     private init(): void {
         this.publish('pageChange',
                 {

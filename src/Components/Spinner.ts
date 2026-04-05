@@ -19,7 +19,6 @@ export class Spinner {
         if(this.props.backdropOption) {
             const backdrop = document.createElement('div');
             backdrop.classList.add('fixed', 'inset-0', 'z-10','bg-neutral-950/20');
-            document.body.style.overflow = 'hidden';
             document.body.append(backdrop);
             this.backdrop = backdrop;
         };

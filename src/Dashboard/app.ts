@@ -6,17 +6,10 @@ import { KeyManager } from './KeyManager';
 import { lockScreen, unlockScreen } from './globVar';
 
 /**
- * @BUGFIXES Beim löschen eines Widgets auch Pagination und Dashboard updaten, hier nochmal Logik im Backend der Pagination anschauen, wenn man das letzt Element löscht dann gibt es einen Bug4
- * @BUGFIXES Es müssen jetzt mal klare Typen für die API Schnittstellen definiert werden, für den Anfang
- * @BUGFIXES Wenn es gar keine files gibt, muss hierbei die Pagination auch gleich upgedated werden. Bei filtered-files muss, auch die Pagination upgedated werden. Upload der Pagination verbessern
- * @todo Modal noch positionieren
- * @todo Upload umbauen, und beim upload die Daten neu holen, damit die Pagination auch direkt upgedated wird
- * @todo automatisches herunterladen von videos im Edge Browser verhindern
+ * @todo Styling verbessern
  * @todo KI integrieren um pdf Dokumente zusammenzufassen.
  * @todo Event member als Objekt verwenden damit man nicht immer die Funktion durchgehen muss, sondern direkt auf die Funktion zugreifen kann, z.B. this.events['openModal']() anstatt this.events.forEach(fn => { if(fn.name === 'openModal') fn() })
  * @todo Uploadstatus anzeigen lassen, dank axios ist das möglich
- * @todo Styling verbessern auch bzgl. der responsivity
- * 
  */
 export class App extends Event {
     constructor() {
