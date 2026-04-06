@@ -78,7 +78,7 @@ export class Sidebar extends Event {
     
     this.el.append(createFolderBtn.el, this.listElement);
     
-    this.listElement.classList.add('flex', 'flex-col', 'justify-center', 'mt-8');
+    this.listElement.classList.add('flex', 'flex-col', 'justify-center', 'mt-8', 'hover:cursor-pointer');
     this.renderListElements();
 
     };
@@ -90,7 +90,7 @@ export class Sidebar extends Event {
             const listItemElement: HTMLElement = document.createElement('li');
             listItemElement.classList.add('listElement');
             listItemElement.dataset.id = item.id;
-            const deleteBtn = new Button({ shape: 'circle', text: '', width: 'w-[30px]', height: 'h-[30px]', color: 'bg-red-200', hoverColor: 'hover:bg-red-600', activeColor: 'active:bg-red-700' });
+            const deleteBtn = new Button({ shape: 'circle', text: '', width: 'w-[30px]', height: 'h-[30px]', color: 'bg-red-200', hoverColor: 'hover:bg-red-400', activeColor: 'active:bg-red-600' });
             const span: HTMLElement = document.createElement('span');
 
             deleteBtn.el.setAttribute('btn-id', item.id);
@@ -176,8 +176,9 @@ export class Sidebar extends Event {
 
             span.classList.add('select-none', 'truncate');
 
-            listItemElement.append(span, deleteBtn.el)
-            listItemElement.classList.add('show-tooltip','flex', 'flex-row', 'justify-between', 'm-2', 'hover:bg-stone-500','p-1', 'rounded');
+            listItemElement.append(span, deleteBtn.el);
+         
+            listItemElement.classList.add('show-tooltip','flex', 'justify-between', 'text-center', 'm-2', 'hover:bg-blue-300', 'active:bg-blue-500','p-2', 'rounded');
             this.listElement.append(listItemElement);
         })
     };
@@ -205,9 +206,9 @@ export class Sidebar extends Event {
            
             if(this.focus === domlistElement.getAttribute('data-id')) {
                 
-                domlistElement.classList.add('text-green-500');
+                domlistElement.classList.add('bg-blue-400');
             } else {
-                domlistElement.classList.remove('text-green-500')
+                domlistElement.classList.remove('bg-blue-400')
             }
         }
         console.log('Focus bei ' + this.focus);

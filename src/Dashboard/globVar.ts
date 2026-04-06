@@ -8,7 +8,7 @@ export function lockScreen(): Spinner | void {
 	if (activeSpinner) return activeSpinner;
 
 	// Scrollen sperren
-	document.body.classList.add('overflow-auto');
+	document.body.classList.add('overflow-hidden');
 
 	const spinner = new Spinner({ backdropOption: true });
 	activeSpinner = spinner;

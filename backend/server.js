@@ -335,7 +335,7 @@ app.post('/ai-request', async(req, res) => {
     const parser = new PDFParse({url: fileData.path});
 
     const text = await parser.getText();
-    // console.log('Text aus PDF: ', text);
+
     const client = new OpenAI({
         apiKey: process.env.API_AI_REQUEST,
         baseURL: process.env.API_AI_URL,

@@ -197,7 +197,7 @@ export class Modal extends Event{
         KeyManager.getInstance().removeModal();
 
         if (this.props.backdropOption) {
-            document.body.classList.add('overflow-hidden');
+            document.body.classList.remove('overflow-hidden');
             document.body.classList.add('overflow-auto');
             this.backdrop.remove();
             this._cleaned = true;
