@@ -173,13 +173,6 @@ export class DashBoard extends Event {
             }
         });
 
-  
-        GlobalEvent.subscribe('send:prompt', async (data: Record<string, any>) => {
-            const { prompt, fileId, folderId } = data;
-            const llm = LLMInterface.getInstance();
-            const response = await this.LLMRequest(prompt, fileId, folderId);
-            llm.receiveMessage(response);
-        });
 
           this.header.getFilter.onFilter(async (params) => {
             GlobalEvent.publish('spinner', { action: 'show'});
@@ -362,14 +355,8 @@ export class DashBoard extends Event {
         llm.show();
 
         llm.onSend(async () => {
-
-            GlobalEvent.publish('send:prompt', 
-                {
-                    prompt: llm.getInputValue(),
-                    fileId: fileId,
-                    folderId: folderId
-                }
-            );
+            const text = await this.LLMRequest(llm.getInputValue(), fileId, folderId);
+            llm.receiveMessage(text);
         });
     }
 
