@@ -327,7 +327,7 @@ export class DashBoard extends Event {
                 const folderId = this.getSidebar().getFocus();
                 const fileId = widget.el.getAttribute('data-id');
                 GlobalEvent.publish('spinner', { action: 'show' });      
-                await this.deleteWidget(folderId, widget, fileId);   
+                await this.deleteWidget(folderId, fileId);   
                 GlobalEvent.publish('spinner', { action: 'hide' });
             });
 
@@ -342,10 +342,24 @@ export class DashBoard extends Event {
                 },
                 {
                     deleteFileBtn: () => widget.deleteWidget(),
+                    assistant: () => this.LLMRequest('Frage: Was ist das für ein Dokument?', file.id, this.sidebar.getFocus())
                 }
             );
         }
     };
+
+    private async LLMRequest(prompt: string, fileId: string, folderId: string): Promise<string> {
+        let text = '';
+        try {
+            const response = await axios.post(API.AI_REQUEST, { prompt, fileId, folderId });
+            text = response.data.answer;
+        } catch (error) {
+            console.warn('Fehler bei der AI Anfrage', error);
+        }
+
+        console.log('Antwort von der AI: ', text);
+        return text;
+    }
 
     public static async getFiles(folderId: string, page: number = 1): Promise<PageData> {
         let data: PageData;      
@@ -384,7 +398,7 @@ export class DashBoard extends Event {
         return page;
     }
 
-    private async deleteWidget(folderId: string, widget: Widget, fileId: string) {
+    private async deleteWidget(folderId: string, fileId: string) {
         try { 
             const response = await axios.post(API.DELETE_FILE, { fileId: fileId, folderId: folderId });
             const msg: Response = response.data;
