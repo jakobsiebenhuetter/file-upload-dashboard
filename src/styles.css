@@ -33,3 +33,18 @@
   animation: slideOutRight 0.5s ease-in forwards;
 }
 
+@keyframes chatSlideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.llm-chat-enter {
+  animation: chatSlideUp 0.25s ease-out forwards;
+}
+

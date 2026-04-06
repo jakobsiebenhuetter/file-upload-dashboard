@@ -173,6 +173,14 @@ export class DashBoard extends Event {
             }
         });
 
+  
+        GlobalEvent.subscribe('send:prompt', async (data: Record<string, any>) => {
+            const { prompt, fileId, folderId } = data;
+            const llm = LLMInterface.getInstance();
+            const response = await this.LLMRequest(prompt, fileId, folderId);
+            llm.receiveMessage(response);
+        });
+
           this.header.getFilter.onFilter(async (params) => {
             GlobalEvent.publish('spinner', { action: 'show'});
             const folderId = this.getSidebar().getFocus();
@@ -343,15 +351,26 @@ export class DashBoard extends Event {
                 },
                 {
                     deleteFileBtn: () => widget.deleteWidget(),
-                    assistant: () => this.showLLMInterface()
+                    assistant: () => this.showLLMInterface(file.id, this.sidebar.getFocus())
                 }
             );
         }
     };
 
-    showLLMInterface(): void {
-        document.body.append(LLMInterface.getInstance().el);
-        LLMInterface.getInstance().show();
+    showLLMInterface(fileId: string, folderId: string): void {
+        const llm = LLMInterface.getInstance();
+        llm.show();
+
+        llm.onSend(async () => {
+
+            GlobalEvent.publish('send:prompt', 
+                {
+                    prompt: llm.getInputValue(),
+                    fileId: fileId,
+                    folderId: folderId
+                }
+            );
+        });
     }
 
     private async LLMRequest(prompt: string, fileId: string, folderId: string): Promise<string> {
