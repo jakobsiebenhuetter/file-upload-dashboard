@@ -1,4 +1,7 @@
 const express = require('express');
+const OpenAI = require('openai');
+const { PDFParse } = require('pdf-parse');
+
 const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
@@ -322,5 +325,43 @@ app.post('/get-filtered-files', (req, res) => {
     };
     res.json(msg);
 })
+
+
+app.post('/ai-request', async(req, res) => {
+    const { prompt, fileId, folderId } = req.body;
+
+    const fileData = storage.getFile(folderId, fileId);
+
+    const parser = new PDFParse({url: fileData.path});
+
+    const text = await parser.getText();
+    // console.log('Text aus PDF: ', text);
+    const client = new OpenAI({
+        apiKey: process.env.API_AI_REQUEST,
+        baseURL: process.env.API_AI_URL,
+    });
+    console.log('Du bist ein Dokumentenassistent, der Nutzern dabei hilft, Informationen aus PDF-Dokumenten zu suchen und erklären. Beantworte die folgende Frage so ausführlich wie möglich. Aber auch so kurz wie möglich ohne unnötigen Daten. Hier ist der Text aus dem Dokument: ' + text.text + ' ' + prompt)
+    const response = await client.responses.create({
+        model: 'openai/gpt-oss-20b',
+        // model: 'gpt-5.2',
+        // stream: true,
+        // // instructions: 'Du bist ein Softwareentwickler, der gerne mit KI arbeitet. Beantworte die folgende Frage so ausführlich wie möglich.',
+        input: 'Du bist ein Dokumentenassistent, der Nutzern dabei hilft, Informationen aus PDF-Dokumenten zu suchen und erklären. Beantworte die folgende Frage so ausführlich wie möglich. Aber auch so kurz wie möglich ohne unnötigen Daten. Hier ist der Text aus dem Dokument: ' + text.text + ' ' + prompt
+    });
+
+    console.log(response.output_text);
+
+    res.json({
+        answer: response.output_text
+    });
+
+});
+
+
+
+
+
+
+
 
 app.listen(2000, () => console.log('Server listen on Port 2000'));

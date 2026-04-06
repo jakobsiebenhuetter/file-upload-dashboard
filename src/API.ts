@@ -7,4 +7,5 @@ export const API = {
     UPLOAD_FILES: 'http://localhost:2000/upload',
     GET_FILES: 'http://localhost:2000/get-files',
     GET_FOLDERS: 'http://localhost:2000/get-folders',
+    AI_REQUEST: 'http://localhost:2000/ai-request',
 };

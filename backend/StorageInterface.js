@@ -46,6 +46,10 @@ class StorageInterface {
     getFilteredFiles(folderId, char, page = 1) {
         return this.storage.getFilteredFiles(folderId, char, page);
     }
+
+    getFile(folderId, fileId) {
+        return this.storage.getFile(folderId, fileId);
+    }
 }
 
 

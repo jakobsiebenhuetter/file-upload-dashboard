@@ -38,10 +38,6 @@ class JSONStorage {
         return data;
     }
 
-    getFolders() {
-        // ...
-    }
-
     deleteFile(folderId, fileId) {
         // Hier nur die Daten für den einen Ordner holen, damit nicht das ganze Objekt durchlaufen werden muss
         const data = this.getData();
@@ -155,6 +151,19 @@ class JSONStorage {
         let lastFile = firstFile + 4;
         let filesForPage = files.slice(firstFile, lastFile);
         return {filesForPage, maxPages};
+    }
+
+    getFile(folderId, fileId) {
+        const data = this.getData();
+        const folder = data.folders.filter((folder) => folder.id === folderId);
+        let file = null;
+        if(folder.length) {
+            file = folder[0].files.filter((file) => file.id === fileId);
+        }
+
+        if(file.length) {
+            return file[0];
+        }
     }
 }
 
