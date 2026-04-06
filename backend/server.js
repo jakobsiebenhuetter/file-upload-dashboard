@@ -340,7 +340,7 @@ app.post('/ai-request', async(req, res) => {
         apiKey: process.env.API_AI_REQUEST,
         baseURL: process.env.API_AI_URL,
     });
-    console.log('Du bist ein Dokumentenassistent, der Nutzern dabei hilft, Informationen aus PDF-Dokumenten zu suchen und erklären. Beantworte die folgende Frage so ausführlich wie möglich. Aber auch so kurz wie möglich ohne unnötigen Daten. Hier ist der Text aus dem Dokument: ' + text.text + ' ' + prompt)
+    console.log(prompt)
     const response = await client.responses.create({
         model: 'openai/gpt-oss-20b',
         // model: 'gpt-5.2',

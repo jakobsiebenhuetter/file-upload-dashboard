@@ -262,14 +262,11 @@ export class DashBoard extends Event {
 
             GlobalEvent.publish('spinner', { action: 'hide' });
         });
-
+        
         // LLM Interface
-        GlobalEvent.subscribe('send:prompt', async (data: Record<string, any>) => {
-            const { prompt, fileId, folderId } = data; 
-            this.llm.onSend(async () => {
-                const text = await this.LLMRequest(prompt, fileId, folderId);
-                this.llm.receiveMessage(text);
-            });
+        this.llm.onSend(async () => {
+            const text = await this.LLMRequest(this.llm.getInputValue(), this.llm.getFocus, this.sidebar.getFocus());
+            this.llm.receiveMessage(text);
         });
     }
 
@@ -363,14 +360,7 @@ export class DashBoard extends Event {
 
     showLLMInterface(fileId: string, folderId: string): void {
         this.llm.show();
-
-        GlobalEvent.publish('send:prompt', 
-            {
-                prompt: this.llm.getInputValue(),
-                fileId: fileId,
-                folderId: folderId
-            }
-        );
+        this.llm.setFocus = fileId;
     }
 
     private async LLMRequest(prompt: string, fileId: string, folderId: string): Promise<string> {

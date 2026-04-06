@@ -11,6 +11,7 @@ export class LLMInterface extends Event {
     private textField: HTMLTextAreaElement = document.createElement('textarea');
     private typingIndicator: HTMLElement = document.createElement('div');
     private messages: Array<{ role: MessageRole; text: string }> = [];
+    private focus: string | null = null;
 
     private constructor() {
         super();
@@ -159,12 +160,19 @@ export class LLMInterface extends Event {
         this.el.appendChild(inputArea);
     }
 
+    set setFocus(focus: string) {
+        this.focus = focus;
+    }
+
+    get getFocus(): string | null {
+        return this.focus;
+    }
+
     private handleSend(): void {
         const text = this.textField.value.trim();
         if (!text) return;
 
         this.addMessage('user', text);
-        this.textField.value = '';
         this.textField.style.height = 'auto';
 
         this.showTyping();
@@ -225,6 +233,7 @@ export class LLMInterface extends Event {
     getInputValue(): string {
         let inputText = this.textField.value.trim();
         this.textField.value = '';
+        console.log('Input Value: ', inputText);
         return inputText;
     }
 
