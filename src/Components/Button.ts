@@ -101,4 +101,10 @@ export class Button extends Event {
     isDisabled(): boolean {
         return this.props.disabled;
     }
+
+    destroy(): void {
+        this.el.remove();
+        this.clearAll();
+        this.el = null;
+    }
 }

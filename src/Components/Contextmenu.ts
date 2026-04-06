@@ -59,6 +59,7 @@ export class ContextMenu {
     }
 
     public destroy() {
+        this.props.items.forEach(item =>  item.clearAll());  
         this.el.remove();
         this.el = null;
     }

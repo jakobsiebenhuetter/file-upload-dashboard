@@ -23,7 +23,7 @@ export class Event {
         };
     };
 
-    removeEvent(): void {
-
-    };
+    clearAll(): void  {
+        this.allFunctions = [];
+    }
 }
