@@ -23,7 +23,7 @@ export class Button extends Event {
         super();
         const defaults: ButtonProps = {
             shape: 'rounded',
-            text: 'Klick mich',
+            text: '',
             icon: '',
             disabled: false,
             width: 'w-[100px]',

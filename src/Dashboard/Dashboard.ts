@@ -14,6 +14,7 @@ import { API } from '../API';
 import { Toast } from '../Components/Toast';
 import { PaginationEventData } from '../Components/Pagination';
 import { Button } from '../Components/Button';
+import { LLMInterface } from '../Components/LLMInterface';
 
 
 export type Folder = {
@@ -342,11 +343,16 @@ export class DashBoard extends Event {
                 },
                 {
                     deleteFileBtn: () => widget.deleteWidget(),
-                    assistant: () => this.LLMRequest('Frage: Was ist das für ein Dokument?', file.id, this.sidebar.getFocus())
+                    assistant: () => this.showLLMInterface()
                 }
             );
         }
     };
+
+    showLLMInterface(): void {
+        document.body.append(LLMInterface.getInstance().el);
+        LLMInterface.getInstance().show();
+    }
 
     private async LLMRequest(prompt: string, fileId: string, folderId: string): Promise<string> {
         let text = '';

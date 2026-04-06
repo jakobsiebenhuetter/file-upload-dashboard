@@ -1,3 +1,45 @@
 {
-  "folders": []
+  "folders": [
+    {
+      "id": "2e03f282-30b8-4580-8e02-d2e3bd7e3c56",
+      "folderName": "dsfdsf",
+      "path": "data\\Folders\\845e39d5-d77d-49cd-8638-f8a3f1495c24",
+      "files": [
+        {
+          "id": "e0b96b8d-680d-44b3-a48c-7ba591e0e759",
+          "title": "Screenshot 2026-04-04 095643.png",
+          "path": "data\\Folders\\845e39d5-d77d-49cd-8638-f8a3f1495c24\\Screenshot 2026-04-04 095643.png",
+          "thumbnailPath": "data\\Thumbnails\\Screenshot 2026-04-04 095643.png",
+          "date": "4.4.2026"
+        },
+        {
+          "id": "eb4968a5-d7b9-4299-9e7e-b7afb47b6a12",
+          "title": "Meine Erstes Elektron Programm _-) 2025-12-08 11-46-52 (2).mp4",
+          "path": "data\\Folders\\845e39d5-d77d-49cd-8638-f8a3f1495c24\\Meine Erstes Elektron Programm _-) 2025-12-08 11-46-52 (2).mp4",
+          "thumbnailPath": "data\\Thumbnails\\Meine Erstes Elektron Programm _-) 2025-12-08 11-46-52 (2).png",
+          "date": "4.4.2026"
+        },
+        {
+          "id": "4fb65e9b-9c86-48a3-b0e4-cb422d1e6ab6",
+          "title": "Meine Erstes Elektron Programm _-) 2025-12-08 11-44-14 (3).mp4",
+          "path": "data\\Folders\\845e39d5-d77d-49cd-8638-f8a3f1495c24\\Meine Erstes Elektron Programm _-) 2025-12-08 11-44-14 (3).mp4",
+          "thumbnailPath": "data\\Thumbnails\\Meine Erstes Elektron Programm _-) 2025-12-08 11-44-14 (3).png",
+          "date": "4.4.2026"
+        },
+        {
+          "id": "2513b41e-4dec-4911-98af-40ed00bc1b9b",
+          "title": "full-stack-developer-wmx-inserat-1.pdf",
+          "path": "data\\Folders\\845e39d5-d77d-49cd-8638-f8a3f1495c24\\full-stack-developer-wmx-inserat-1.pdf",
+          "thumbnailPath": "./data/Thumbnails/4c692844-f91c-4e76-9e6b-995ffde9ed51.png",
+          "date": "5.4.2026"
+        }
+      ]
+    },
+    {
+      "id": "ccf38228-7c57-4b02-9e04-05115c5b1929",
+      "folderName": "adasd",
+      "path": "data\\Folders\\8a445bcd-ff22-4e00-a0af-82aca3d7dc16",
+      "files": []
+    }
+  ]
 }
