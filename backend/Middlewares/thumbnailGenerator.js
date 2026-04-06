@@ -2,6 +2,8 @@ const puppeteer = require('puppeteer-core');
 const ffmpegPath = require('ffmpeg-static');
 const ffmpeg = require('fluent-ffmpeg');
 const ffprobePath = require('ffprobe-static');
+const pdf = require('pdf-poppler');
+
 const crypto = require('crypto');
 
 const fs = require('fs');
@@ -14,14 +16,26 @@ ffmpeg.setFfprobePath(ffprobePath.path);
 const tnPath = './data/Thumbnails';
 
 // PDF to PNG converter middleware
-async function pdfConverter(pdfPath) {
-    const { pdf } = await import('pdf-to-img');
-    const uuid = crypto.randomUUID();
-    const newthumbnailPath = `${tnPath}/${uuid}.png`;
-    const document = await pdf(pdfPath);
-    const pageBuffer = await document.getPage(1);
 
-    fs.writeFileSync(newthumbnailPath, pageBuffer);
+
+
+async function pdfConverter(pdfPath) {
+    // Hier mit pdf-poppler arbeiten
+    const uuid = crypto.randomUUID();
+    const newthumbnailPath = path.join(`${tnPath}`, `${uuid}-1.png`);
+    let options = {
+        format: 'png',
+        out_dir: tnPath,
+        out_prefix: uuid,
+        page: 1
+    }
+    try {
+        const res = await pdf.convert(pdfPath, options)
+        console.log('PDF erfolgreich konvertiert:', res);
+    } catch (error) {
+        console.error('Fehler bei der PDF-Konvertierung:', error);
+    }
+
     return newthumbnailPath;
 };
 
@@ -94,10 +108,13 @@ async function generateTN(file) {
     let thumbnailPath = null;
     let filePath = file.path;
     const extname = path.extname(filePath);
+    console.log('Generating thumbnail for:', filePath);
+    console.log('File extension:', extname);
     try {
         switch (extname) {
             case '.pdf': {
                 thumbnailPath = await pdfConverter(filePath);
+                console.log('PDF thumbnail generated at:', thumbnailPath);
                 break;
             }
             case '.mp4': {

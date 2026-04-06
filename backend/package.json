@@ -21,6 +21,7 @@
     "multer": "^2.0.2",
     "openai": "^6.13.0",
     "pdf-parse": "^2.4.5",
+    "pdf-poppler": "^0.2.3",
     "pdf-to-img": "^5.0.0",
     "puppeteer-core": "^24.37.5"
   }
