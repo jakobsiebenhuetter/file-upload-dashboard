@@ -74,6 +74,7 @@ export class DashBoard extends Event {
      files: File[];
      filterState: 'filter' | 'no-filter' = 'no-filter';
      filterValue?: string = '';
+     llm = LLMInterface.getInstance();;
 
      constructor() {
          super();
@@ -261,7 +262,17 @@ export class DashBoard extends Event {
 
             GlobalEvent.publish('spinner', { action: 'hide' });
         });
-    };
+
+        // LLM Interface
+        GlobalEvent.subscribe('send:prompt', async (data: Record<string, any>) => {
+            const { prompt, fileId, folderId } = data; 
+            this.llm.onSend(async () => {
+                const text = await this.LLMRequest(prompt, fileId, folderId);
+                this.llm.receiveMessage(text);
+            });
+        });
+    }
+
 
     getSidebar(): Sidebar {
         return this.sidebar;
@@ -338,8 +349,8 @@ export class DashBoard extends Event {
             widget.addContextMenu(
                 {
                     items: [
-                        new Button({ text: 'Datei löschen', color: 'bg-red-500', hoverColor: 'hover:bg-red-600', id: 'deleteFileBtn', width: 'w-[200px]', height: 'h-[30px]' }),
-                        new Button({ text: 'Dokumenten-Assistent', color: 'bg-red-500', hoverColor: 'hover:bg-red-600', id: 'assistant', width: 'w-[200px]', height: 'h-[30px]' })
+                        new Button({ text: 'Datei löschen', color: 'bg-sky-500/30', hoverColor: 'hover:bg-sky-500/50', id: 'deleteFileBtn', width: 'w-[200px]', height: 'h-[30px]' }),
+                        new Button({ text: 'Dokumenten-Assistent', color: 'bg-sky-500/30', hoverColor: 'hover:bg-sky-500/50', id: 'assistant', width: 'w-[200px]', height: 'h-[30px]' })
                     ]
                 },
                 {
@@ -351,13 +362,15 @@ export class DashBoard extends Event {
     };
 
     showLLMInterface(fileId: string, folderId: string): void {
-        const llm = LLMInterface.getInstance();
-        llm.show();
+        this.llm.show();
 
-        llm.onSend(async () => {
-            const text = await this.LLMRequest(llm.getInputValue(), fileId, folderId);
-            llm.receiveMessage(text);
-        });
+        GlobalEvent.publish('send:prompt', 
+            {
+                prompt: this.llm.getInputValue(),
+                fileId: fileId,
+                folderId: folderId
+            }
+        );
     }
 
     private async LLMRequest(prompt: string, fileId: string, folderId: string): Promise<string> {
