@@ -1,5 +1,7 @@
 import { Event } from './Event';
 
+import { Tooltip } from './Tooltip';
+
 type Position = 'left' | 'right';
 type ButtonProps = {
     id?: string;
@@ -100,6 +102,17 @@ export class Button extends Event {
 
     isDisabled(): boolean {
         return this.props.disabled;
+    }
+
+    addTooltip(text: string): void {
+        this.el.onmouseover = () => {
+            Tooltip.getInstance().setTarget(this.el).setText(text).show();
+        }
+
+        this.el.onmouseleave = () => {
+            Tooltip.getInstance().hide();
+        }
+        
     }
 
     destroy(): void {
