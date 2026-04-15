@@ -8,6 +8,7 @@ export function lockScreen(): Spinner | void {
 	if (activeSpinner) return activeSpinner;
 
 	// Scrollen sperren
+	document.body.classList.remove('overflow-auto');
 	document.body.classList.add('overflow-hidden');
 
 	const spinner = new Spinner({ backdropOption: true });
@@ -23,5 +24,6 @@ export function unlockScreen(): void {
 	}
 
 	// Scrollen wieder erlauben
+	document.body.classList.remove('overflow-hidden');
 	document.body.classList.add('overflow-auto');
 }
