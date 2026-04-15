@@ -74,7 +74,7 @@ export class DashBoard extends Event {
      files: File[];
      filterState: 'filter' | 'no-filter' = 'no-filter';
      filterValue?: string = '';
-     llm = LLMInterface.getInstance();;
+     llm = LLMInterface.getInstance();
 
      constructor() {
          super();
@@ -84,6 +84,7 @@ export class DashBoard extends Event {
     };
 
     initApp(): void {
+        this.el.classList.add('p-4', 'pt-6', 'bg-stone-200');
         DashBoard.getFolders().then((folders) => {
             
             let folderId = null;
@@ -308,13 +309,23 @@ export class DashBoard extends Event {
             widget.onClick(() => {
                 // Hier unterscheiden ob Bilddatei oder PDF Datei oder andere Datei
                 let modal: Modal = null;
-                let modalContent: HTMLIFrameElement | HTMLImageElement = null;;
+                let modalContent = null;
+
                 let modalContentHeight = 'h-[auto]';
                 let ext = file.path.split('.').pop();
 
                 if(isImage(ext)) {
-                    modal = new Modal({ text: file.title ,backdropOption: true, width: '',height:'h-[750px]' , rounded: true});
-                    modalContent = document.createElement('img');
+                    modal = new Modal({ text: file.title ,backdropOption: true , width:'w-[700px]', height:'h-[700px]' , rounded: true});
+                    // Im Modal Bilder managen
+                    modal.el.style.maxWidth = '700px';
+                    let img = document.createElement('img');
+                    img.classList.add('w-full', 'h-full', 'object-fit');
+                    img.src = file.path;
+                    modalContent = document.createElement('div');
+                    
+                    modalContent.classList.add('flex-1', 'w-full', 'h-full', 'object-fit');
+                    modalContent.append(img);
+                    modal.el.append(modalContent);
                  
                 } else {
                     modal = new Modal({text: file.title,  backdropOption: true, width:'w-[1000px]', height: 'h-[800px]' ,rounded: true});
@@ -324,11 +335,12 @@ export class DashBoard extends Event {
                     // modalContent.setAttribute('controls', 'true');
                     // modalContent.setAttribute('controlsList', 'nodownload');
                     modalContentHeight = 'h-full';
+                    modalContent.src = file.path; // PDF oder URL setzen 
                 }
 
                 modal.el.classList.add('flex','flex-col','overflow-hidden','justify-end');
-                modalContent.classList.add('m-1', 'border-none', 'bg-white', `w-[auto]`, `${modalContentHeight}`);
-                modalContent.src = file.path; // PDF oder URL setzen 
+                modalContent.classList.add('m-1', 'border-none', 'bg-white','h-[auto]', `w-[auto]`, `${modalContentHeight}`);
+                
                 modal.el.append(modalContent);
                 document.body.append(modal.el);
             });
@@ -352,13 +364,13 @@ export class DashBoard extends Event {
                 },
                 {
                     deleteFileBtn: () => widget.deleteWidget(),
-                    assistant: () => this.showLLMInterface(file.id, this.sidebar.getFocus())
+                    assistant: () => this.showLLMInterface(file.id)
                 }
             );
         }
     };
 
-    showLLMInterface(fileId: string, folderId: string): void {
+    showLLMInterface(fileId: string): void {
         this.llm.show();
         this.llm.setFocus = fileId;
     }
