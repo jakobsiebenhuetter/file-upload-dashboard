@@ -20,7 +20,7 @@ export class LLMInterface extends Event {
 
     private renderUI(): void {
         this.el.classList.add(
-            'fixed', 'z-50',
+            'fixed', 'z-1',
             'w-[400px]', 'h-[520px]',
             'bg-white', 'rounded-xl', 'shadow-lg',
             'border', 'border-slate-200',
