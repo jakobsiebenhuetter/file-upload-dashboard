@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import { Button } from './Button';
+import { Event } from './Event';
 
 export type TContextMenu = {
     items: Button[];
@@ -13,7 +14,7 @@ export type TContextMenuEvent = {
     [id: string]: (args?: any) => void;
 };
 
-export class ContextMenu {
+export class ContextMenu extends Event {
     props: TContextMenu;
     el: HTMLElement = document.createElement('div');
     xPosition: number = 0;
@@ -21,6 +22,8 @@ export class ContextMenu {
     eventData: TContextMenuEvent;
 
     constructor(props: TContextMenu) {
+        super();
+
         const defaults: TContextMenu = {
             items: [],
             id: 'ContextMenu',
@@ -47,7 +50,10 @@ export class ContextMenu {
     private addListener(): void {
         this.props.items.forEach(item => {
             let handler = typeof this.props.eventData[item.props.id] === 'function' ? this.props.eventData[item.props.id] : () =>  console.log('Kein Event');
-            item.onClick(handler);
+            item.onClick(() => {
+                handler();
+                destroyContextMenu(this);
+            });
         });
     }
 
@@ -61,7 +67,11 @@ export class ContextMenu {
     public destroy() {
         this.props.items.forEach(item =>  item.clearAll());  
         this.el.remove();
-        this.el = null;
+        this.publish('destroy');
+    }
+
+    public onDestroy(handler: () => void): void {
+        this.subscribe('destroy', handler);
     }
 
     static handleContextMenu() {
@@ -69,4 +79,10 @@ export class ContextMenu {
             document.querySelector('#ContextMenu')?.remove();
         });
     }
+}
+
+// util function zur Zerstörung des ContextMenus
+export function destroyContextMenu(contextMenu: ContextMenu) {
+    contextMenu.destroy();
+    contextMenu = null;
 }
