@@ -336,6 +336,12 @@ app.post('/ai-request', async(req, res) => {
 
     const text = await parser.getText();
 
+    if(process.env.API_AI_REQUEST === undefined || process.env.API_AI_URL === undefined ) {
+        return res.json({
+            answer: 'AI API Key oder URL nicht definiert'
+        });
+    }
+    
     const client = new OpenAI({
         apiKey: process.env.API_AI_REQUEST,
         baseURL: process.env.API_AI_URL,
