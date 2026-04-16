@@ -84,7 +84,7 @@ export class DashBoard extends Event {
     };
 
     initApp(): void {
-        this.el.classList.add('p-4', 'pt-6', 'bg-stone-200');
+        this.el.classList.add('p-4', 'bg-stone-200');
         DashBoard.getFolders().then((folders) => {
             
             let folderId = null;
