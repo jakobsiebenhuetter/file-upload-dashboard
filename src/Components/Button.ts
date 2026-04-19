@@ -18,7 +18,7 @@ type ButtonProps = {
 }
 
 export class Button extends Event {
-    el = document.createElement('div');
+    el = document.createElement('button');
     public props: ButtonProps;
 
     constructor(props?: ButtonProps) {
@@ -54,7 +54,7 @@ export class Button extends Event {
     }
 
     private renderUI(): void {
-        this.el.classList.add('select-none','flex','items-center','justify-center','cursor-pointer',this.props.width,this.props.height,this.props.color, this.props.hoverColor, this.props.shape === 'circle' ? 'rounded-full' : 'rounded', this.props.activeColor ? this.props.activeColor : 'no-active-color');
+        this.el.classList.add('flex','items-center','justify-center','cursor-pointer',this.props.width,this.props.height,this.props.color, this.props.hoverColor, this.props.shape === 'circle' ? 'rounded-full' : 'rounded', this.props.activeColor ? this.props.activeColor : 'no-active-color');
         if(this.props.text) {
             this.el.textContent = this.props.text;
         }
