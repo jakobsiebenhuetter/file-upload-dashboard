@@ -185,6 +185,7 @@ export class Widget extends Event {
         ContextMenu.handleContextMenu();
         
         this.el.oncontextmenu = (e) => {
+            console.log(document.activeElement);
             e.preventDefault();
             // Hier muss überlegt werden, weches Pattern in Zukunft verwendet wird für das destroyen dei Componente sollte sich um sich selbst kümmern beim löschen
             if(this.contextMenu) {
@@ -193,6 +194,9 @@ export class Widget extends Event {
             contexMenuData.eventData = eventData;
             this.contextMenu = new ContextMenu(contexMenuData);
             this.contextMenu.show(e.pageX, e.pageY);
+            setTimeout(() => {
+                console.log(document.activeElement);
+            }, 1000);
         }
     }
 

@@ -29,8 +29,7 @@ export class ContextMenu extends Event {
             id: 'ContextMenu',
         };
 
-        this.props = {...defaults, ...props};
-        this.addListener();
+        this.props = {...defaults, ...props};  
     }
 
     private renderUI(): void {
@@ -44,16 +43,23 @@ export class ContextMenu extends Event {
             // item.el.classList.add('block', 'w-full', 'text-left', 'px-4', 'py-2', 'hover:bg-gray-100');
             this.el.appendChild(item.el);
         });
+
+        
     }
 
     // Das muss man mit TS besser abfangen -> Regeln definieren, z.B. jedes Item muss eine Id haben damit man das Event zuordnen kann
     private addListener(): void {
+        this.props.items[0]?.el.focus({ focusVisible: true });
         this.props.items.forEach(item => {
             let handler = typeof this.props.eventData[item.props.id] === 'function' ? this.props.eventData[item.props.id] : () =>  console.log('Kein Event');
             item.onClick(() => {
                 handler();
-                destroyContextMenu(this);
+                this.publish('destroy', this);
             });
+        });
+
+        this.subscribe('destroy', (params) => {
+            destroyContextMenu(params);
         });
     }
 
@@ -62,6 +68,7 @@ export class ContextMenu extends Event {
         this.props.xPosition = x;
         this.props.yPosition = y;
         this.renderUI();
+        this.addListener();
     }
 
     public destroy() {
@@ -81,8 +88,16 @@ export class ContextMenu extends Event {
     }
 }
 
-// util function zur Zerstörung des ContextMenus
+
+
+// util Funktionen zur Erzeugung/Zerstörung des ContextMenus
+
+export function createContextMenu(props: TContextMenu) {
+    const menu = new ContextMenu(props);
+    menu.show(props.xPosition || 0, props.yPosition || 0);
+    return menu;
+}
 export function destroyContextMenu(contextMenu: ContextMenu) {
-    contextMenu.destroy();
+    contextMenu.publish('destroy', contextMenu);
     contextMenu = null;
 }
