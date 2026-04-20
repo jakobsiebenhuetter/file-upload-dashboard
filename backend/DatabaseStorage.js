@@ -1,7 +1,8 @@
+const Database = require('better-sqlite3');
+
 const crypto = require('crypto');
 const fs = require('fs');
 
-const Database = require('better-sqlite3');
 const TNGenerator = require('./Middlewares/thumbnailGenerator');
 const db = new Database('../data/file-upload-dashboard.db');
 
