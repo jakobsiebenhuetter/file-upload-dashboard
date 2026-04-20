@@ -114,11 +114,14 @@ class DatabaseStorage {
         }
     }
     
+    // Get files  maxPages fehlt
     getFiles(folderId) {
         const data = this.getData();
         const folder = data.folders.filter((folder) => folder.id === folderId);
         return folder.length ? folder[0].files : [];
     }
+
+    // Zusätzlich fehlen getFolders, getFilteredFiles und getFile
 }
 
 module.exports = DatabaseStorage;

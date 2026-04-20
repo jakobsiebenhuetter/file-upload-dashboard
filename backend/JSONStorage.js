@@ -7,7 +7,13 @@ const jsonPath = '../data/data.json';
 const tnPath = './data/Thumbnails';
 
 class JSONStorage {
- 
+    
+    getData() {
+        const file = fs.readFileSync(jsonPath, 'utf-8');
+        const data = JSON.parse(file);
+        return data;
+    }
+
     saveFolder(folderObj) {
         const data = this.getData();
         data.folders.push(folderObj);
@@ -32,11 +38,7 @@ class JSONStorage {
         return data;
     }
 
-    getData() {
-        const file = fs.readFileSync(jsonPath, 'utf-8');
-        const data = JSON.parse(file);
-        return data;
-    }
+
 
     deleteFile(folderId, fileId) {
         // Hier nur die Daten für den einen Ordner holen, damit nicht das ganze Objekt durchlaufen werden muss
