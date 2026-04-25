@@ -330,7 +330,7 @@ app.post('/get-filtered-files', (req, res) => {
 
 app.post('/ai-request', async(req, res) => {
     const { prompt, fileId, folderId } = req.body;
-
+    
     const fileData = storage.getFile(folderId, fileId);
     // const {filesForPage} = storage.getFiles(folderId, 1);
     // let text = '';
@@ -406,14 +406,6 @@ app.post('/ai-request', async(req, res) => {
         answer: response.choices[0].message.content
     });
 });
-
-
-async function extractPDFText(fileDataPath) {
-    const parser = new PDFParse({url: fileDataPath});
-    const text = await parser.getText();
-    return text.text;
-}
-
 
 
 
