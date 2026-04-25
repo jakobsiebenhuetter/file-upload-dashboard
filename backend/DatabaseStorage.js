@@ -1,9 +1,10 @@
 const crypto = require('crypto');
 const fs = require('fs');
+const path = require('path');
 
 const Database = require('better-sqlite3');
 const TNGenerator = require('./Middlewares/thumbnailGenerator');
-const db = new Database('../data/file-upload-dashboard.db');
+const db = new Database(path.join(__dirname, '..', 'data', 'file-upload-dashboard.db'));
 
 class DatabaseStorage {
 

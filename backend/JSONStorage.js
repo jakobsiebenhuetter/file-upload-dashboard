@@ -1,10 +1,10 @@
 const fs = require('fs');
+const path = require('path');
 const crypto = require('crypto');
 
 const TNGenerator = require('./Middlewares/thumbnailGenerator');
 
-const jsonPath = '../data/data.json';
-const tnPath = './data/Thumbnails';
+const jsonPath = path.join(__dirname, '..', 'data', 'data.json');
 
 class JSONStorage {
  
