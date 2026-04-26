@@ -181,9 +181,7 @@ export class Widget extends Event {
     }
 
     // Muss noch implementiert werden mit einer eigenen Komponente für das Contextmenü
-    addContextMenu(contexMenuData: TContextMenu): void {
-        ContextMenu.handleContextMenu();
-        
+    addContextMenu(contexMenuData: TContextMenu): void { 
         this.el.oncontextmenu = (e) => {
             e.preventDefault();
             // Hier muss überlegt werden, weches Pattern in Zukunft verwendet wird für das destroyen dei Componente sollte sich um sich selbst kümmern beim löschen
