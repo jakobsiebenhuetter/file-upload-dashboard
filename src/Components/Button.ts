@@ -55,6 +55,7 @@ export class Button extends Event {
 
     private renderUI(): void {
         this.el.classList.add('select-none','flex','items-center','justify-center','cursor-pointer',this.props.width,this.props.height,this.props.color, this.props.hoverColor, this.props.shape === 'circle' ? 'rounded-full' : 'rounded', this.props.activeColor ? this.props.activeColor : 'no-active-color');
+        this.el.setAttribute('id', this.props.id);
         if(this.props.text) {
             this.el.textContent = this.props.text;
         }

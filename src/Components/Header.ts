@@ -1,6 +1,7 @@
 import '../styles.css';
 import { Filter } from './Filter';
 import { Pagination } from './Pagination';
+import { DarkModeButton } from './DarkModeButton';
 
 
 export class Header {
@@ -10,6 +11,7 @@ export class Header {
     el: HTMLElement = document.createElement('div');
     filter: Filter;
     pagination: Pagination;
+    darkmodeBtn: DarkModeButton;
     width: string = 'w-[200px]';
     height: number = 100;
     color: string = 'lightgray';
@@ -20,6 +22,7 @@ export class Header {
 
         this.filter = new Filter();
         this.pagination = new Pagination();
+        this.darkmodeBtn = new DarkModeButton();
         
         const defaults = {
             width: this.width,
@@ -42,7 +45,7 @@ export class Header {
 
     renderUI() {
         this.el.classList.add('bg-stone-200', 'flex', 'flex-row', 'items-center', 'justify-between', 'p-4');
-        this.el.append(this.filter.el, this.pagination.el);
+        this.el.append(this.filter.el, this.pagination.el, this.darkmodeBtn.el);
     }
 
     get getFilter(): Filter {
