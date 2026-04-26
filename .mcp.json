@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "doc-manager": {
+      "command": "node",
+      "args": ["backend/MCP/MCP-Server.js"]
+    }
+  }
+} 
