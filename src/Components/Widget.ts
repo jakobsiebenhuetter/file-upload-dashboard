@@ -2,7 +2,7 @@ import '../styles.css';
 import { Button } from './Button';
 import { Event } from './Event';
 import { Tooltip } from './Tooltip';
-import { ContextMenu, destroyContextMenu, TContextMenu, TContextMenuEvent } from './Contextmenu';
+import { ContextMenu, destroyContextMenu, TContextMenu } from './Contextmenu';
 
 // Titel vom Widget eingeben und ein icon vom Format
 interface IWidgetProps {
@@ -181,7 +181,7 @@ export class Widget extends Event {
     }
 
     // Muss noch implementiert werden mit einer eigenen Komponente für das Contextmenü
-    addContextMenu(contexMenuData: TContextMenu, eventData?: TContextMenuEvent): void {
+    addContextMenu(contexMenuData: TContextMenu): void {
         ContextMenu.handleContextMenu();
         
         this.el.oncontextmenu = (e) => {
@@ -190,7 +190,6 @@ export class Widget extends Event {
             if(this.contextMenu) {
                 destroyContextMenu(this.contextMenu);
             }
-            contexMenuData.eventData = eventData;
             this.contextMenu = new ContextMenu(contexMenuData);
             this.contextMenu.show(e.pageX, e.pageY);
         }

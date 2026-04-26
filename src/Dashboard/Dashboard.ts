@@ -358,13 +358,15 @@ export class DashBoard extends Event {
             widget.addContextMenu(
                 {
                     items: [
-                        new Button({ text: 'Datei löschen', color: 'bg-sky-500/30', hoverColor: 'hover:bg-sky-500/50', id: 'deleteFileBtn', width: 'w-[200px]', height: 'h-[30px]' }),
-                        new Button({ text: 'Dokumenten-Assistent', color: 'bg-sky-500/30', hoverColor: 'hover:bg-sky-500/50', id: 'assistant', width: 'w-[200px]', height: 'h-[30px]' })
+                        {
+                            btn: new Button({ text: 'Datei löschen', color: 'bg-sky-500/30', hoverColor: 'hover:bg-sky-500/50', id: 'deleteFileBtn', width: 'w-[200px]', height: 'h-[30px]' }),
+                            event: () => widget.deleteWidget()
+                        },
+                        {
+                            btn: new Button({ text: 'Dokumenten-Assistent', color: 'bg-sky-500/30', hoverColor: 'hover:bg-sky-500/50', id: 'assistant', width: 'w-[200px]', height: 'h-[30px]' }),
+                            event: () => this.showLLMInterface(file.id)
+                        }
                     ]
-                },
-                {
-                    deleteFileBtn: () => widget.deleteWidget(),
-                    assistant: () => this.showLLMInterface(file.id)
                 }
             );
         }

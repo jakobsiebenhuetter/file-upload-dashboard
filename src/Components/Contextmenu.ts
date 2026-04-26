@@ -3,23 +3,17 @@ import { Button } from './Button';
 import { Event } from './Event';
 
 export type TContextMenu = {
-    items: Button[];
+    items: {btn: Button, event?: () => void}[];
     id?: string;
     xPosition?: number;
     yPosition?: number;
-    eventData?: TContextMenuEvent ;
 }
-
-export type TContextMenuEvent = {
-    [id: string]: (args?: any) => void;
-};
 
 export class ContextMenu extends Event {
     props: TContextMenu;
     el: HTMLElement = document.createElement('div');
     xPosition: number = 0;
     yPosition: number = 0;
-    eventData: TContextMenuEvent;
 
     constructor(props: TContextMenu) {
         super();
@@ -42,15 +36,15 @@ export class ContextMenu extends Event {
         this.el.setAttribute('id', this.props.id);
         this.props.items.forEach(item => {
             // item.el.classList.add('block', 'w-full', 'text-left', 'px-4', 'py-2', 'hover:bg-gray-100');
-            this.el.appendChild(item.el);
+            this.el.appendChild(item.btn.el);
         });
     }
 
     // Das muss man mit TS besser abfangen -> Regeln definieren, z.B. jedes Item muss eine Id haben damit man das Event zuordnen kann
     private addListener(): void {
         this.props.items.forEach(item => {
-            let handler = typeof this.props.eventData[item.props.id] === 'function' ? this.props.eventData[item.props.id] : () =>  console.log('Kein Event');
-            item.onClick(() => {
+            let handler = typeof item.event === 'function' ? item.event : () =>  console.log('Kein Event');
+            item.btn.onClick(() => {
                 handler();
                 destroyContextMenu(this);
             });
@@ -65,7 +59,7 @@ export class ContextMenu extends Event {
     }
 
     public destroy() {
-        this.props.items.forEach(item =>  item.clearAll());  
+        this.props.items.forEach(item =>  item.btn.clearAll());  
         this.el.remove();
         this.publish('destroy');
     }
