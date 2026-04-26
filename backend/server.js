@@ -362,8 +362,8 @@ app.post('/ai-request', async(req, res) => {
     });
     console.log('Das ist der Userprompt: ' + prompt)
     const response = await client.responses.create({
-        model: 'openai/gpt-oss-20b',
-        // model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+        // model: 'openai/gpt-oss-20b',
+        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
         // model: 'gpt-5.2',
         // stream: true,
         // instructions: 'Du bist ein Softwareentwickler, der gerne mit KI arbeitet. Beantworte die folgende Frage so ausführlich wie möglich.',
