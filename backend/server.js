@@ -7,11 +7,14 @@ const path = require('path');
 const cors = require('cors');
 const multer = require('multer');
 const crypto = require('crypto');
+const {exec} = require('child_process');
 
 const StorageInterface = require('./StorageInterface');
 const {validateInput} = require('./util');
 const storage = new StorageInterface('json');
 
+const PORT = process.env.PORT || 2000;
+const url = process.env.MAIN_URL || `http://localhost:${PORT}`;
 
 const app = express();
 app.use(cors());
@@ -364,5 +367,8 @@ app.post('/ai-request', async(req, res) => {
 });
 
 
-
-app.listen(2000, () => console.log('Server listen on Port 2000'));
+app.listen(PORT, () => {
+    console.log(`Server listen on Port ${PORT}`);
+    console.log(process.platform);
+    exec(`start ${url}`);
+});
