@@ -365,9 +365,4 @@ app.post('/ai-request', async(req, res) => {
 
 
 
-
-
-
-
-
 app.listen(2000, () => console.log('Server listen on Port 2000'));

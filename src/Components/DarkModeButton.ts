@@ -21,8 +21,14 @@ export class DarkModeButton extends Button {
         const contextMenuData: TContextMenu = {
             position: 'left',
             items: [
-                {btn: new Button({text: 'Option 1', width: 'w-[150px]', height: 'h-[30px]', color: 'bg-gray-200', hoverColor: 'hover:bg-gray-300'}), event: () => console.log('Option 1 clicked')},
-                {btn: new Button({text: 'Option 2', width: 'w-[150px]', height: 'h-[30px]', color: 'bg-gray-200', hoverColor: 'hover:bg-gray-300'}), event: () => console.log('Option 2 clicked')},
+                {
+                    btn: new Button({text: 'Option 1', width: 'w-[150px]', height: 'h-[30px]', color: 'bg-gray-200', hoverColor: 'hover:bg-gray-300'}), 
+                    event: () => console.log('Option 1 clicked')
+                },
+                {
+                    btn: new Button({text: 'Option 2', width: 'w-[150px]', height: 'h-[30px]', color: 'bg-gray-200', hoverColor: 'hover:bg-gray-300'}),
+                    event: () => console.log('Option 2 clicked')
+                },
             ] 
         };
 
