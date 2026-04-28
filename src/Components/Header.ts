@@ -44,7 +44,7 @@ export class Header {
 
 
     renderUI() {
-        this.el.classList.add('bg-stone-200', 'flex', 'flex-row', 'items-center', 'justify-between', 'p-4');
+        this.el.classList.add('bg-stone-200', 'flex', 'flex-row', 'items-center', 'justify-between', 'p-4', 'dark:bg-gray-800');
         this.el.append(this.filter.el, this.pagination.el, this.darkmodeBtn.el);
     }
 

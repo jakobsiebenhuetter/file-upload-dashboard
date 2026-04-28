@@ -84,7 +84,7 @@ export class DashBoard extends Event {
     };
 
     initApp(): void {
-        this.el.classList.add('p-4', 'bg-stone-200');
+        this.el.classList.add('p-4', 'bg-stone-200', 'dark:bg-gray-800');
         DashBoard.getFolders().then((folders) => {
             
             let folderId = null;
@@ -283,7 +283,7 @@ export class DashBoard extends Event {
     
     private renderHeroPage(files: File[]): void {
         const heroPage = document.createElement('div');
-        heroPage.classList.add('bg-stone-100', 'w-full');
+        heroPage.classList.add('bg-stone-100', 'dark:bg-grey-800', 'w-full');
         heroPage.append(this.header.el, this.widgetContainerWrapper);
         this.el.append(heroPage);
         this.renderGrid(files);
@@ -293,8 +293,8 @@ export class DashBoard extends Event {
         this.widgetContainer.innerHTML = ``;
         this.el.classList.add('flex', 'min-h-screen');
         this.widgetContainerWrapper.append(this.widgetContainer);
-        this.widgetContainerWrapper.classList.add('w-full', 'bg-stone-200', 'p-4');
-        this.widgetContainer.classList.add('min-h-screen', 'rounded', 'p-[10px]', 'bg-blue-200', 'grid', 'grid-cols-[repeat(auto-fill,minmax(210px,1fr))]', 'auto-rows-[300px]', 'rounded-[12px]');    
+        this.widgetContainerWrapper.classList.add('dark:bg-gray-800', 'w-full', 'bg-stone-200', 'p-4');
+        this.widgetContainer.classList.add('dark:bg-gray-700','min-h-screen', 'rounded', 'p-[10px]', 'bg-blue-200', 'grid', 'grid-cols-[repeat(auto-fill,minmax(210px,1fr))]', 'auto-rows-[300px]', 'rounded-[12px]');    
   
         this.createWidgets(files);
     };
