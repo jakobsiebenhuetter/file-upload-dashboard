@@ -19,7 +19,7 @@ type ButtonProps = {
 
 export class Button extends Event {
     el = document.createElement('div');
-    public props: ButtonProps;
+    protected props: ButtonProps;
 
     constructor(props?: ButtonProps) {
         super();
@@ -69,11 +69,18 @@ export class Button extends Event {
         this.subscribe('click', handler);
     }
 
-    private hasIcon(): boolean {
+    public hasIcon(): boolean {
         return this.props.icon && this.props.icon.length > 0;
     }
 
-    private setIcon(): void {
+
+    protected setIcon(icon?: string): void {
+
+        if(this.hasIcon() && icon) {
+            this.el.innerHTML = '';
+            this.props.icon = icon
+        }
+
         const iconElement = document.createElement('span');
         iconElement.innerHTML = this.props.icon;
         
