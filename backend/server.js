@@ -54,7 +54,17 @@ if(!fs.existsSync(tnPath)){
 }
 
 let mcpClient;
-let openaiTools = [];
+let mcpTools = [];
+const globalPrompt = [
+    {
+        role: 'SYSTEM',
+        parts: [
+            {
+                text: `Du bist ein hilfreicher Assistent, der dabei hilft Informationen über Dokumente zu geben. Du bekommst den Inhalt eines Dokuments und eine Frage dazu, beantworte die Frage so gut wie möglich auf Basis des Inhalts. Wenn du die Frage nicht beantworten kannst, sage das auch. Antworte immer in einem vollständigen Satz. Bitte berücksichtige den gesamten Chatverlauf, um die Frage zu beantworten.`
+            }
+        ]
+    }
+];
 
 async function initMcp() {
     const mcpTransport = new StdioClientTransport({
@@ -69,8 +79,8 @@ async function initMcp() {
 
     await mcpClient.connect(mcpTransport);
 
-    const { tools: mcpTools } = await mcpClient.listTools();
-    openaiTools = mcpTools.map(tool => ({
+    const { tools } = await mcpClient.listTools();
+    mcpTools = tools.map(tool => ({
         type: 'function',
         function: {
             name: tool.name,
@@ -78,7 +88,7 @@ async function initMcp() {
             parameters: tool.inputSchema,
         },
     }));
-    console.log(`MCP verbunden, ${openaiTools.length} Tools verfügbar.`);
+    console.log(`MCP verbunden, ${mcpTools.length} Tools verfügbar.`);
 }
 
 
@@ -366,90 +376,63 @@ app.post('/get-filtered-files', (req, res) => {
 app.post('/ai-request', async(req, res) => {
 
     const { prompt, fileId, folderId } = req.body;
-
-    if(process.env.API_AI_REQUEST === undefined || process.env.API_AI_URL === undefined ) {
-        return res.json({
-            answer: 'AI API Key oder URL nicht definiert'
-        });
-    }
-
-    const client = new OpenAI({
-        apiKey: process.env.API_AI_REQUEST,
-        baseURL: process.env.API_AI_URL,
-    });
-
-
-
-    const messages = [
-        {
-            role: 'system',
-            content: 'Du bist ein Dokumentenassistent. Verwende die bereitgestellten Tools, um Dokumente zu lesen, und beantworte dann die Frage des Nutzers.',
-        },
-        {
-            role: 'user',
-            content: `${prompt}\n\n(Kontext: folderId=${folderId}, fileId=${fileId})`,
-        },
-    ];
+    const apiKey = process.env.API_AI_GOOGLE_KEY
 
     try {
-        for (let step = 0; step < 7; step++) {
-            const response = await client.chat.completions.create({
-                model: 'meta-llama/llama-4-scout-17b-16e-instruct',
-                messages,
-                tools: openaiTools,
-                tool_choice: 'auto',
+
+        if(apiKey === undefined || apiKey === undefined ) {
+            return res.json({
+                answer: 'AI API Key oder URL nicht definiert'
             });
-            console.log(`AI-Antwort erhalten, Schritt ${step + 1}`);
-            const msg = response.choices[0].message;
-            messages.push(msg);
-
-            if (!msg.tool_calls?.length) {
-                console.log(msg.content);
-                return res.json({ answer: msg.content });
-            }
-
-            for (const call of msg.tool_calls) {
-                const toolArgs = JSON.parse(call.function.arguments || '{}');
-                console.log(`Tool-Call: ${call.function.name}`, toolArgs);
-                const result = await mcpClient.callTool({
-                    name: call.function.name,
-                    arguments: toolArgs,
-                });
-
-                const imagePart = result.content.find(c => c.type === 'image');
-                const textPart  = result.content.find(c => c.type === 'text');
-
-                if (imagePart) {
-                    messages.push({
-                        role: 'tool',
-                        tool_call_id: call.id,
-                        content: 'Bild geladen, siehe nächste User-Nachricht.',
-                    });
-                    messages.push({
-                        role: 'user',
-                        content: [{
-                            type: 'image_url',
-                            image_url: { url: `data:${imagePart.mimeType};base64,${imagePart.data}` },
-                        }],
-                    });
-                } else {
-                    messages.push({
-                        role: 'tool',
-                        tool_call_id: call.id,
-                        content: textPart?.text ?? '',
-                    });
-                }
-            }
         }
-        res.json({ answer: 'Maximale Anzahl an Tool-Iterationen erreicht.' });
-    } catch (err) {
-        console.error('ai-request Fehler:', err);
-        res.status(500).json({ answer: `Fehler: ${err.message}` });
-    }
+        
+        const googleClient = new GoogleGenAI({
+            apiKey: apiKey,
+        });
+        
+        globalPrompt.push(
+            {
+                role: 'USER',
+                parts: [
+                    {
+                        text: prompt
+                    }
+                ]
+        })
+
+        const response = await googleClient.models.generateContent({
+            model: "gemini-3-flash-preview",
+            contents: globalPrompt,
+            // tools: [
+            //     //...
+            // ]
+        });
+        
+        globalPrompt.push(
+            {
+                role: 'MODEL',
+                parts: [
+                    {
+                        text: response.text
+                    }
+                ]
+            });
+
+        } catch (error) {
+            console.error('Error handling AI request:', error);
+            return res.json({
+                answer: 'Fehler bei der Verarbeitung der AI-Anfrage'
+            });
+        }
+    console.dir(globalPrompt);
+    res.json({
+        answer: globalPrompt[globalPrompt.length - 1].parts[0].text
+    });
+
 });
 
 
-async function handleGoogleGenAI() {
+async function handleGoogleGenAI(prompt = "Explain how AI works in a few words") {
     
     const googleClient = new GoogleGenAI({
         apiKey: process.env.API_AI_GOOGLE_KEY,
@@ -457,7 +440,7 @@ async function handleGoogleGenAI() {
     
     const response = await googleClient.models.generateContent({
     model: "gemini-3-flash-preview",
-    contents: "Explain how AI works in a few words",
+    contents: prompt,
     tools: [
         //...
     ]
