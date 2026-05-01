@@ -57,7 +57,7 @@ let mcpClient;
 let mcpTools = [];
 const globalPrompt = [
     {
-        role: 'SYSTEM',
+        role: 'USER',
         parts: [
             {
                 text: `Du bist ein hilfreicher Assistent, der dabei hilft Informationen über Dokumente zu geben. Du bekommst den Inhalt eines Dokuments und eine Frage dazu, beantworte die Frage so gut wie möglich auf Basis des Inhalts. Wenn du die Frage nicht beantworten kannst, sage das auch. Antworte immer in einem vollständigen Satz. Bitte berücksichtige den gesamten Chatverlauf, um die Frage zu beantworten.`
@@ -80,15 +80,17 @@ async function initMcp() {
     await mcpClient.connect(mcpTransport);
 
     const { tools } = await mcpClient.listTools();
-    mcpTools = tools.map(tool => ({
-        type: 'function',
-        function: {
-            name: tool.name,
-            description: tool.description,
-            parameters: tool.inputSchema,
-        },
-    }));
-    console.log(`MCP verbunden, ${mcpTools.length} Tools verfügbar.`);
+    mcpTools = [
+        {
+            functionDeclarations: tools.map(tool => ({  
+                name: tool.name,
+                description: tool.description,
+                parameters: tool.inputSchema,
+            })),
+        }
+    ];
+
+    console.log(`MCP verbunden, ${mcpTools[0].functionDeclarations.length} Tools verfügbar.`);
 }
 
 
@@ -380,7 +382,7 @@ app.post('/ai-request', async(req, res) => {
 
     try {
 
-        if(apiKey === undefined || apiKey === undefined ) {
+        if(apiKey === undefined) {
             return res.json({
                 answer: 'AI API Key oder URL nicht definiert'
             });
@@ -395,19 +397,34 @@ app.post('/ai-request', async(req, res) => {
                 role: 'USER',
                 parts: [
                     {
-                        text: prompt
+                        text: `FolderId = ${folderId}; FileId = ${fileId} ${prompt}`
                     }
                 ]
-        })
+            });
 
         const response = await googleClient.models.generateContent({
-            model: "gemini-3-flash-preview",
+            // model: "gemini-3-flash-preview",
+            model: "gemini-2.5-flash",
             contents: globalPrompt,
-            // tools: [
-            //     //...
-            // ]
+            config: {
+                tools: [
+                    mcpTools,
+                    // {googleSearch: {}}
+                ] 
+            }
         });
         
+        console.log('AI Response:', response.functionCalls);
+        
+        if(response.functionCalls) {
+            const toolResponse = await mcpClient.callTool({
+                name: response.functionCalls[0].name,
+                arguments: response.functionCalls[0].args
+            });
+            console.log('Tool Response:', toolResponse);
+        }
+
+ 
         globalPrompt.push(
             {
                 role: 'MODEL',
