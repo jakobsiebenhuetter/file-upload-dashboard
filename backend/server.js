@@ -1,6 +1,11 @@
 const express = require('express');
 const OpenAI = require('openai');
 // const Grok = require('grok-sdk');
+const { GoogleGenAI } = require('@google/genai');
+
+const { Client } = require("@modelcontextprotocol/sdk/client/index.js");
+const { StdioClientTransport } = require("@modelcontextprotocol/sdk/client/stdio.js");
+
 const { PDFParse } = require('pdf-parse');
 
 const fs = require('fs');
@@ -47,6 +52,35 @@ if(!fs.existsSync(folderPath)){
 if(!fs.existsSync(tnPath)){
     fs.mkdirSync(tnPath);
 }
+
+let mcpClient;
+let openaiTools = [];
+
+async function initMcp() {
+    const mcpTransport = new StdioClientTransport({
+        command: 'node',
+        args: [path.join(__dirname, 'MCP', 'MCP-Server.js')],
+    });
+
+    mcpClient = new Client(
+        { name: 'MCP Client host', version: '1.0.0' },
+        { capabilities: {} }
+    );
+
+    await mcpClient.connect(mcpTransport);
+
+    const { tools: mcpTools } = await mcpClient.listTools();
+    openaiTools = mcpTools.map(tool => ({
+        type: 'function',
+        function: {
+            name: tool.name,
+            description: tool.description,
+            parameters: tool.inputSchema,
+        },
+    }));
+    console.log(`MCP verbunden, ${openaiTools.length} Tools verfügbar.`);
+}
+
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../dist', 'index.html'));
@@ -330,85 +364,112 @@ app.post('/get-filtered-files', (req, res) => {
 
 
 app.post('/ai-request', async(req, res) => {
-    const { prompt, fileId, folderId } = req.body;
-    
-    const fileData = storage.getFile(folderId, fileId);
-    // const {filesForPage} = storage.getFiles(folderId, 1);
-    // let text = '';
-    // let counter = 0;
-    // do {
-    
-    //     if(filesForPage[counter].path.endsWith('.pdf')) {
-    //         text += `\n--- Ein Dokument --- \n`;
-    //         console.log('fürs extrahieren: ');
-    //         console.dir(filesForPage[counter]);
-    //         text += await extractPDFText(filesForPage[counter].path);
-    //     };
 
-    //     counter++;
-    // } while(counter < filesForPage.length);
-  
-    // console.log('Der gesamte text: ' + text)
+    const { prompt, fileId, folderId } = req.body;
 
     if(process.env.API_AI_REQUEST === undefined || process.env.API_AI_URL === undefined ) {
         return res.json({
             answer: 'AI API Key oder URL nicht definiert'
         });
     }
-    
+
     const client = new OpenAI({
         apiKey: process.env.API_AI_REQUEST,
         baseURL: process.env.API_AI_URL,
     });
-    // console.log('Das ist der Userprompt: ' + prompt)
-    // const response = await client.responses.create({
-    //     // model: 'openai/gpt-oss-20b',
-    //     model: 'meta-llama/llama-4-scout-17b-16e-instruct',
-    //     // model: 'gpt-5.2',
-    //     // stream: true,
-    //     // instructions: 'Du bist ein Softwareentwickler, der gerne mit KI arbeitet. Beantworte die folgende Frage so ausführlich wie möglich.',
-    //     input: 'Du bist ein Dokumentenassistent, der Nutzern dabei hilft, Informationen aus PDF-Dokumenten zu suchen und erklären. Beantworte die folgende Frage so ausführlich wie möglich. Aber auch so kurz wie möglich ohne unnötigen Daten. Hier ist der Text aus dem Dokument: ' + text + ' ' + prompt
-        
-    // });
 
-    // console.log(response.output_text);
 
-    // res.json({
-    //     answer: response.output_text
-    // });
 
-    const imageBuffer = fs.readFileSync(fileData.path);
-    const base64Image = imageBuffer.toString('base64');
+    const messages = [
+        {
+            role: 'system',
+            content: 'Du bist ein Dokumentenassistent. Verwende die bereitgestellten Tools, um Dokumente zu lesen, und beantworte dann die Frage des Nutzers.',
+        },
+        {
+            role: 'user',
+            content: `${prompt}\n\n(Kontext: folderId=${folderId}, fileId=${fileId})`,
+        },
+    ];
 
-    const response = await client.chat.completions.create({
-        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
-        messages: [
-            {
-                role: "user",
-                content: [
-                    { 
-                        type: "text", 
-                        text: prompt
-                    },
-                    {
-                        type: "image_url",
-                        image_url: {
-                            url: `data:image/jpeg;base64,${base64Image}` 
-                        }
-                    }
-                ]
+    try {
+        for (let step = 0; step < 7; step++) {
+            const response = await client.chat.completions.create({
+                model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+                messages,
+                tools: openaiTools,
+                tool_choice: 'auto',
+            });
+            console.log(`AI-Antwort erhalten, Schritt ${step + 1}`);
+            const msg = response.choices[0].message;
+            messages.push(msg);
+
+            if (!msg.tool_calls?.length) {
+                console.log(msg.content);
+                return res.json({ answer: msg.content });
             }
-        ]
-    });
-    
-    console.log(response.choices[0].message.content);
-    
-    res.json({
-        answer: response.choices[0].message.content
-    });
+
+            for (const call of msg.tool_calls) {
+                const toolArgs = JSON.parse(call.function.arguments || '{}');
+                console.log(`Tool-Call: ${call.function.name}`, toolArgs);
+                const result = await mcpClient.callTool({
+                    name: call.function.name,
+                    arguments: toolArgs,
+                });
+
+                const imagePart = result.content.find(c => c.type === 'image');
+                const textPart  = result.content.find(c => c.type === 'text');
+
+                if (imagePart) {
+                    messages.push({
+                        role: 'tool',
+                        tool_call_id: call.id,
+                        content: 'Bild geladen, siehe nächste User-Nachricht.',
+                    });
+                    messages.push({
+                        role: 'user',
+                        content: [{
+                            type: 'image_url',
+                            image_url: { url: `data:${imagePart.mimeType};base64,${imagePart.data}` },
+                        }],
+                    });
+                } else {
+                    messages.push({
+                        role: 'tool',
+                        tool_call_id: call.id,
+                        content: textPart?.text ?? '',
+                    });
+                }
+            }
+        }
+        res.json({ answer: 'Maximale Anzahl an Tool-Iterationen erreicht.' });
+    } catch (err) {
+        console.error('ai-request Fehler:', err);
+        res.status(500).json({ answer: `Fehler: ${err.message}` });
+    }
 });
 
 
+async function handleGoogleGenAI() {
+    
+    const googleClient = new GoogleGenAI({
+        apiKey: process.env.API_AI_GOOGLE_KEY,
+    });
+    
+    const response = await googleClient.models.generateContent({
+    model: "gemini-3-flash-preview",
+    contents: "Explain how AI works in a few words",
+    tools: [
+        //...
+    ]
+  });
 
+  return response.text;
+}
 
-app.listen(2000, () => console.log('Server listen on Port 2000'));
+app.listen(2000, () => {
+    console.log('Server listen on Port 2000');
+    initMcp().catch(err => {
+        console.error('MCP-Init fehlgeschlagen:', err);
+        process.exit(1);
+    });
+});

@@ -2,6 +2,8 @@ const { Server } = require("@modelcontextprotocol/sdk/server/index.js");
 const { StdioServerTransport } = require("@modelcontextprotocol/sdk/server/stdio.js");
 const { CallToolRequestSchema, ListToolsRequestSchema } = require("@modelcontextprotocol/sdk/types.js");
 const fs = require('fs');
+const path = require('path');
+const resolvePath = (p) => path.isAbsolute(p) ? p : path.resolve(__dirname,'..', p);
 
 const StorageInterface = require('../StorageInterface.js');
 const { extractPDFText } = require('../Middlewares/PDFExtractor.js');
@@ -30,8 +32,22 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                 required: ['folderId'],
             }
         },
+
         {
-            name: 'Dokumentinhalt',
+            name: 'Dokumentinhalt-png',
+            description: 'Gibt den Inhalt eines Bilddokuments zurück als bae64',
+            inputSchema: {
+                type: 'object',
+                properties: {
+                    fileId: { type: 'string', description: 'Die ID des Bilddokuments, dessen Inhalt zurückgegeben werden soll' },
+                    folderId: { type: 'string', description: 'Die ID des Ordners, in dem sich das Bilddokument befindet' },
+                },
+                required: ['fileId', 'folderId'],
+            }
+        },
+
+        {
+            name: 'Dokumentinhalt-pdf',
             description: 'Gibt den Inhalt eines Dokuments zurück',
             inputSchema: {
                 type: 'object',
@@ -55,14 +71,20 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
     }
     
-    if(name === "Dokumentinhalt") {
+    if(name === "Dokumentinhalt-pdf") {
         const fileData = storage.getFile(args.folderId, args.fileId);
         if (fileData.path.endsWith('.pdf')) {
-            const text = await extractPDFText(fileData.path);
-            return { content: [{ type: "text", text }] };
-            
-        } else if (fileData.path.endsWith('.png') || fileData.path.endsWith('.jpg') || fileData.path.endsWith('.jpeg')) {
-            const base64 = fs.readFileSync(fileData.path).toString('base64');
+            console.error(`Extrahiere Text aus PDF: ${fileData.path}`);
+            const text = await extractPDFText(resolvePath(fileData.path));
+            return { content: [{ type: "text", text }] };  
+        }
+    }
+    
+    if (name === "Dokumentinhalt-png") {
+        const fileData = storage.getFile(args.folderId, args.fileId);
+        console.error(`Lese Bilddatei: ${fileData.path}`);
+        if(!fileData.path.endsWith('.png') && !fileData.path.endsWith('.jpeg')) return;
+        const base64 = fs.readFileSync(resolvePath(fileData.path)).toString('base64');
             const mimeType = fileData.path.endsWith('.png') ? 'image/png' : 'image/jpeg';
             return {
                 content: [{
@@ -72,9 +94,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 }]
             };
         }
-    }
-    throw new Error(`Tool ${name} nicht gefunden`);
-})
+        throw new Error(`Tool ${name} nicht gefunden`);
+    });
 
 async function main() {
     const transport = new StdioServerTransport();
