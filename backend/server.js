@@ -17,6 +17,7 @@ const crypto = require('crypto');
 const StorageInterface = require('./StorageInterface');
 const {validateInput} = require('./util');
 const { extractPDFText } = require('./Middlewares/PDFExtractor.js');
+
 const storage = new StorageInterface('json');
 
 
@@ -60,7 +61,7 @@ const globalPrompt = [
         role: 'USER',
         parts: [
             {
-                text: `Du bist ein hilfreicher Assistent, der dabei hilft Informationen über Dokumente zu geben. Du bekommst den Inhalt eines Dokuments und eine Frage dazu, beantworte die Frage so gut wie möglich auf Basis des Inhalts. Wenn du die Frage nicht beantworten kannst, sage das auch. Antworte immer in einem vollständigen Satz. Bitte berücksichtige den gesamten Chatverlauf, um die Frage zu beantworten.`
+                text: `Du bist ein hilfreicher Assistent, der dabei hilft Informationen über Dokumente zu geben. Du bekommst den Inhalt eines Dokuments und eine Frage dazu, beantworte die Frage so gut wie möglich auf Basis des Inhalts. Wenn du die Frage nicht beantworten kannst, sage das auch. Antworte immer in einem vollständigen Satz. Bitte berücksichtige den gesamten Chatverlauf, um die Frage zu beantworten. Verwende die bereitgestellten Tools, wenn nötig, die Ergebnisse verwende aber nicht als Output sondern verwende deinen Output`
             }
         ]
     }
@@ -397,24 +398,26 @@ app.post('/ai-request', async(req, res) => {
                 role: 'USER',
                 parts: [
                     {
-                        text: `FolderId = ${folderId}; FileId = ${fileId} ${prompt}`
+                        text: `FolderId = ${folderId}; FileId = ${fileId}; User:  ${prompt}`
                     }
                 ]
             });
 
         const response = await googleClient.models.generateContent({
-            // model: "gemini-3-flash-preview",
-            model: "gemini-2.5-flash",
+            model: "gemini-3-flash-preview",
+            // model: "gemini-2.5-flash",
+            // model: "gemini-2.5-flash-lite",
             contents: globalPrompt,
             config: {
                 tools: [
-                    mcpTools,
+                    mcpTools
                     // {googleSearch: {}}
+                    // {codeExecution: {}} 
                 ] 
             }
         });
         
-        console.log('AI Response:', response.functionCalls);
+        console.dir(response.functionCalls);
         
         if(response.functionCalls) {
             const toolResponse = await mcpClient.callTool({
@@ -424,16 +427,26 @@ app.post('/ai-request', async(req, res) => {
             console.log('Tool Response:', toolResponse);
         }
 
- 
-        globalPrompt.push(
-            {
-                role: 'MODEL',
-                parts: [
-                    {
-                        text: response.text
-                    }
-                ]
+        const modelResponse = {
+            role: 'MODEL',
+            parts: []
+        };
+
+        if(response.text) {
+            modelResponse.parts.push({
+                text: response.text
             });
+        } else if(response.functionCalls) {
+            modelResponse.parts.push(
+                {
+                    text: `Tool ${response.functionCalls[0].name} wurde aufgerufen mit den Argumenten
+                    ${JSON.stringify(response.functionCalls[0].args)}
+                    und hat die folgende Antwort zurückgegeben: ${toolResponse.content[0].text}`
+                }
+            );
+        }
+
+        globalPrompt.push(modelResponse);
 
         } catch (error) {
             console.error('Error handling AI request:', error);
@@ -441,7 +454,9 @@ app.post('/ai-request', async(req, res) => {
                 answer: 'Fehler bei der Verarbeitung der AI-Anfrage'
             });
         }
+
     console.dir(globalPrompt);
+
     res.json({
         answer: globalPrompt[globalPrompt.length - 1].parts[0].text
     });
