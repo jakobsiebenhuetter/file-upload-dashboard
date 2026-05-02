@@ -6,6 +6,7 @@ import { KeyManager } from './KeyManager';
 import { lockScreen, unlockScreen } from './globVar';
 
 /**
+ * @todo Pagination nach shadcn style implementieren.
  * @TODO Event Klasse erweitern um mehrere Funktionen zu einem Event zu speichern
  * @todo Event member als Objekt verwenden damit man nicht immer die Funktion durchgehen muss, sondern direkt auf die Funktion zugreifen kann, z.B. this.events['openModal']() anstatt this.events.forEach(fn => { if(fn.name === 'openModal') fn() })
  * @todo Uploadstatus anzeigen lassen, dank axios ist das möglich

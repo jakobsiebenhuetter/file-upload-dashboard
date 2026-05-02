@@ -30,7 +30,8 @@ export type PageData = {
     maxPages: number;
     files: File[];
     hasNextPage: boolean,
-    hasPreviousPage: boolean
+    hasPreviousPage: boolean,
+    state: 'filter' | 'no-filter';
 }
 
 export type File = {
@@ -72,7 +73,6 @@ export class DashBoard extends Event {
      sidebar: Sidebar;
      dropzone: DropZone | null = null;
      files: File[];
-     filterState: 'filter' | 'no-filter' = 'no-filter';
      filterValue?: string = '';
      llm = LLMInterface.getInstance();
 
@@ -97,7 +97,7 @@ export class DashBoard extends Event {
             DashBoard.getFiles(folderId).then((data) => {
                 this.files = data.files;
                 // this.header.getPagination.updatePagination(data.currentPage, data.files.length, data.hasNextPage, data.hasPreviousPage);
-                this.header.getPagination.setPaginationData(1, data.hasNextPage, false);
+                this.header.getPagination.updatePagination(1, data.hasNextPage, false);
                 this.renderHeroPage(this.files);
             });     
         });        
@@ -110,7 +110,6 @@ export class DashBoard extends Event {
         });
 
         GlobalEvent.subscribe('folderFocusChanged:renderFiles', (folderId) => {
-            this.filterState = 'no-filter';
             DashBoard.getFiles(folderId).then((data) => {
                 if(data.files) {
                     this.files = data.files;
@@ -124,17 +123,26 @@ export class DashBoard extends Event {
 
         // Hier weiter machen Schritt für Schritt, sonst werde ich verrückt :-)
         GlobalEvent.subscribe('change:page', (paginationData: PaginationEventData) => {
+            GlobalEvent.publish('spinner', { action: 'show' });
             const { nextPage } = paginationData;
-            if(this.filterState === 'no-filter') {
+            let state = '';
+            state = this.header.getFilter.getValue() ?'filter' : 'no-filter';
+
             // Hier muss noch unterschieden werden ob gefiltert wird oder nicht, da es sonst zu Problemen mit der Pagination
-            DashBoard.getFiles(this.sidebar.getFocus(), nextPage).then((paginationData) => {
-                this.files = paginationData.files;  
-                this.header.getPagination.updatePagination(paginationData.currentPage, paginationData.hasNextPage, paginationData.hasPreviousPage);
-                this.renderGrid(this.files);
-            })
+            if(state === 'no-filter') {
+                DashBoard.getFiles(this.sidebar.getFocus(), nextPage).then((paginationData) => {
+                    this.files = paginationData.files;  
+                    this.header.getPagination.updatePagination(paginationData.currentPage, paginationData.hasNextPage, paginationData.hasPreviousPage);
+                    this.renderGrid(this.files);
+                });
+            
             } else {
-                 //... 
+                this.getFilteredFiles(this.sidebar.getFocus(), this.header.getFilter.getValue(), nextPage)
+                .then((pageData) => {
+                    GlobalEvent.publish('filter:renderFiles', pageData);
+                });
             }
+            GlobalEvent.publish('spinner', { action: 'hide' });
         });
 
         this.header.getPagination.onPageChange(async (params) => {
@@ -144,7 +152,6 @@ export class DashBoard extends Event {
         // upload:renderFiles ???
         // Es gibt eine strukturelle diskrepanz, beim filtern und ohne filtern rendering
          GlobalEvent.subscribe('renderFiles', (data: PageData) => {
-            this.filterState = 'no-filter';
             console.log('Daten im Dashboard erhalten: ', data);
             if(data.files){
                 this.files = data.files;
@@ -156,7 +163,7 @@ export class DashBoard extends Event {
         });
 
         GlobalEvent.subscribe('filter:renderFiles', (data: PageData) => {
-            this.filterState = 'filter';
+            
             if(data.files) {
                 this.files = data.files;
                 this.renderGrid(this.files);
@@ -190,8 +197,7 @@ export class DashBoard extends Event {
 
             } else {    
 
-                const page = this.header.getPagination.getPage.currentPage;
-                const pageData = await this.getFilteredFiles(folderId, params.inputValue, page);
+                const pageData = await this.getFilteredFiles(folderId, params.inputValue, 1);
                 GlobalEvent.publish('filter:renderFiles', pageData);
             };
             GlobalEvent.publish('spinner', { action: 'hide'});
