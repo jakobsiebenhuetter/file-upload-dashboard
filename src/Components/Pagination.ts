@@ -19,7 +19,6 @@ export type PaginationEventData = {
     event: MouseEvent;
     action: 'next' | 'prev';
     nextPage: number;
-    state?: 'filter' | 'no-filter';
 }
 
 
@@ -62,7 +61,6 @@ export class Pagination extends Event{
         this.filesPerPage = this.props.filesPerPage;
         this.renderUI();
         this.addListeners();
-        // this.init();
     }
 
     private renderUI() {
@@ -86,7 +84,6 @@ export class Pagination extends Event{
         if(this.hasPreviousPage) {
             this.enableLeftButton();
         }
-
     }
 
     private addListeners(): void {
@@ -127,21 +124,6 @@ export class Pagination extends Event{
         }
     }
     
-    private init(): void {
-        this.publish('pageChange',
-                {
-                    //...
-                }
-            );
-        }
-
-
-    setPaginationData(currentPage: number, hasNextPage: boolean, hasPreviousPage: boolean): void {
-        this.currentPage = currentPage;
-        this.hasNextPage = hasNextPage;
-        this.hasPreviousPage = hasPreviousPage;
-        this.updatePagination(currentPage, hasNextPage, hasPreviousPage);
-    }
     // Validiert wird im Backend, hier wird nur die Anfrage gesendet und die UI aktualisiert
    
     updatePagination(page: number, hasnextPage = false, hasPreviousPage = false): void {
