@@ -31,7 +31,7 @@ export type PageData = {
     files: File[];
     hasNextPage: boolean,
     hasPreviousPage: boolean,
-    state: 'filter' | 'no-filter';
+    // state: 'filter' | 'no-filter';
 }
 
 export type File = {
@@ -97,7 +97,7 @@ export class DashBoard extends Event {
             DashBoard.getFiles(folderId).then((data) => {
                 this.files = data.files;
                 // this.header.getPagination.updatePagination(data.currentPage, data.files.length, data.hasNextPage, data.hasPreviousPage);
-                this.header.getPagination.updatePagination(1, data.hasNextPage, false);
+                this.header.getPagination.updatePagination(1, data.maxPages, data.hasNextPage, false);
                 this.renderHeroPage(this.files);
             });     
         });        
@@ -115,7 +115,7 @@ export class DashBoard extends Event {
                     this.files = data.files;
                     // Pagination updaten und filter clearen im backend
                     console.log('Daten im Dashboard erhalten: ', data);
-                    this.header.getPagination.updatePagination(1 , data.hasNextPage, false);
+                    this.header.getPagination.updatePagination(1 , data.maxPages, data.hasNextPage, false);
                     this.renderGrid(this.files);
                 }
             });
@@ -126,13 +126,13 @@ export class DashBoard extends Event {
             GlobalEvent.publish('spinner', { action: 'show' });
             const { nextPage } = paginationData;
             let state = '';
-            state = this.header.getFilter.getValue() ?'filter' : 'no-filter';
+            state = this.header.getFilter.getValue() ? 'filter' : 'no-filter';
 
             // Hier muss noch unterschieden werden ob gefiltert wird oder nicht, da es sonst zu Problemen mit der Pagination
             if(state === 'no-filter') {
                 DashBoard.getFiles(this.sidebar.getFocus(), nextPage).then((paginationData) => {
                     this.files = paginationData.files;  
-                    this.header.getPagination.updatePagination(paginationData.currentPage, paginationData.hasNextPage, paginationData.hasPreviousPage);
+                    this.header.getPagination.updatePagination(paginationData.currentPage, paginationData.maxPages, paginationData.hasNextPage, paginationData.hasPreviousPage);
                     this.renderGrid(this.files);
                 });
             
@@ -155,7 +155,7 @@ export class DashBoard extends Event {
             console.log('Daten im Dashboard erhalten: ', data);
             if(data.files){
                 this.files = data.files;
-                this.header.getPagination.updatePagination(data.currentPage, data.hasNextPage, data.hasPreviousPage);
+                this.header.getPagination.updatePagination(data.currentPage, data.maxPages, data.hasNextPage, data.hasPreviousPage);
                 this.renderGrid(this.files);
             } else {
                 console.error('Daten:', data);
@@ -167,7 +167,7 @@ export class DashBoard extends Event {
             if(data.files) {
                 this.files = data.files;
                 this.renderGrid(this.files);
-                this.header.getPagination.updatePagination(data.currentPage, data.hasNextPage, data.hasPreviousPage);
+                this.header.getPagination.updatePagination(data.currentPage, data.maxPages, data.hasNextPage, data.hasPreviousPage);
             } else {
                 console.error('Daten:', data);
             }
@@ -445,7 +445,7 @@ export class DashBoard extends Event {
             
             DashBoard.getFiles(this.sidebar.getFocus(), this.header.getPagination.currentPage).then((paginationData) => {
                 this.files = paginationData.files;  
-                this.header.getPagination.updatePagination(paginationData.currentPage, paginationData.hasNextPage, paginationData.hasPreviousPage);
+                this.header.getPagination.updatePagination(paginationData.currentPage, paginationData.maxPages, paginationData.hasNextPage, paginationData.hasPreviousPage);
                 GlobalEvent.publish('renderFiles', paginationData);
             });
         

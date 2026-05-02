@@ -98,20 +98,18 @@ class JSONStorage {
         } catch (error) {
             console.error('Error reading data:', error);
         }
-        console.log('Alle Dateien im Ordner: ', files);
+
         let firstFile = (page - 1) * 4;
         let lastFile = firstFile + 4;
 
 
         maxPages = files.files.length ? Math.ceil(files.files.length / 4)  : 1;
-        console.log('Max Pages', maxPages);
+        
         if(files.files.length < lastFile + 1) {
             lastFile = files.files.length;
         }
         
         let filesForPage = files.files.slice(firstFile, lastFile);
-
-        console.log('Alles', filesForPage);
         return {filesForPage, maxPages};
     }
 
