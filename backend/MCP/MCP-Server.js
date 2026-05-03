@@ -90,7 +90,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 content: [{
                     type: "image",
                     data: base64,
-                    mimeType
+                    mimeType:mimeType,
                 }]
             };
         }

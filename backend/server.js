@@ -58,10 +58,10 @@ let mcpClient;
 let mcpTools = [];
 const globalPrompt = [
     {
-        role: 'USER',
+        role: 'user',
         parts: [
             {
-                text: `Du bist ein hilfreicher Assistent, der dabei hilft Informationen über Dokumente zu geben. Du bekommst den Inhalt eines Dokuments und eine Frage dazu, beantworte die Frage so gut wie möglich auf Basis des Inhalts. Wenn du die Frage nicht beantworten kannst, sage das auch. Antworte immer in einem vollständigen Satz. Bitte berücksichtige den gesamten Chatverlauf, um die Frage zu beantworten. Verwende die bereitgestellten Tools, wenn nötig, die Ergebnisse verwende aber nicht als Output sondern verwende deinen Output`
+                text: `Du bist ein hilfreicher Assistent, der dabei hilft Informationen über Dokumente zu geben. Du bekommst den Inhalt eines Dokuments und eine Frage dazu, beantworte die Frage so gut wie möglich auf Basis des Inhalts. Wenn du die Frage nicht beantworten kannst, sage das auch. Antworte immer in einem vollständigen Satz. Bitte berücksichtige den gesamten Chatverlauf, um die Frage zu beantworten. Verwende die bereitgestellten Tools. Die läufst ihn einer Agenten Schleife also berücksichtige genau auch die alten Nachrichten. Wenn du die Antwort schon hast und die Schleife noch nicht zu Ende ist, dann antworte mit der selben Antwort wieder;`
             }
         ]
     }
@@ -395,65 +395,74 @@ app.post('/ai-request', async(req, res) => {
         
         globalPrompt.push(
             {
-                role: 'USER',
+                role: 'user',
                 parts: [
                     {
-                        text: `FolderId = ${folderId}; FileId = ${fileId}; User:  ${prompt}`
+                        text: `FolderId = ${folderId}; User:  ${prompt}`
                     }
                 ]
             });
-
-        const response = await googleClient.models.generateContent({
-            model: "gemini-3-flash-preview",
-            // model: "gemini-2.5-flash",
-            // model: "gemini-2.5-flash-lite",
-            contents: globalPrompt,
-            config: {
-                tools: [
-                    mcpTools
+            
+        for(let i = 0; i < 3; i++) {
+            const response = await googleClient.models.generateContent({
+                model: "gemini-3-flash-preview",
+                // model: "gemini-2.5-flash",
+                // model: "gemini-2.5-flash-lite",
+                contents: globalPrompt,
+                config: {
+                    tools: mcpTools
                     // {googleSearch: {}}
                     // {codeExecution: {}} 
-                ] 
-            }
-        });
-        
-        console.dir(response.functionCalls);
-        
-        if(response.functionCalls) {
-            const toolResponse = await mcpClient.callTool({
-                name: response.functionCalls[0].name,
-                arguments: response.functionCalls[0].args
+                }
             });
-            console.log('Tool Response:', toolResponse);
-        }
+            
+            console.log('functionCalls:', response.functionCalls);
+            console.log('text:', response.text);
 
-        const modelResponse = {
-            role: 'MODEL',
-            parts: []
-        };
-
-        if(response.text) {
-            modelResponse.parts.push({
+            const modelResponse = {
+                role: 'model',
+                parts: []
+            };
+            
+            if(response.text) {
+                modelResponse.parts.push({
                 text: response.text
             });
-        } else if(response.functionCalls) {
-            modelResponse.parts.push(
-                {
-                    text: `Tool ${response.functionCalls[0].name} wurde aufgerufen mit den Argumenten
-                    ${JSON.stringify(response.functionCalls[0].args)}
-                    und hat die folgende Antwort zurückgegeben: ${toolResponse.content[0].text}`
+
+            } else if(response.functionCalls?.length) {
+                const call = response.functionCalls[0];
+                const toolResponse = await mcpClient.callTool({
+                    name: call.name,
+                    arguments: call.args
+                });
+
+                modelResponse.parts.push(
+                    {
+                        text: `Tool ${call.name} wurde aufgerufen mit den Argumenten ${JSON.stringify(call.args)}.`
+                    }
+                );
+
+                for (const item of toolResponse.content ?? []) {
+                    if (item.type === 'text') {
+                        modelResponse.parts.push({ text: item.text });
+                    } else if (item.type === 'image') {
+                        modelResponse.parts.push({
+                            inlineData: {
+                                mimeType: item.mimeType,
+                                data: item.data
+                            }
+                        });
+                    }
                 }
-            );
-        }
-
-        globalPrompt.push(modelResponse);
-
-        } catch (error) {
-            console.error('Error handling AI request:', error);
-            return res.json({
-                answer: 'Fehler bei der Verarbeitung der AI-Anfrage'
-            });
-        }
+            }   
+            globalPrompt.push(modelResponse);
+        } 
+    } catch (error) {
+        console.error('Error handling AI request:', error);
+        return res.json({
+            answer: 'Fehler bei der Verarbeitung der AI-Anfrage'
+        });
+    }
 
     console.dir(globalPrompt);
 
