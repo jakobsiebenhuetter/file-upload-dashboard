@@ -1,6 +1,13 @@
 import { Button } from "./Button";
 import { ContextMenu, TContextMenu } from "./Contextmenu";
 
+/**
+ * 
+ * @info This component is responsible for toggling between light and dark mode. It also has an optional context menu that can be opened on click. The user's theme preference is saved in localStorage and applied on page load.
+ * 
+ * @todo Implement the context menu with actual functionality. Currently, it just logs to the console when an option is clicked.
+ * 
+ */
 
 export class DarkModeButton extends Button {
     openContext = false;
