@@ -1,15 +1,20 @@
-const express = require('express');
-const OpenAI = require('openai');
-const { PDFParse } = require('pdf-parse');
+import express from 'express';
 
-const fs = require('fs');
-const path = require('path');
-const cors = require('cors');
-const multer = require('multer');
-const crypto = require('crypto');
-const {exec} = require('child_process');
+import OpenAI from 'openai';
+import {PDFParse} from 'pdf-parse';
+import fs from 'fs';
+import path from 'path';
+import cors from 'cors';
 
-const StorageInterface = require('./StorageInterface');
+import multer from 'multer';
+import crypto from 'crypto';
+
+import {exec} from 'child_process';
+
+import {StorageInterface} from './StorageInterface.js';
+
+
+
 const {validateInput} = require('./util');
 const storage = new StorageInterface('json');
 
@@ -214,7 +219,7 @@ app.post('/upload', async (req, res) => {
         data: null
     };
 
-    let newPath = null;
+    let newPath = '';
     const datetime = new Date(); // Hier weiter machen
     let date = `${datetime.getDate()}.${datetime.getMonth() + 1}.${datetime.getFullYear()}`;
     const uploadStorage = multer.diskStorage({
@@ -273,10 +278,12 @@ app.post('/get-filtered-files', (req, res) => {
     let page = parseInt(pageNumber);
 
     let msg = {
+        info: '',
         message: '',
         type: 'info',
         files: [],
         currentPage: 1,
+        filesForPage: [],
         maxPages: 1,
         hasNextPage: false,
         hasPreviousPage: false,

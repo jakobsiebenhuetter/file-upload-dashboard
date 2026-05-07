@@ -1,19 +1,23 @@
 
-const DatabaseStorage = require('./DatabaseStorage');
-const JSONStorage = require('./JSONStorage');
+import {DatabaseStorage} from './DatabaseStorage.js';
+import {JSONStorage} from './JSONStorage.js';
 
-class StorageInterface {
-    storageType = null;
+
+export class StorageInterface {
+    storageType: string;
+    storage: JSONStorage; // DatabaseStorage | JSONStorage;
+
     constructor(storageType = 'db') {
         this.storageType = storageType;
         this.storage = this.getStorage();
     }
     getStorage() {
-        if (this.storageType === 'db') {
-            return new DatabaseStorage();
-        } else {
-            return new JSONStorage();
-        }
+        return new JSONStorage();
+        // if (this.storageType === 'db') {
+        //     // return new DatabaseStorage();
+        //     return new Error('DatabaseStorage is currently not supported');
+        // } else {
+        // }
     }
 
     getData() {
@@ -24,15 +28,15 @@ class StorageInterface {
         return this.storage.saveFolder(folderObj);
     }
 
-    async saveFiles(files, folderId, date) {
+    async saveFiles(files, folderId: string, date: string) {
         return await this.storage.saveFiles(files, folderId, date);
     }
     
-    deleteFile(folderId, fileId) {
+    deleteFile(folderId: string, fileId: string) {
         return this.storage.deleteFile(folderId, fileId);
     }
 
-    deleteFolder(id) {
+    deleteFolder(id: string) {
         this.storage.deleteFolder(id);
     }
 
@@ -40,18 +44,15 @@ class StorageInterface {
         return this.storage.getFolders();
     }
 
-    getFiles(folderId, page = 1) {
+    getFiles(folderId: string, page = 1) {
         return this.storage.getFiles(folderId, page);
     }
 
-    getFilteredFiles(folderId, char, page = 1) {
+    getFilteredFiles(folderId: string, char, page = 1) {
         return this.storage.getFilteredFiles(folderId, char, page);
     }
 
-    getFile(folderId, fileId) {
+    getFile(folderId: string, fileId: string) {
         return this.storage.getFile(folderId, fileId);
     }
 }
-
-
-module.exports = StorageInterface;

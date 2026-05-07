@@ -1,12 +1,13 @@
-const fs = require('fs');
-const crypto = require('crypto');
+import fs from 'fs';
+import crypto from 'crypto';
 
-const TNGenerator = require('./Middlewares/thumbnailGenerator');
+import {generateTN} from './Middlewares/thumbnailGenerator.js';
+
 
 const jsonPath = '../data/data.json';
 const tnPath = './data/Thumbnails';
 
-class JSONStorage {
+export class JSONStorage {
     
     getData() {
         const file = fs.readFileSync(jsonPath, 'utf-8');
@@ -21,7 +22,7 @@ class JSONStorage {
         return data;
     }
 
-    async saveFiles(files, folderId, date) {
+    async saveFiles(files, folderId: string, date: string) {
         const data = this.getData();
         
          for (let folder of data.folders) {
@@ -29,7 +30,7 @@ class JSONStorage {
                 for (const file of files) {
                     const uuid = crypto.randomUUID();
                     const title = file.originalname;
-                    let thumbnailPath = await TNGenerator.generateTN(file);
+                    let thumbnailPath = await generateTN(file);
                     folder.files.push({ id: uuid, title: title, path: file.path, thumbnailPath: thumbnailPath, date: date });
                 }
             }
@@ -40,7 +41,7 @@ class JSONStorage {
 
 
 
-    deleteFile(folderId, fileId) {
+    deleteFile(folderId: string, fileId: string) {
         // Hier nur die Daten für den einen Ordner holen, damit nicht das ganze Objekt durchlaufen werden muss
         const data = this.getData();
          for (const folder of data.folders) {
@@ -65,7 +66,7 @@ class JSONStorage {
         return this.getFiles(folderId); 
     }
 
-    deleteFolder(folderId) {
+    deleteFolder(folderId: string) {
         const data = this.getData();
         for (const folder of data.folders) {
 
@@ -88,7 +89,7 @@ class JSONStorage {
         }
     }
 
-    getFiles(folderId, page = 1) {
+    getFiles(folderId: string, page = 1) {
         // ... hier weiter machen
         let files = [];
         let maxPages = 1;
@@ -126,7 +127,7 @@ class JSONStorage {
         return folders;
     }
 
-    getFilteredFiles(folderId, char, page = 1) {
+    getFilteredFiles(folderId: string, char: string, page = 1) {
         // Maxpages mit prev und nextPage hier berechnen
         // !!!! genauso wie bei getFiles, nur dass hier vorher, und hier eventuell auch den state setzen, muss aber noch überlegt werden
         
@@ -155,7 +156,7 @@ class JSONStorage {
         return {filesForPage, maxPages};
     }
 
-    getFile(folderId, fileId) {
+    getFile(folderId: string, fileId: string) {
         const data = this.getData();
         const folder = data.folders.filter((folder) => folder.id === folderId);
         let file = null;
