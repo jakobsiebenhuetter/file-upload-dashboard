@@ -66,6 +66,11 @@ const globalPrompt = [
                 Gib zusätzlich {loop: 'break'} zurück wenn du mit der Beantwortung fertig bist.
                 Wenn der Benutzer eine Frage stellt, die du nicht beantworten kannst, weil die Information nicht im Dokument enthalten ist, dann sage das auch. Antworte immer in einem vollständigen Satz. Bitte berücksichtige den gesamten Chatverlauf, um die Frage zu beantworten. Verwende die bereitgestellten Tools, aber nur wenn nötig. 
                 Wenn du die Frage nicht beantworten kannst, sage das auch. Antworte immer in einem vollständigen Satz. Bitte berücksichtige den gesamten Chatverlauf, um die Frage zu beantworten. Verwende die bereitgestellten Tools. Die läufst ihn einer Agenten Schleife also berücksichtige genau auch die alten Nachrichten. Wenn du die Antwort schon hast und die Schleife noch nicht zu Ende ist, dann antworte mit der selben Antwort wieder;`
+                text: `Du bist ein hilfreicher Assistent, der dabei hilft Informationen über Dokumente zu geben. 
+                Du bekommst den Inhalt eines Dokuments und eine Frage dazu, beantworte die Frage so gut wie möglich auf Basis des Inhalts.
+                Gib zusätzlich {loop: 'break'} zurück wenn du mit der Beantwortung fertig bist.
+                Wenn der Benutzer eine Frage stellt, die du nicht beantworten kannst, weil die Information nicht im Dokument enthalten ist, dann sage das auch. Antworte immer in einem vollständigen Satz. Bitte berücksichtige den gesamten Chatverlauf, um die Frage zu beantworten. Verwende die bereitgestellten Tools, aber nur wenn nötig. 
+                Wenn du die Frage nicht beantworten kannst, sage das auch. Antworte immer in einem vollständigen Satz. Bitte berücksichtige den gesamten Chatverlauf, um die Frage zu beantworten. Verwende die bereitgestellten Tools. Die läufst ihn einer Agenten Schleife also berücksichtige genau auch die alten Nachrichten. Wenn du die Antwort schon hast und die Schleife noch nicht zu Ende ist, dann antworte mit der selben Antwort wieder;`
             }
         ]
     }
@@ -406,6 +411,10 @@ app.post('/ai-request', async(req, res) => {
                         der User schreibt ${prompt};
                         Berücksichtige den gesamten Chatverlauf, um die Frage zu beantworten. Verwende die bereitgestellten Tools, aber nur wenn nötig.
                         Wenn du die Frage nicht beantworten kannst, sage das auch. Antworte immer in einem vollständigen Satz. Bitte berücksichtige den gesamten Chatverlauf, um die Frage zu beantworten. Verwende die bereitgestellten Tools. Die läufst ihn einer Agenten Schleife also berücksichtige genau auch die alten Nachrichten. Wenn du die Antwort schon hast und die Schleife noch nicht zu Ende ist, dann antworte mit der selben Antwort wieder;`
+                        text: `Die FolderId lautet ${folderId}.
+                        der User schreibt ${prompt};
+                        Berücksichtige den gesamten Chatverlauf, um die Frage zu beantworten. Verwende die bereitgestellten Tools, aber nur wenn nötig.
+                        Wenn du die Frage nicht beantworten kannst, sage das auch. Antworte immer in einem vollständigen Satz. Bitte berücksichtige den gesamten Chatverlauf, um die Frage zu beantworten. Verwende die bereitgestellten Tools. Die läufst ihn einer Agenten Schleife also berücksichtige genau auch die alten Nachrichten. Wenn du die Antwort schon hast und die Schleife noch nicht zu Ende ist, dann antworte mit der selben Antwort wieder;`
                     }
                 ]
             });
@@ -433,12 +442,13 @@ app.post('/ai-request', async(req, res) => {
             
             if(response.text) {
                 let text = response.text;
+                let text = response.text;
                 modelResponse.parts.push({
+                text: text
                 text: text
             });
 
             const breakLoop = text.match(/{loop: 'break'}/g)
-            text = text.replace(/{loop: 'break'}/g, '').trim();
             console.log('breakLoop: ', breakLoop);
 
             if(breakLoop) {
