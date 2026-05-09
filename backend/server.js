@@ -438,6 +438,7 @@ app.post('/ai-request', async(req, res) => {
             });
 
             const breakLoop = text.match(/{loop: 'break'}/g)
+            text = text.replace(/{loop: 'break'}/g, '').trim();
             console.log('breakLoop: ', breakLoop);
 
             if(breakLoop) {
