@@ -5,13 +5,16 @@ type MessageRole = 'user' | 'ai';
 
 export class LLMInterface extends Event {
     private static instance: LLMInterface;
-
     el: HTMLElement = document.createElement('div');
     private chatArea: HTMLElement = document.createElement('div');
     private textField: HTMLTextAreaElement = document.createElement('textarea');
     private typingIndicator: HTMLElement = document.createElement('div');
     private messages: Array<{ role: MessageRole; text: string }> = [];
     private focus: string | null = null;
+    private history: string[] = [];
+    private historyIndex = -1;
+    private draft = '';
+    private suppressInputReset = false;
 
     private constructor() {
         super();
@@ -134,12 +137,39 @@ export class LLMInterface extends Event {
         this.textField.addEventListener('input', () => {
             this.textField.style.height = 'auto';
             this.textField.style.height = Math.min(this.textField.scrollHeight, 100) + 'px';
+
+            if (!this.suppressInputReset) {
+                this.historyIndex = -1;
+                this.draft = '';
+            }
         });
 
         this.textField.addEventListener('keydown', (e: KeyboardEvent) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 this.handleSend();
+            } else if (e.key === 'ArrowUp' && this.isCaretInFirstLine()) {
+                if (this.history.length === 0) return;
+                if (this.historyIndex >= this.history.length - 1) {
+                    e.preventDefault();
+                    return;
+                }
+                if (this.historyIndex === -1) {
+                    this.draft = this.textField.value;
+                }
+                this.historyIndex++;
+                this.setValuePreservingHistory(
+                    this.history[this.history.length - 1 - this.historyIndex]
+                );
+                e.preventDefault();
+            } else if (e.key === 'ArrowDown' && this.isCaretInLastLine()) {
+                if (this.historyIndex === -1) return;
+                this.historyIndex--;
+                const next = this.historyIndex === -1
+                    ? this.draft
+                    : this.history[this.history.length - 1 - this.historyIndex];
+                this.setValuePreservingHistory(next);
+                e.preventDefault();
             }
         });
 
@@ -172,11 +202,39 @@ export class LLMInterface extends Event {
         const text = this.textField.value.trim();
         if (!text) return;
 
+        if (this.history.at(-1) !== text) {
+            this.history.push(text);
+        }
+        this.historyIndex = -1;
+        this.draft = '';
+
         this.addMessage('user', text);
         this.textField.style.height = 'auto';
 
         this.showTyping();
         this.publish('send');
+    }
+
+    private isCaretInFirstLine(): boolean {
+        const pos = this.textField.selectionStart ?? 0;
+        const firstNewline = this.textField.value.indexOf('\n');
+        return firstNewline === -1 || pos <= firstNewline;
+    }
+
+    private isCaretInLastLine(): boolean {
+        const pos = this.textField.selectionStart ?? 0;
+        const lastNewline = this.textField.value.lastIndexOf('\n');
+        return lastNewline === -1 || pos > lastNewline;
+    }
+
+    private setValuePreservingHistory(value: string): void {
+        this.suppressInputReset = true;
+        this.textField.value = value;
+        this.textField.style.height = 'auto';
+        this.textField.style.height = Math.min(this.textField.scrollHeight, 100) + 'px';
+        const end = value.length;
+        this.textField.setSelectionRange(end, end);
+        this.suppressInputReset = false;
     }
 
     addMessage(role: MessageRole, text: string): void {
