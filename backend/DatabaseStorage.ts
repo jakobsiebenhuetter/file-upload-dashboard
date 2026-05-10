@@ -1,3 +1,4 @@
+// @ts-nocheck
 import fs from 'fs';
 import crypto from 'crypto';
 import Database from 'better-sqlite3';

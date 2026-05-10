@@ -3,6 +3,7 @@ import crypto from 'crypto';
 
 import {generateTN} from './Middlewares/thumbnailGenerator.js';
 
+import {TFile, TFolder} from './StorageInterface.js';
 
 const jsonPath = '../data/data.json';
 const tnPath = './data/Thumbnails';
@@ -15,14 +16,14 @@ export class JSONStorage {
         return data;
     }
 
-    saveFolder(folderObj) {
+    saveFolder(folderObj: TFolder) {
         const data = this.getData();
         data.folders.push(folderObj);
         fs.writeFileSync(jsonPath, JSON.stringify(data, null, 2), 'utf-8');
         return data;
     }
 
-    async saveFiles(files, folderId: string, date: string) {
+    async saveFiles(files: Express.Multer.File[], folderId: string, date: string) {
         const data = this.getData();
         
          for (let folder of data.folders) {
@@ -41,7 +42,7 @@ export class JSONStorage {
 
 
 
-    deleteFile(folderId: string, fileId: string) {
+    deleteFile(folderId: string, fileId: string): {filesForPage: TFile[], maxPages: number} {
         // Hier nur die Daten für den einen Ordner holen, damit nicht das ganze Objekt durchlaufen werden muss
         const data = this.getData();
          for (const folder of data.folders) {
@@ -51,7 +52,7 @@ export class JSONStorage {
                         try {
                             fs.rmSync(file.thumbnailPath);
                             fs.rmSync(file.path);
-                            const fileIndex = folder.files.findIndex((file) => { return file.id === fileId });
+                            const fileIndex = folder.files.findIndex((file: TFile) => { return file.id === fileId });
                             folder.files.splice(fileIndex, 1);
                             fs.writeFileSync(jsonPath, JSON.stringify(data, null, 2), 'utf-8');
                             
@@ -75,7 +76,7 @@ export class JSONStorage {
                     folders: null,
                 };
                 
-                newObj.folders = data.folders.filter((f) => f !== folder);
+                newObj.folders = data.folders.filter((f: TFolder) => f !== folder);
                 fs.writeFileSync(jsonPath, JSON.stringify(newObj, null, 2), 'utf-8');
                 fs.rmSync(folder.path, { recursive: true, force: true });
                 
@@ -89,13 +90,13 @@ export class JSONStorage {
         }
     }
 
-    getFiles(folderId: string, page = 1) {
+    getFiles(folderId: string, page = 1): {filesForPage: TFile[], maxPages: number} {
         // ... hier weiter machen
         let files = [];
         let maxPages = 1;
          try {
             const data = this.getData();
-            files = data.folders.find((folder) => folder.id === folderId) || {files: []};
+            files = data.folders.find((folder: TFolder) => folder.id === folderId) || {files: []};
         } catch (error) {
             console.error('Error reading data:', error);
         }
@@ -137,12 +138,12 @@ export class JSONStorage {
 
         try {
             const data = this.getData();
-            const folder = data.folders.filter((folder) => folder.id === folderId);
+            const folder = data.folders.filter((folder: TFolder) => folder.id === folderId);
             if(folder.length) {
               console.log('Gefundener Ordner: ', folder);
                 files = folder[0].files;
                 if(files.length) {
-                    files = files.filter((file) => file.title.includes(char));
+                    files = files.filter((file: TFile) => file.title.includes(char));
                 }
             }
         } catch (error) {
@@ -158,10 +159,10 @@ export class JSONStorage {
 
     getFile(folderId: string, fileId: string) {
         const data = this.getData();
-        const folder = data.folders.filter((folder) => folder.id === folderId);
+        const folder = data.folders.filter((folder: TFolder) => folder.id === folderId);
         let file = null;
         if(folder.length) {
-            file = folder[0].files.filter((file) => file.id === fileId);
+            file = folder[0].files.filter((file: TFile) => file.id === fileId);
         }
 
         if(file.length) {
@@ -169,5 +170,3 @@ export class JSONStorage {
         }
     }
 }
-
-module.exports = JSONStorage;

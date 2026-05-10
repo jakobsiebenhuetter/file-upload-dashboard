@@ -2,6 +2,7 @@ import puppeteer from 'puppeteer-core';
 import ffmpegPath from 'ffmpeg-static';
 import ffmpeg from 'fluent-ffmpeg';
 import ffprobePath from 'ffprobe-static';
+
 import pdf from 'pdf-poppler';
 
 
@@ -48,7 +49,7 @@ console.log(process.env.BROWSER_PATH);
 async function startPuppeteerBrowser(filePath: string) {
     const browser = await puppeteer.launch({ headless: true,
         // Hier wurde der Pfad zur ausführbaren Chrome-Datei angepasst, damit es auf meinem System funktioniert. Auf anderen Systemen muss dieser Pfad ggf. angepasst werden.
-        executablePath: process.env.BROWSER_PATH,
+        executablePath: process.env.BROWSER_PATH as string,
      });
     const page = await browser.newPage();
 
@@ -108,7 +109,7 @@ async function createVideoThumbnail(videoPath: string, tnPath: string, fileName:
     });
 }
 
-export async function generateTN(file) {
+export async function generateTN(file: Express.Multer.File) {
     let thumbnailPath = null;
     let filePath = file.path;
     const extname = path.extname(filePath);

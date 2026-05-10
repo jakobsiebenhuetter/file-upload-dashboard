@@ -4,9 +4,8 @@
   "description": "",
   "license": "ISC",
   "author": "",
-  "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "start": " tsc && node dist/backend/server.js"
   },
   "dependencies": {
     "better-sqlite3": "^12.6.2",
