@@ -1,7 +1,22 @@
 
-import {DatabaseStorage} from './DatabaseStorage.js';
+// import {DatabaseStorage} from './DatabaseStorage.js';
 import {JSONStorage} from './JSONStorage.js';
+import {TSaveFolder} from '../shared-types/Types.js';
 
+export type TFile = {
+    id: string;
+    title: string;
+    path: string;
+    thumbnailPath: string;
+    date: string;
+}
+
+export type TFolder = {
+    id: string;
+    folderName: string;
+    path: string;
+    files: TFile[];
+}
 
 export class StorageInterface {
     storageType: string;
@@ -24,11 +39,11 @@ export class StorageInterface {
         return this.storage.getData();
     }
 
-    saveFolder(folderObj) {
+    saveFolder(folderObj: TFolder) {
         return this.storage.saveFolder(folderObj);
     }
 
-    async saveFiles(files, folderId: string, date: string) {
+    async saveFiles(files: any, folderId: string, date: string) {
         return await this.storage.saveFiles(files, folderId, date);
     }
     
@@ -48,7 +63,7 @@ export class StorageInterface {
         return this.storage.getFiles(folderId, page);
     }
 
-    getFilteredFiles(folderId: string, char, page = 1) {
+    getFilteredFiles(folderId: string, char: string, page = 1) {
         return this.storage.getFilteredFiles(folderId, char, page);
     }
 
