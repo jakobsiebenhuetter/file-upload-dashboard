@@ -27,7 +27,7 @@ const tnPath = './data/Thumbnails';
 async function pdfConverter(pdfPath: string) {
     // Hier mit pdf-poppler arbeiten
     const uuid = crypto.randomUUID();
-    const newthumbnailPath = path.join(`${tnPath}`, `${uuid}-1.png`);
+    let newthumbnailPath = path.join(`${tnPath}`, `${uuid}-1.png`);
     let options = {
         format: 'png',
         out_dir: tnPath,
@@ -36,7 +36,15 @@ async function pdfConverter(pdfPath: string) {
     }
     try {
         const res = await pdf.convert(pdfPath, options)
-        console.log('PDF erfolgreich konvertiert:', res);
+        console.log('info:', res);
+        /**
+         * Dieser Check ist nötig, weil pdf-poppler inkonsistent -1 oder 01 am Schluss hinzufügt
+         * @todo Alle Umlaute müssen noch umkonvertiert werden
+         */
+        if(!fs.existsSync(newthumbnailPath)) {
+            newthumbnailPath = path.join(`${tnPath}`, `${uuid}-01.png`);
+        } 
+        
     } catch (error) {
         console.error('Fehler bei der PDF-Konvertierung:', error);
     }

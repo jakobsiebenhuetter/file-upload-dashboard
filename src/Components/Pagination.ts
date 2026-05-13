@@ -4,9 +4,8 @@ import { Button } from "./Button";
 import { Event } from "./Event";
 import { File } from "../Dashboard/Dashboard";
 
-
-
 type PaginationProps = {
+    maxPages?: number; // mit maxpages weiter machen
     currentPage: number;
     hasPreviousPage: boolean;
     hasNextPage: boolean;
@@ -17,7 +16,6 @@ type PaginationProps = {
 
 export type PaginationEventData = {
     event: MouseEvent;
-    action: 'next' | 'prev';
     nextPage: number;
 }
 
@@ -32,11 +30,13 @@ export class Pagination extends Event{
         </svg>`;
     el: HTMLElement = document.createElement('div');
     leftArrow = new Button({shape: 'circle', text: 'Zurück', icon: this.leftArrowIcon, iconPosition: 'left', width: 'w-[auto]', height: 'h-[40px]', color: 'bg-blue-300', hoverColor: 'hover:bg-blue-400', activeColor: 'active:bg-blue-500' });
-    heroElement = new Button({ shape: 'circle', text: '1', width: 'w-[40px]', height: 'h-[40px]', color: 'bg-blue-300' });
+    mainButton = new Button({ shape: 'circle', text: '1', width: 'w-[40px]', height: 'h-[40px]', color: 'bg-blue-300' });
+    maxPagesButton = new Button({ shape: 'circle', width: 'w-[40px]', height: 'h-[40px]', color: 'bg-blue-300' });
     rightArrow = new Button({ shape: 'circle', text: 'Weiter',  icon: this.rightArrowIcon , width: 'w-[auto]', height: 'h-[40px]', color: 'bg-blue-300', hoverColor: 'hover:bg-blue-400', activeColor:'active:bg-blue-500' });
 
     protected props: PaginationProps;
     currentPage: number;
+    maxPages: number;
     hasNextPage: boolean;
     hasPreviousPage: boolean;
     currentFiles: File[];
@@ -49,6 +49,7 @@ export class Pagination extends Event{
         const defaults: PaginationProps = {
             folderId: '',
             currentPage: 1,
+            maxPages: 1,
             hasPreviousPage: false,
             hasNextPage: false,
             filesPerPage: 10,     
@@ -57,6 +58,7 @@ export class Pagination extends Event{
         this.props = { ...defaults, ...data };
         this.hasPreviousPage = this.props.hasPreviousPage;
         this.currentPage = this.props.currentPage;
+        this.maxPages = this.props.maxPages;
         this.hasNextPage = this.props.hasNextPage;
         this.filesPerPage = this.props.filesPerPage;
         this.renderUI();
@@ -65,25 +67,11 @@ export class Pagination extends Event{
 
     private renderUI() {
         $(this.leftArrow.el).addClass('flex justify-center items-center cursor-pointer m-2');
-        $(this.heroElement.el).addClass('flex justify-center items-center cursor-pointer m-2');
+        $(this.mainButton.el).addClass('flex justify-center items-center cursor-pointer m-2');
+        $(this.maxPagesButton.el).addClass('flex justify-center items-center cursor-pointer m-2');
         $(this.rightArrow.el).addClass('flex justify-center items-center cursor-pointer m-2');
         $(this.el).addClass('flex flex-row justify-center items-center cursor-pointer select-none bg-yellow-50 rounded-full');
-        this.el.append(this.leftArrow.el, this.heroElement.el, this.rightArrow.el);
-    }
-
-    private update(): void {
-
-        this.disableLeftButton();
-        this.disableRightButton();
-
-        this.heroElement.el.textContent = this.currentPage.toString();
-        if(this.hasNextPage) {
-            this.enableRightButton();
-        }
-
-        if(this.hasPreviousPage) {
-            this.enableLeftButton();
-        }
+        this.el.append(this.leftArrow.el, this.mainButton.el, this.maxPagesButton.el, this.rightArrow.el);
     }
 
     private addListeners(): void {
@@ -95,11 +83,10 @@ export class Pagination extends Event{
             this.publish('pageChange', 
                 { 
                     event: e,
-                    action: 'prev',
                     nextPage: this.currentPage 
                 }
             );
-            this.updatePagination(this.currentPage, this.hasNextPage, this.hasPreviousPage);
+            this.updatePagination(this.currentPage, this.maxPages, this.hasNextPage, this.hasPreviousPage);
         });
 
         this.rightArrow.onClick((e) => {
@@ -109,11 +96,10 @@ export class Pagination extends Event{
             this.publish('pageChange',
                 {
                     event: e,
-                    action: 'next',
                     nextPage: this.currentPage,
                 }
             );
-            this.updatePagination(this.currentPage,  this.hasNextPage, this.hasPreviousPage);
+            this.updatePagination(this.currentPage,  this.maxPages, this.hasNextPage, this.hasPreviousPage);
         });
     }
 
@@ -126,12 +112,31 @@ export class Pagination extends Event{
     
     // Validiert wird im Backend, hier wird nur die Anfrage gesendet und die UI aktualisiert
    
-    updatePagination(page: number, hasnextPage = false, hasPreviousPage = false): void {
+    updatePagination(page: number, maxPages: number, hasnextPage: boolean, hasPreviousPage: boolean): void {
         this.currentPage = page;
+        this.maxPages = maxPages;
         this.hasNextPage = hasnextPage;
         this.hasPreviousPage = hasPreviousPage;
         this.update();
     }
+
+    private update(): void {
+
+        this.disableLeftButton();
+        this.disableRightButton();
+
+        this.mainButton.el.textContent = this.currentPage.toString();
+        this.maxPagesButton.el.textContent = this.maxPages.toString();
+        if(this.hasNextPage) {
+            this.enableRightButton();
+        }
+
+        if(this.hasPreviousPage) {
+            this.enableLeftButton();
+        }
+    }
+
+    
 
     onPageChange(handler: (args?: PaginationEventData) => void): void {
        this.subscribe('pageChange', handler);
