@@ -10,7 +10,7 @@ import { GlobalEvent } from '../Dashboard/events';
 import { DashBoard, File, Folder } from '../Dashboard/Dashboard';
 import { API } from '../API';
 import { Button } from './Button';
-
+import { TSaveFolder } from '../../shared-types/Types';
 
 export class Sidebar extends Event {
     private focus: string | null = null;
@@ -49,7 +49,10 @@ export class Sidebar extends Event {
             let data = null;
 
             modal.saveBtnOnClick(async () => {
-                
+                const saveFolderData: TSaveFolder = {
+                    text: modal.getInputValue()
+                };
+
                 if(!modal.getInputValue()) {
                     const toast = new Toast({ text: 'Der Ordnername darf nicht leer sein', icon: 'error', color: 'bg-red-500', width: '' });
                     return;
@@ -57,7 +60,7 @@ export class Sidebar extends Event {
                 
                 GlobalEvent.publish('spinner', { action: 'show'});
 
-                let response = await axios.post(API.CREATE_FOLDER, { text: modal.getInputValue(), id: modal.getInputValue() });
+                let response = await axios.post(API.CREATE_FOLDER, saveFolderData);
                 data = response.data;
 
             if (data.info) {

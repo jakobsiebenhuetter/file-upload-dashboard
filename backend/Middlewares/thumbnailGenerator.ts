@@ -1,16 +1,21 @@
-const puppeteer = require('puppeteer-core');
-const ffmpegPath = require('ffmpeg-static');
-const ffmpeg = require('fluent-ffmpeg');
-const ffprobePath = require('ffprobe-static');
-const pdf = require('pdf-poppler');
+import puppeteer from 'puppeteer-core';
+import ffmpegPath from 'ffmpeg-static';
+import ffmpeg from 'fluent-ffmpeg';
+import ffprobePath from 'ffprobe-static';
 
-const crypto = require('crypto');
+import pdf from 'pdf-poppler';
 
-const fs = require('fs');
-const path = require('path');
-require('dotenv').config();
 
-ffmpeg.setFfmpegPath(ffmpegPath);
+import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
+import dotenv from 'dotenv';
+dotenv.config();
+// require('dotenv').config();
+
+if(ffmpegPath) {
+    ffmpeg.setFfmpegPath(ffmpegPath as unknown as string);
+}
 ffmpeg.setFfprobePath(ffprobePath.path);
 
 const tnPath = './data/Thumbnails';
@@ -19,7 +24,7 @@ const tnPath = './data/Thumbnails';
 
 
 
-async function pdfConverter(pdfPath) {
+async function pdfConverter(pdfPath: string) {
     // Hier mit pdf-poppler arbeiten
     const uuid = crypto.randomUUID();
     let newthumbnailPath = path.join(`${tnPath}`, `${uuid}-1.png`);
@@ -49,10 +54,10 @@ async function pdfConverter(pdfPath) {
 
 // Puppeteer browser middleware
 console.log(process.env.BROWSER_PATH);
-async function startPuppeteerBrowser(filePath) {
+async function startPuppeteerBrowser(filePath: string) {
     const browser = await puppeteer.launch({ headless: true,
         // Hier wurde der Pfad zur ausführbaren Chrome-Datei angepasst, damit es auf meinem System funktioniert. Auf anderen Systemen muss dieser Pfad ggf. angepasst werden.
-        executablePath: process.env.BROWSER_PATH,
+        executablePath: process.env.BROWSER_PATH as string,
      });
     const page = await browser.newPage();
 
@@ -60,7 +65,7 @@ async function startPuppeteerBrowser(filePath) {
 
     const fileContent = fs.readFileSync(filePath, 'utf-8');
 
-    const escapeHtml = (str) =>
+    const escapeHtml = (str: string) =>
         str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     const escaped = escapeHtml(fileContent);
     const htmlContent = `
@@ -98,7 +103,7 @@ async function startPuppeteerBrowser(filePath) {
 }
 
 // video thumbnail generator middleware
-async function createVideoThumbnail(videoPath, tnPath, fileName) {
+async function createVideoThumbnail(videoPath: string, tnPath: string, fileName: string) {
     return new Promise((resolve, reject) => {
         ffmpeg(videoPath)
             .on('end', resolve)
@@ -112,7 +117,7 @@ async function createVideoThumbnail(videoPath, tnPath, fileName) {
     });
 }
 
-async function generateTN(file) {
+export async function generateTN(file: Express.Multer.File) {
     let thumbnailPath = null;
     let filePath = file.path;
     const extname = path.extname(filePath);
@@ -148,9 +153,3 @@ async function generateTN(file) {
     }
     return thumbnailPath;
 }
-
-
-
-module.exports = {
-    generateTN,
-};

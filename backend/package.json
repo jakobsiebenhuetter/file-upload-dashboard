@@ -4,10 +4,8 @@
   "description": "",
   "license": "ISC",
   "author": "",
-  "type": "commonjs",
-  "main": "DatabaseStorage.js",
   "scripts": {
-    "start": "node server.js"
+    "start": " tsc && node dist/backend/server.js"
   },
   "dependencies": {
     "better-sqlite3": "^12.6.2",
@@ -24,5 +22,14 @@
     "pdf-to-img": "^5.0.0",
     "puppeteer-core": "^24.37.5",
     "typeorm": "^0.3.28"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/cors": "^2.8.19",
+    "@types/ffprobe-static": "^2.0.3",
+    "@types/fluent-ffmpeg": "^2.1.28",
+    "@types/multer": "^2.1.0",
+    "@types/node": "^25.6.0",
+    "typescript": "^6.0.3"
   }
 }
