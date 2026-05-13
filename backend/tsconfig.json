@@ -1,29 +1,26 @@
 {
-  // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
     // File Layout
-    // "rootDir": "./src",
-    // "outDir": "./dist",
-
+    "rootDir": "..",
+    "outDir": "./dist",
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
     "module": "commonjs",
     "target": "es2022",
-    "types": ["jquery", "jqueryui"],
+    "esModuleInterop": true,
+    "types": ["node"],
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
     // and npm install -D @types/node
-
     // Other Outputs
-    "sourceMap": true,
-    // "declaration": true,
-    // "declarationMap": true,
-
+    "sourceMap": false,
+    "declaration": false,
+    "declarationMap": false,
+    "noEmit": false,
     // Stricter Typechecking Options
-    // "noUncheckedIndexedAccess": true,
-    // "exactOptionalPropertyTypes": true,
-    "esModuleInterop":true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
     // Style Options
     // "noImplicitReturns": true,
     // "noImplicitOverride": true,
@@ -31,24 +28,14 @@
     // "noUnusedParameters": true,
     // "noFallthroughCasesInSwitch": true,
     // "noPropertyAccessFromIndexSignature": true,
-    // "allowSyntheticDefaultImports": true, // für jquery import
     // Recommended Options
-    "strict": false,
-    // "verbatimModuleSyntax": true,
-    // "isolatedModules": true,
+    "strict": true,
+    "verbatimModuleSyntax": false,
+    "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
   },
-
-    "include": [
-      "src",
-      "shared-types"
-    ],
-  "exclude": [
-    "node_modules",
-    "backend",
-    "playwright.config.ts",
-    "tests"
-  ]
+  "include": ["server.ts", "declarations.d.ts", "../shared-types/Types.ts"],
+  "exclude": ["node_modules", "DatabaseStorage.ts"]
 }

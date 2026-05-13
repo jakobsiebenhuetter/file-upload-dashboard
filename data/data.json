@@ -1,30 +1,23 @@
 {
   "folders": [
     {
-      "id": "289d4362-3f1b-4f04-8b3f-4ebec8be5ea0",
-      "folderName": "dsfdsfsd",
-      "path": "data\\Folders\\95e475b3-8da1-4033-a370-ae7c529a71e6",
+      "id": "735d6202-9a67-4b5f-b48a-f144ab17ca08",
+      "folderName": "dfsf",
+      "path": "data\\Folders\\d18707d3-997b-4be7-9841-f71ed3eceaee",
       "files": [
         {
-          "id": "e0dfbbff-55b7-4504-b5a8-7c191269b085",
-          "title": "Angular-Web-Developer-In-m-w-d.pdf",
-          "path": "data\\Folders\\95e475b3-8da1-4033-a370-ae7c529a71e6\\Angular-Web-Developer-In-m-w-d.pdf",
-          "thumbnailPath": "data\\Thumbnails\\90c27b8e-287e-44f4-881d-ac70fc22edd0-1.png",
-          "date": "17.4.2026"
+          "id": "b4eb227f-a4d6-44b6-b814-5c36a158e6bf",
+          "title": "KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026-2.pdf",
+          "path": "data\\Folders\\d18707d3-997b-4be7-9841-f71ed3eceaee\\KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026-2.pdf",
+          "thumbnailPath": "data\\Thumbnails\\812394d3-e8b5-402d-b46a-bfde673b10f6-1.png",
+          "date": "3.5.2026"
         },
         {
-          "id": "99b1ee70-305d-42e9-b721-643ebe95b85b",
-          "title": "full-stack-developer-wmx-inserat-1.pdf",
-          "path": "data\\Folders\\95e475b3-8da1-4033-a370-ae7c529a71e6\\full-stack-developer-wmx-inserat-1.pdf",
-          "thumbnailPath": "data\\Thumbnails\\eed3d1cb-8eea-4398-8b92-b9b251b18daa-1.png",
-          "date": "17.4.2026"
-        },
-        {
-          "id": "2bdf0a76-ac46-421e-8348-3256762a91c5",
-          "title": "WhatsApp Image 2026-04-19 at 10.05.56.jpeg",
-          "path": "data\\Folders\\95e475b3-8da1-4033-a370-ae7c529a71e6\\WhatsApp Image 2026-04-19 at 10.05.56.jpeg",
-          "thumbnailPath": "data\\Thumbnails\\WhatsApp Image 2026-04-19 at 10.05.56.jpeg",
-          "date": "19.4.2026"
+          "id": "4420186d-f192-44cb-8893-65365adb6fa9",
+          "title": "n-14_2009-1.pdf",
+          "path": "data\\Folders\\d18707d3-997b-4be7-9841-f71ed3eceaee\\n-14_2009-1.pdf",
+          "thumbnailPath": "data\\Thumbnails\\69c4476b-41de-49f2-94ca-11adfe89dbf8-1.png",
+          "date": "3.5.2026"
         }
       ]
     }
