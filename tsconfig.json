@@ -46,6 +46,7 @@
       "shared-types"
     ],
   "exclude": [
+    "frontend",
     "node_modules",
     "backend",
     "playwright.config.ts",
