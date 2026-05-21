@@ -1,11 +1,6 @@
-function validateInput(input) {
+export function validateInput(input: string): boolean {
     if(!input || input.trim() === '') {
         return false;
     }
     return true;
 }
-
-
-module.exports = {
-    validateInput
-};

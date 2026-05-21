@@ -1,16 +1,23 @@
-const express = require('express');
-const OpenAI = require('openai');
-const { PDFParse } = require('pdf-parse');
+import express from 'express';
 
-const fs = require('fs');
-const path = require('path');
-const cors = require('cors');
-const multer = require('multer');
-const crypto = require('crypto');
-const {exec} = require('child_process');
+import OpenAI from 'openai';
+import {PDFParse} from 'pdf-parse';
+import fs from 'fs';
+import path from 'path';
+import cors from 'cors';
 
-const StorageInterface = require('./StorageInterface');
-const {validateInput} = require('./util');
+import multer from 'multer';
+import crypto from 'crypto';
+
+import {exec} from 'child_process';
+
+import {StorageInterface} from './StorageInterface.js';
+
+import { TPageData } from '../shared-types/Types.js';
+
+import {validateInput} from './util';
+
+
 const storage = new StorageInterface('json');
 
 const PORT = process.env.PORT || 2000;
@@ -25,8 +32,8 @@ const folderPath = './data/Folders';
 const tnPath = './data/Thumbnails';
 
 // Statische Dateien aus dem dist-Ordner bereitstellen
-app.use(express.static(path.join(__dirname, '..', 'dist')));
-app.use('/data', express.static(path.join(__dirname, 'data')));
+app.use(express.static(path.join(__dirname, '../../..', 'dist')));
+app.use('/data', express.static(path.join(__dirname, '../..', 'data')));
 
 // Hier noch überprüfen,ob die Datenstruktur existiert, wenn nicht, dann erstellen
 if (!fs.existsSync(jsonPath)) {
@@ -53,6 +60,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../dist', 'index.html'));
 });
 
+// Hier weiter machen mit den Typen für die Endpoints
 app.get('/getData', async (req, res) => {
     const data = storage.getData();
     res.json(data);
@@ -78,12 +86,11 @@ app.get('/get-folders', (req, res) => {
 });
 
 
-
 app.post('/get-files', (req, res) => {
     // Hier prev und next bestimmen
     let { folderId, page } = req.body;
     page = parseInt(page);
-    let msg = {
+    let msg: TPageData = {
         message: '',
         type: 'info',
         files: [],
@@ -91,7 +98,8 @@ app.post('/get-files', (req, res) => {
         maxPages: 1,
         hasNextPage: false,
         hasPreviousPage: false,
-        state: 'no-filter'
+        state: 'no-filter',
+        info: ''
     };
 
     if(page < 1) {
@@ -133,7 +141,7 @@ app.post('/get-files', (req, res) => {
 app.post('/delete-file', async (req, res) => {
     const { fileId, folderId } = req.body;
     let msg = {
-        data: [],
+        data: {},
         type: '',
         message: ''
     };
@@ -148,10 +156,11 @@ app.post('/delete-file', async (req, res) => {
     res.json(msg);
 });
 
+
 app.post('/create-folder', (req, res) => {
     // Hier noch die richtige id übergeben
     // Ordnernamen übergeben? Gibt es den Namen schon?
-    const { text, id } = req.body;
+    const { text } = req.body;
     let data = storage.getData();
 
     if(!validateInput(text)) {
@@ -214,7 +223,7 @@ app.post('/upload', async (req, res) => {
         data: null
     };
 
-    let newPath = null;
+    let newPath = '';
     const datetime = new Date(); // Hier weiter machen
     let date = `${datetime.getDate()}.${datetime.getMonth() + 1}.${datetime.getFullYear()}`;
     const uploadStorage = multer.diskStorage({
@@ -244,7 +253,7 @@ app.post('/upload', async (req, res) => {
     upload(req, res, async (err) => {
         let focus = req.body.focus;
         try {
-            data = await storage.saveFiles(req.files, focus, date);
+            const data = await storage.saveFiles(req.files, focus, date);
             msg.message = 'Erfolgreich upgeloadet';
             msg.type = 'success';
             msg.data = data;
@@ -272,11 +281,14 @@ app.post('/get-filtered-files', (req, res) => {
     let { folderId, char, pageNumber } = req.body;
     let page = parseInt(pageNumber);
 
-    let msg = {
+    
+    let msg: TPageData = {
+        info: '',
         message: '',
         type: 'info',
         files: [],
         currentPage: 1,
+        filesPerPage: [],
         maxPages: 1,
         hasNextPage: false,
         hasPreviousPage: false,
@@ -296,7 +308,7 @@ app.post('/get-filtered-files', (req, res) => {
         msg.info = 'Kein Suchbegriff';
         msg.maxPages = unfilteredFiles.maxPages;
         msg.currentPage = 1;
-        msg.filesForPage = unfilteredFiles.filesForPage;
+        msg.filesPerPage = unfilteredFiles.filesForPage;
         msg.hasNextPage = false;
         msg.hasPreviousPage = false;
         msg.type = 'info';
@@ -317,6 +329,7 @@ app.post('/get-filtered-files', (req, res) => {
       }
 
      msg = {
+        message: 'Gefilterte Dateien erfolgreich geladen',
         info: 'Gefilterte Dateien',
         files: filesForPage,
         maxPages: maxPages,

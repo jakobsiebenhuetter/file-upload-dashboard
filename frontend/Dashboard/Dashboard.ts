@@ -16,35 +16,20 @@ import { PaginationEventData } from '../Components/Pagination';
 import { Button } from '../Components/Button';
 import { LLMInterface } from '../Components/LLMInterface';
 
+import { TFile, TPageData } from '../../shared-types/Types';
 
 export type Folder = {
     id: string;
     folderName: string;
     path: string;
-    files: File[];
+    files: TFile[];
     focus?: boolean;
 }
 
-export type PageData = {
-    currentPage: number;
-    maxPages: number;
-    files: File[];
-    hasNextPage: boolean,
-    hasPreviousPage: boolean,
-    // state: 'filter' | 'no-filter';
-}
-
-export type File = {
-    id: string;
-    title: string;
-    date: string;
-    path: string;
-    thumbnailPath: string;
-}
 
 type APIResponse = {
     message: string;
-    data: Folder[] | File[] | PageData;
+    data: Folder[] | TFile[] | TPageData;
     type: 'success';
 }
 
@@ -72,7 +57,7 @@ export class DashBoard extends Event {
      widgetContainerWrapper: HTMLElement = document.createElement('div');
      sidebar: Sidebar;
      dropzone: DropZone | null = null;
-     files: File[];
+     files: TFile[];
      filterValue?: string = '';
      llm = LLMInterface.getInstance();
 
@@ -151,7 +136,7 @@ export class DashBoard extends Event {
 
         // upload:renderFiles ???
         // Es gibt eine strukturelle diskrepanz, beim filtern und ohne filtern rendering
-         GlobalEvent.subscribe('renderFiles', (data: PageData) => {
+         GlobalEvent.subscribe('renderFiles', (data: TPageData) => {
             console.log('Daten im Dashboard erhalten: ', data);
             if(data.files){
                 this.files = data.files;
@@ -162,7 +147,7 @@ export class DashBoard extends Event {
             }
         });
 
-        GlobalEvent.subscribe('filter:renderFiles', (data: PageData) => {
+        GlobalEvent.subscribe('filter:renderFiles', (data: TPageData) => {
             
             if(data.files) {
                 this.files = data.files;
@@ -287,7 +272,7 @@ export class DashBoard extends Event {
         this.el.append(this.sidebar.el);    
     }
     
-    private renderHeroPage(files: File[]): void {
+    private renderHeroPage(files: TFile[]): void {
         const heroPage = document.createElement('div');
         heroPage.classList.add('bg-stone-100', 'dark:bg-grey-800', 'w-full');
         heroPage.append(this.header.el, this.widgetContainerWrapper);
@@ -295,7 +280,7 @@ export class DashBoard extends Event {
         this.renderGrid(files);
      };
 
-    private renderGrid(files: File[]): void {
+    private renderGrid(files: TFile[]): void {
         this.widgetContainer.innerHTML = ``;
         this.el.classList.add('flex', 'min-h-screen');
         this.widgetContainerWrapper.append(this.widgetContainer);
@@ -305,7 +290,7 @@ export class DashBoard extends Event {
         this.createWidgets(files);
     };
 
-    private createWidgets(files: File[]): void {
+    private createWidgets(files: TFile[]): void {
 
         for (const file of files) {
 
@@ -396,8 +381,8 @@ export class DashBoard extends Event {
         return text;
     }
 
-    public static async getFiles(folderId: string, page: number = 1): Promise<PageData> {
-        let data: PageData;      
+    public static async getFiles(folderId: string, page: number = 1): Promise<TPageData> {
+        let data: TPageData;      
         try {
             const response = await axios.post(API.GET_FILES, {folderId, page});
             // oder hier einen weiteren Paramter für Trigger Toast übergeben
@@ -422,8 +407,8 @@ export class DashBoard extends Event {
         return data;
     }
 
-    async getFilteredFiles(folderId: string, char: string, pageNumber: number): Promise<PageData> {
-        let page: PageData;
+    async getFilteredFiles(folderId: string, char: string, pageNumber: number): Promise<TPageData> {
+        let page: TPageData;
         try {
             const response = await axios.post(API.GET_FILTER_FILES, {folderId, char, pageNumber});
             page = response.data;

@@ -10,6 +10,7 @@ import { GlobalEvent } from '../Dashboard/events';
 import { DashBoard, File, Folder } from '../Dashboard/Dashboard';
 import { API } from '../API';
 import { Button } from './Button';
+import { TSaveFolder } from '../../shared-types/Types';
 
 export class Sidebar extends Event {
     private focus: string | null = null;
@@ -48,7 +49,7 @@ export class Sidebar extends Event {
             let data = null;
 
             modal.saveBtnOnClick(async () => {
-                const saveFolderData = {
+                const saveFolderData: TSaveFolder = {
                     text: modal.getInputValue()
                 };
 

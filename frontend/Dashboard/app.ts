@@ -6,6 +6,7 @@ import { KeyManager } from './KeyManager';
 import { lockScreen, unlockScreen } from './globVar';
 
 /**
+ * @Todo checken ob alle Configs da sind, wenn nicht, dann mit default Werten belegen
  * @BUGFIX Deutsche und Polnische Umlaute richtig umkonvertieren für Dateipfade
  * @todo Pagination nach shadcn style implementieren.
  * @TODO Event Klasse erweitern um mehrere Funktionen zu einem Event zu speichern
