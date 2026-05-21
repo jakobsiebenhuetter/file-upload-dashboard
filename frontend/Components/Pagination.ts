@@ -1,0 +1,167 @@
+import $ from 'jquery';
+
+import { Button } from "./Button";
+import { Event } from "./Event";
+
+type PaginationProps = {
+    maxPages?: number; // mit maxpages weiter machen
+    currentPage: number;
+    hasPreviousPage: boolean;
+    hasNextPage: boolean;
+    currentFiles?: File[];
+    filesPerPage: number;
+    folderId: string;
+};
+
+export type PaginationEventData = {
+    event: MouseEvent;
+    nextPage: number;
+}
+
+
+export class Pagination extends Event{
+    leftArrowIcon = `<svg width="1.5em" height="1.5em" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor" class="mr-1.5 h-4 w-4 stroke-2">
+            <path d="M15 6L9 12L15 18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>`;
+
+    rightArrowIcon =`<svg width="1.5em" height="1.5em" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor" class="ml-1.5 h-4 w-4 stroke-2">
+            <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>`;
+    el: HTMLElement = document.createElement('div');
+    leftArrow = new Button({shape: 'circle', text: 'Zurück', icon: this.leftArrowIcon, iconPosition: 'left', width: 'w-[auto]', height: 'h-[40px]', color: 'bg-blue-300', hoverColor: 'hover:bg-blue-400', activeColor: 'active:bg-blue-500' });
+    mainButton = new Button({ shape: 'circle', text: '1', width: 'w-[40px]', height: 'h-[40px]', color: 'bg-blue-300' });
+    maxPagesButton = new Button({ shape: 'circle', width: 'w-[40px]', height: 'h-[40px]', color: 'bg-blue-300' });
+    rightArrow = new Button({ shape: 'circle', text: 'Weiter',  icon: this.rightArrowIcon , width: 'w-[auto]', height: 'h-[40px]', color: 'bg-blue-300', hoverColor: 'hover:bg-blue-400', activeColor:'active:bg-blue-500' });
+
+    protected props: PaginationProps;
+    currentPage: number;
+    maxPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    currentFiles: File[];
+    filesPerPage: number;
+    folderId: string = '';
+    
+    
+    constructor(data?: PaginationProps) {
+        super();
+        const defaults: PaginationProps = {
+            folderId: '',
+            currentPage: 1,
+            maxPages: 1,
+            hasPreviousPage: false,
+            hasNextPage: false,
+            filesPerPage: 10,     
+        };
+
+        this.props = { ...defaults, ...data };
+        this.hasPreviousPage = this.props.hasPreviousPage;
+        this.currentPage = this.props.currentPage;
+        this.maxPages = this.props.maxPages;
+        this.hasNextPage = this.props.hasNextPage;
+        this.filesPerPage = this.props.filesPerPage;
+        this.renderUI();
+        this.addListeners();
+    }
+
+    private renderUI() {
+        $(this.leftArrow.el).addClass('flex justify-center items-center cursor-pointer m-2');
+        $(this.mainButton.el).addClass('flex justify-center items-center cursor-pointer m-2');
+        $(this.maxPagesButton.el).addClass('flex justify-center items-center cursor-pointer m-2');
+        $(this.rightArrow.el).addClass('flex justify-center items-center cursor-pointer m-2');
+        $(this.el).addClass('flex flex-row justify-center items-center cursor-pointer select-none bg-yellow-50 rounded-full');
+        this.el.append(this.leftArrow.el, this.mainButton.el, this.maxPagesButton.el, this.rightArrow.el);
+    }
+
+    private addListeners(): void {
+
+        this.leftArrow.onClick((e) => {
+            if(!this.hasPreviousPage) return;
+            this.currentPage = this.currentPage - 1;
+
+            this.publish('pageChange', 
+                { 
+                    event: e,
+                    nextPage: this.currentPage 
+                }
+            );
+            this.updatePagination(this.currentPage, this.maxPages, this.hasNextPage, this.hasPreviousPage);
+        });
+
+        this.rightArrow.onClick((e) => {
+            if(!this.hasNextPage) return;
+            this.currentPage = this.currentPage + 1;
+
+            this.publish('pageChange',
+                {
+                    event: e,
+                    nextPage: this.currentPage,
+                }
+            );
+            this.updatePagination(this.currentPage,  this.maxPages, this.hasNextPage, this.hasPreviousPage);
+        });
+    }
+
+    get getPage() {
+        return {
+            currentPage: this.currentPage,
+            files: this.currentFiles,
+        }
+    }
+    
+    // Validiert wird im Backend, hier wird nur die Anfrage gesendet und die UI aktualisiert
+   
+    updatePagination(page: number, maxPages: number, hasnextPage: boolean, hasPreviousPage: boolean): void {
+        this.currentPage = page;
+        this.maxPages = maxPages;
+        this.hasNextPage = hasnextPage;
+        this.hasPreviousPage = hasPreviousPage;
+        this.update();
+    }
+
+    private update(): void {
+
+        this.disableLeftButton();
+        this.disableRightButton();
+
+        this.mainButton.el.textContent = this.currentPage.toString();
+        this.maxPagesButton.el.textContent = this.maxPages.toString();
+        if(this.hasNextPage) {
+            this.enableRightButton();
+        }
+
+        if(this.hasPreviousPage) {
+            this.enableLeftButton();
+        }
+    }
+
+    
+
+    onPageChange(handler: (args?: PaginationEventData) => void): void {
+       this.subscribe('pageChange', handler);
+    }
+
+    private disableLeftButton(): void {
+        // this.leftArrow.el.classList.remove('hover:bg-gray-400', 'cursor-pointer');
+        // this.leftArrow.el.classList.add('opacity-50', 'cursor-not-allowed');
+        this.leftArrow.disable();
+    }
+
+    private disableRightButton(): void {
+        // this.rightArrow.el.classList.remove('hover:bg-gray-400', 'cursor-pointer');
+        // this.rightArrow.el.classList.add('opacity-50', 'cursor-not-allowed');
+        this.rightArrow.disable();
+    }
+
+    private enableLeftButton(): void {
+        // this.leftArrow.el.classList.remove('opacity-50', 'cursor-not-allowed');
+        // this.leftArrow.el.classList.add('hover:bg-gray-400', 'cursor-pointer');
+        this.leftArrow.enable();
+    }
+
+    private enableRightButton(): void {
+        // this.rightArrow.el.classList.remove('opacity-50', 'cursor-not-allowed');
+        // this.rightArrow.el.classList.add('hover:bg-gray-400', 'cursor-pointer');
+        this.rightArrow.enable();
+    }
+}
