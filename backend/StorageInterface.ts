@@ -1,7 +1,6 @@
 
 // import {DatabaseStorage} from './DatabaseStorage.js';
 import {JSONStorage} from './JSONStorage.js';
-import {TSaveFolder} from '../shared-types/Types.js';
 
 export type TFile = {
     id: string;

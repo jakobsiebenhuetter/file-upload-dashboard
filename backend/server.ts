@@ -11,22 +11,12 @@ import crypto from 'crypto';
 
 import {exec} from 'child_process';
 
-import {StorageInterface, TFile} from './StorageInterface.js';
+import {StorageInterface} from './StorageInterface.js';
+
+import { TPageData } from '../shared-types/Types.js';
 
 import {validateInput} from './util';
 
-  export type TFilesResponse = {
-    info?: string;
-    filesForPage?: {};
-    message?: string;
-    type: string;
-    files: TFile[];
-    currentPage: number;
-    maxPages: number;
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-    state: string;
-  };
 
 const storage = new StorageInterface('json');
 
@@ -96,12 +86,11 @@ app.get('/get-folders', (req, res) => {
 });
 
 
-
 app.post('/get-files', (req, res) => {
     // Hier prev und next bestimmen
     let { folderId, page } = req.body;
     page = parseInt(page);
-    let msg: TFilesResponse = {
+    let msg: TPageData = {
         message: '',
         type: 'info',
         files: [],
@@ -109,7 +98,8 @@ app.post('/get-files', (req, res) => {
         maxPages: 1,
         hasNextPage: false,
         hasPreviousPage: false,
-        state: 'no-filter'
+        state: 'no-filter',
+        info: ''
     };
 
     if(page < 1) {
@@ -292,13 +282,13 @@ app.post('/get-filtered-files', (req, res) => {
     let page = parseInt(pageNumber);
 
     
-    let msg: TFilesResponse = {
+    let msg: TPageData = {
         info: '',
         message: '',
         type: 'info',
         files: [],
         currentPage: 1,
-        filesForPage: {},
+        filesPerPage: [],
         maxPages: 1,
         hasNextPage: false,
         hasPreviousPage: false,
@@ -318,7 +308,7 @@ app.post('/get-filtered-files', (req, res) => {
         msg.info = 'Kein Suchbegriff';
         msg.maxPages = unfilteredFiles.maxPages;
         msg.currentPage = 1;
-        msg.filesForPage = unfilteredFiles.filesForPage;
+        msg.filesPerPage = unfilteredFiles.filesForPage;
         msg.hasNextPage = false;
         msg.hasPreviousPage = false;
         msg.type = 'info';
@@ -339,6 +329,7 @@ app.post('/get-filtered-files', (req, res) => {
       }
 
      msg = {
+        message: 'Gefilterte Dateien erfolgreich geladen',
         info: 'Gefilterte Dateien',
         files: filesForPage,
         maxPages: maxPages,
