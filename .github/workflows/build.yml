@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [main]
+    branches: [shared-Types]
   workflow_dispatch:
 
 jobs:
