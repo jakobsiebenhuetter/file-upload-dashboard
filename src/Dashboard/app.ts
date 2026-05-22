@@ -15,7 +15,16 @@ import { lockScreen, unlockScreen } from './globVar';
 export class App extends Event {
     constructor() {
         super();
-        lockScreen();
+        lockScreen(
+            {
+                backdropOption: 
+                {
+                    default: 'bg-slate-400',
+                    darkMode: 'dark:bg-slate-700',    
+                },
+                icon: true,
+            }
+        );
         this.initApp();
         setTimeout(() => {
             unlockScreen();

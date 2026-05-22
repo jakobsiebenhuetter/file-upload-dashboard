@@ -13,7 +13,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 // require('dotenv').config();
 
-if(ffmpegPath) {
+if (ffmpegPath) {
     ffmpeg.setFfmpegPath(ffmpegPath as unknown as string);
 }
 ffmpeg.setFfprobePath(ffprobePath.path);
@@ -21,8 +21,6 @@ ffmpeg.setFfprobePath(ffprobePath.path);
 const tnPath = './data/Thumbnails';
 
 // PDF to PNG converter middleware
-
-
 
 async function pdfConverter(pdfPath: string) {
     // Hier mit pdf-poppler arbeiten
@@ -41,10 +39,10 @@ async function pdfConverter(pdfPath: string) {
          * Dieser Check ist nötig, weil pdf-poppler inkonsistent -1 oder 01 am Schluss hinzufügt
          * @todo Alle Umlaute müssen noch umkonvertiert werden
          */
-        if(!fs.existsSync(newthumbnailPath)) {
+        if (!fs.existsSync(newthumbnailPath)) {
             newthumbnailPath = path.join(`${tnPath}`, `${uuid}-01.png`);
-        } 
-        
+        }
+
     } catch (error) {
         console.error('Fehler bei der PDF-Konvertierung:', error);
     }
@@ -55,10 +53,11 @@ async function pdfConverter(pdfPath: string) {
 // Puppeteer browser middleware
 console.log(process.env.BROWSER_PATH);
 async function startPuppeteerBrowser(filePath: string) {
-    const browser = await puppeteer.launch({ headless: true,
+    const browser = await puppeteer.launch({
+        headless: true,
         // Hier wurde der Pfad zur ausführbaren Chrome-Datei angepasst, damit es auf meinem System funktioniert. Auf anderen Systemen muss dieser Pfad ggf. angepasst werden.
         executablePath: process.env.BROWSER_PATH as string,
-     });
+    });
     const page = await browser.newPage();
 
     // Read and escape file content to avoid accidental HTML injection

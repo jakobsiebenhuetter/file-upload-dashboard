@@ -176,7 +176,11 @@ export class DashBoard extends Event {
          GlobalEvent.subscribe('spinner', (data: Record<string, any>) => {
             const { action } = data;
             if (action === 'show') {
-                lockScreen();
+                lockScreen(
+                    {
+                        backdropOption: 'bg-transparent'
+                    }
+                );
             } else if (action === 'hide') {
                 unlockScreen();
             }

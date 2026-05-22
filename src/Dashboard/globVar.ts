@@ -1,9 +1,9 @@
-import { Spinner } from "../Components/Spinner";
+import { Spinner, TSpinnerProps } from "../Components/Spinner";
 
 // neue Variable zur Nachverfolgung des aktiven Spinners
 let activeSpinner: Spinner | null = null;
 
-export function lockScreen(): Spinner | void {
+export function lockScreen(props: TSpinnerProps): Spinner | void {
 	// Verhindere mehrfaches Sperren
 	if (activeSpinner) return activeSpinner;
 
@@ -11,7 +11,7 @@ export function lockScreen(): Spinner | void {
 	document.body.classList.remove('overflow-auto');
 	document.body.classList.add('overflow-hidden');
 
-	const spinner = new Spinner({ backdropOption: true });
+	const spinner = new Spinner(props);
 	activeSpinner = spinner;
 	return spinner;
 };
