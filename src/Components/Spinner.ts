@@ -30,6 +30,7 @@ export class Spinner {
     renderUI(): void {
         this.container = document.createElement('div');
         this.container.classList.add(
+            'spinner-container',
             'fixed',
             'top-1/2',
             'left-1/2',
@@ -44,6 +45,7 @@ export class Spinner {
 
         if (this.props.backdropOption) {
             this.backdrop = document.createElement('div');
+            this.backdrop.setAttribute('id', 'spinner-backdrop');
 
             if (typeof this.props.backdropOption === 'string') 
                 {

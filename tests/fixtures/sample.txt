@@ -1,0 +1,5 @@
+Sample upload fixture for the file-upload-dashboard E2E test.
+Line 2 — arbitrary text content, kept small (~1 KB) to keep the test fast.
+Line 3 — referenced by tests/upload-flow.spec.ts.
+Line 4 — change me if you want to verify file integrity in the upload.
+Line 5 — end of fixture.
