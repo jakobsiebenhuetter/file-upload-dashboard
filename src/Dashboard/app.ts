@@ -6,8 +6,9 @@ import { KeyManager } from './KeyManager';
 import { lockScreen, unlockScreen } from './globVar';
 
 /**
- * @BUGFIX Deutsche und Polnische Umlaute richtig umkonvertieren für Dateipfade
- * @todo Pagination nach shadcn style implementieren.
+ * @TODO Sidebartext zentrieren
+ * @TODO Alle PRs mergen, danach Frontend in einen eigenen Ordner migrieren, am besten einen Neune Branch dafür erstellen
+ * @TODO Dann einen Neune Branch für die komplette Integration mit sqlite3 durchführen und dann mit einem ORM arbeiten
  * @TODO Event Klasse erweitern um mehrere Funktionen zu einem Event zu speichern
  * @todo Event member als Objekt verwenden damit man nicht immer die Funktion durchgehen muss, sondern direkt auf die Funktion zugreifen kann, z.B. this.events['openModal']() anstatt this.events.forEach(fn => { if(fn.name === 'openModal') fn() })
  * @todo Uploadstatus anzeigen lassen, dank axios ist das möglich
