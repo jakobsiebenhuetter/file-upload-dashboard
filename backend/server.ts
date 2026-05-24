@@ -1,10 +1,5 @@
 import express from 'express';
 
-// const Grok = require('grok-sdk');
-// const { GoogleGenAI } = require('@google/genai');
-
-// const { Client } = require("@modelcontextprotocol/sdk/client/index.js");
-// const { StdioClientTransport } = require("@modelcontextprotocol/sdk/client/stdio.js");
 import OpenAI from 'openai';
 import {PDFParse} from 'pdf-parse';
 import fs from 'fs';
@@ -60,18 +55,15 @@ if(!fs.existsSync(folderPath)){
 if(!fs.existsSync(tnPath)){
     fs.mkdirSync(tnPath);
 }
+
 let mcpClient;
 let mcpTools = [];
 const globalPrompt = [
     {
-        role: 'user',
+        role: 'USER',
         parts: [
             {
-                text: `Du bist ein hilfreicher Assistent, der dabei hilft Informationen über Dokumente zu geben. 
-                Du bekommst den Inhalt eines Dokuments und eine Frage dazu, beantworte die Frage so gut wie möglich auf Basis des Inhalts.
-                Gib zusätzlich {loop: 'break'} zurück wenn du mit der Beantwortung fertig bist.
-                Wenn der Benutzer eine Frage stellt, die du nicht beantworten kannst, weil die Information nicht im Dokument enthalten ist, dann sage das auch. Antworte immer in einem vollständigen Satz. Bitte berücksichtige den gesamten Chatverlauf, um die Frage zu beantworten. Verwende die bereitgestellten Tools, aber nur wenn nötig. 
-                Wenn du die Frage nicht beantworten kannst, sage das auch. Antworte immer in einem vollständigen Satz. Bitte berücksichtige den gesamten Chatverlauf, um die Frage zu beantworten. Verwende die bereitgestellten Tools. Die läufst ihn einer Agenten Schleife also berücksichtige genau auch die alten Nachrichten. Wenn du die Antwort schon hast und die Schleife noch nicht zu Ende ist, dann antworte mit der selben Antwort wieder;`
+                text: `Du bist ein hilfreicher Assistent, der dabei hilft Informationen über Dokumente zu geben. Du bekommst den Inhalt eines Dokuments und eine Frage dazu, beantworte die Frage so gut wie möglich auf Basis des Inhalts. Wenn du die Frage nicht beantworten kannst, sage das auch. Antworte immer in einem vollständigen Satz. Bitte berücksichtige den gesamten Chatverlauf, um die Frage zu beantworten. Verwende die bereitgestellten Tools, wenn nötig, die Ergebnisse verwende aber nicht als Output sondern verwende deinen Output`
             }
         ]
     }
@@ -103,6 +95,7 @@ async function initMcp() {
 
     console.log(`MCP verbunden, ${mcpTools[0].functionDeclarations.length} Tools verfügbar.`);
 }
+
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../dist', 'index.html'));
@@ -392,11 +385,13 @@ app.post('/get-filtered-files', (req, res) => {
 
 
 app.post('/ai-request', async(req, res) => {
-
     const { prompt, fileId, folderId } = req.body;
-    const apiKey = process.env.API_AI_GOOGLE_KEY
 
-    try {
+    const fileData = storage.getFile(folderId, fileId);
+
+    const parser = new PDFParse({url: fileData.path});
+
+    const text = await parser.getText();
 
         if(apiKey === undefined) {
             return res.json({
@@ -410,118 +405,77 @@ app.post('/ai-request', async(req, res) => {
         
         globalPrompt.push(
             {
-                role: 'user',
+                role: 'USER',
                 parts: [
                     {
-                        text: `Die FolderId lautet ${folderId}.
-                        der User schreibt ${prompt};
-                        Berücksichtige den gesamten Chatverlauf, um die Frage zu beantworten. Verwende die bereitgestellten Tools, aber nur wenn nötig.
-                        Wenn du die Frage nicht beantworten kannst, sage das auch. Antworte immer in einem vollständigen Satz. Bitte berücksichtige den gesamten Chatverlauf, um die Frage zu beantworten. Verwende die bereitgestellten Tools. Die läufst ihn einer Agenten Schleife also berücksichtige genau auch die alten Nachrichten. Wenn du die Antwort schon hast und die Schleife noch nicht zu Ende ist, dann antworte mit der selben Antwort wieder;`
+                        text: `FolderId = ${folderId}; FileId = ${fileId}; User:  ${prompt}`
                     }
                 ]
             });
-            
-        for(let i = 0; i < 3; i++) {
-            const response = await googleClient.models.generateContent({
-                model: "gemini-3-flash-preview",
-                // model: "gemini-2.5-flash",
-                // model: "gemini-2.5-flash-lite",
-                contents: globalPrompt,
-                config: {
-                    tools: mcpTools
+
+        const response = await googleClient.models.generateContent({
+            model: "gemini-3-flash-preview",
+            // model: "gemini-2.5-flash",
+            // model: "gemini-2.5-flash-lite",
+            contents: globalPrompt,
+            config: {
+                tools: [
+                    mcpTools
                     // {googleSearch: {}}
                     // {codeExecution: {}} 
-                }
-            });
-            
-            console.log('functionCalls:', response.functionCalls);
-            console.log('text:', response.text);
-
-            const modelResponse = {
-                role: 'model',
-                parts: []
-            };
-            
-            if(response.text) {
-                let text = response.text;
-                modelResponse.parts.push({
-                text: text
-            });
-
-            const breakLoop = text.match(/{loop: 'break'}/g)
-            text = text.replace(/{loop: 'break'}/g, '').trim();
-            console.log('breakLoop: ', breakLoop);
-
-            if(breakLoop) {
-                globalPrompt.push(modelResponse);
-                break;  
+                ] 
             }
-
-            } else if(response.functionCalls?.length) {
-                const call = response.functionCalls[0];
-                const toolResponse = await mcpClient.callTool({
-                    name: call.name,
-                    arguments: call.args
-                });
-
-                modelResponse.parts.push(
-                    {
-                        text: `Tool ${call.name} wurde aufgerufen mit den Argumenten ${JSON.stringify(call.args)}.`
-                    }
-                );
-
-                for (const item of toolResponse.content ?? []) {
-                    if (item.type === 'text') {
-                        modelResponse.parts.push({ text: item.text });
-                    } else if (item.type === 'image') {
-                        modelResponse.parts.push({
-                            inlineData: {
-                                mimeType: item.mimeType,
-                                data: item.data
-                            }
-                        });
-                    }
-                }
-            }   
-            globalPrompt.push(modelResponse);
-        } 
-    } catch (error) {
-        console.error('Error handling AI request:', error);
-        return res.json({
-            answer: 'Fehler bei der Verarbeitung der AI-Anfrage'
         });
-    }
+        
+        console.dir(response.functionCalls);
+        
+        if(response.functionCalls) {
+            const toolResponse = await mcpClient.callTool({
+                name: response.functionCalls[0].name,
+                arguments: response.functionCalls[0].args
+            });
+            console.log('Tool Response:', toolResponse);
+        }
+
+        const modelResponse = {
+            role: 'MODEL',
+            parts: []
+        };
+
+        if(response.text) {
+            modelResponse.parts.push({
+                text: response.text
+            });
+        } else if(response.functionCalls) {
+            modelResponse.parts.push(
+                {
+                    text: `Tool ${response.functionCalls[0].name} wurde aufgerufen mit den Argumenten
+                    ${JSON.stringify(response.functionCalls[0].args)}
+                    und hat die folgende Antwort zurückgegeben: ${toolResponse.content[0].text}`
+                }
+            );
+        }
+
+        globalPrompt.push(modelResponse);
+
+        } catch (error) {
+            console.error('Error handling AI request:', error);
+            return res.json({
+                answer: 'Fehler bei der Verarbeitung der AI-Anfrage'
+            });
+        }
 
     console.dir(globalPrompt);
 
     res.json({
-        answer: globalPrompt[globalPrompt.length - 1].parts[0].text
+        answer: response.output_text
     });
 
 });
 
-async function handleGoogleGenAI(prompt = "Explain how AI works in a few words") {
-    
-    const googleClient = new GoogleGenAI({
-        apiKey: process.env.API_AI_GOOGLE_KEY,
-    });
-    
-    const response = await googleClient.models.generateContent({
-    model: "gemini-3-flash-preview",
-    contents: prompt,
-    tools: [
-        //...
-    ]
-  });
 
-  return response.text;
-}
 app.listen(PORT, () => {
     console.log(`Server listen on Port ${PORT}`);
-        initMcp().catch(err => {
-        console.error('MCP-Init fehlgeschlagen:', err);
-        process.exit(1);
-    });
     console.log(process.platform);
     exec(`start ${url}`);
 });

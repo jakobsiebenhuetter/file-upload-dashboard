@@ -1,12 +1,12 @@
-const crypto = require('crypto');
-const fs = require('fs');
-const path = require('path');
+// @ts-nocheck
+import fs from 'fs';
+import crypto from 'crypto';
+import Database from 'better-sqlite3';
 
-const Database = require('better-sqlite3');
-const TNGenerator = require('./Middlewares/thumbnailGenerator');
-const db = new Database(path.join(__dirname, '..', 'data', 'file-upload-dashboard.db'));
+const db = new Database('../data/file-upload-dashboard.db');
+import {generateTN} from './Middlewares/thumbnailGenerator.js';
 
-class DatabaseStorage {
+export class DatabaseStorage {
 
     constructor() {
         try {
@@ -62,7 +62,7 @@ class DatabaseStorage {
             const uuid = crypto.randomUUID();
             const fileName = file.originalname;
           
-            let thumbnailPath = await TNGenerator.generateTN(file);
+            let thumbnailPath = await generateTN(file);
            
             try {
                 db.prepare('INSERT INTO files (fileId, folderId, fileName, path, thumbnailPath, date) VALUES (?, ?, ?, ?, ?, ?)').run(uuid, folderId, fileName, file.path, thumbnailPath, date);
@@ -115,11 +115,14 @@ class DatabaseStorage {
         }
     }
     
-    getFiles(folderId) {
+    // Get files  maxPages fehlt
+    getFiles(folderId: string) {
         const data = this.getData();
         const folder = data.folders.filter((folder) => folder.id === folderId);
         return folder.length ? folder[0].files : [];
     }
+
+    // Zusätzlich fehlen getFolders, getFilteredFiles und getFile
 }
 
 module.exports = DatabaseStorage;

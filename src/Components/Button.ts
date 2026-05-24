@@ -18,8 +18,8 @@ type ButtonProps = {
 }
 
 export class Button extends Event {
-    el = document.createElement('button');
-    public props: ButtonProps;
+    el = document.createElement('div');
+    protected props: ButtonProps;
 
     constructor(props?: ButtonProps) {
         super();
@@ -54,7 +54,8 @@ export class Button extends Event {
     }
 
     private renderUI(): void {
-        this.el.classList.add('flex','items-center','justify-center','cursor-pointer',this.props.width,this.props.height,this.props.color, this.props.hoverColor, this.props.shape === 'circle' ? 'rounded-full' : 'rounded', this.props.activeColor ? this.props.activeColor : 'no-active-color');
+        this.el.classList.add('select-none','flex','items-center','justify-center','cursor-pointer',this.props.width,this.props.height,this.props.color, this.props.hoverColor, this.props.shape === 'circle' ? 'rounded-full' : 'rounded', this.props.activeColor ? this.props.activeColor : 'no-active-color');
+        this.el.setAttribute('id', this.props.id);
         if(this.props.text) {
             this.el.textContent = this.props.text;
         }
@@ -68,11 +69,18 @@ export class Button extends Event {
         this.subscribe('click', handler);
     }
 
-    private hasIcon(): boolean {
+    public hasIcon(): boolean {
         return this.props.icon && this.props.icon.length > 0;
     }
 
-    private setIcon(): void {
+
+    protected setIcon(icon?: string): void {
+
+        if(this.hasIcon() && icon) {
+            this.el.innerHTML = '';
+            this.props.icon = icon
+        }
+
         const iconElement = document.createElement('span');
         iconElement.innerHTML = this.props.icon;
         

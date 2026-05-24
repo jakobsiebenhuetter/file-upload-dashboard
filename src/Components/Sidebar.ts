@@ -11,7 +11,6 @@ import { DashBoard, File, Folder } from '../Dashboard/Dashboard';
 import { API } from '../API';
 import { Button } from './Button';
 
-
 export class Sidebar extends Event {
     private focus: string | null = null;
     protected props: Record<string, any> = {};
@@ -38,7 +37,7 @@ export class Sidebar extends Event {
 
     renderUI(): void {
    
-        this.el.classList.add('min-h-screen', 'bg-stone-200', 'p-4', 'pt-6', 'min-w-[270px]');
+        this.el.classList.add('min-h-screen', 'bg-stone-200', 'p-4', 'pt-6', 'min-w-[270px]', 'dark:bg-gray-800');
         const icon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" /></svg>`
         const createFolderBtn = new Button({ text: 'Ordner erstellen', width: 'w-full', height: 'h-[40px]', shape: 'circle', color: 'bg-blue-300', hoverColor: 'hover:bg-blue-400', icon: icon, activeColor: 'active:bg-blue-500' });
         createFolderBtn.el.setAttribute('id', 'create-folder');
@@ -49,7 +48,10 @@ export class Sidebar extends Event {
             let data = null;
 
             modal.saveBtnOnClick(async () => {
-                
+                const saveFolderData = {
+                    text: modal.getInputValue()
+                };
+
                 if(!modal.getInputValue()) {
                     const toast = new Toast({ text: 'Der Ordnername darf nicht leer sein', icon: 'error', color: 'bg-red-500', width: '' });
                     return;
@@ -57,7 +59,7 @@ export class Sidebar extends Event {
                 
                 GlobalEvent.publish('spinner', { action: 'show'});
 
-                let response = await axios.post(API.CREATE_FOLDER, { text: modal.getInputValue(), id: modal.getInputValue() });
+                let response = await axios.post(API.CREATE_FOLDER, saveFolderData);
                 data = response.data;
 
             if (data.info) {

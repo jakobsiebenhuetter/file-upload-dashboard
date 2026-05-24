@@ -30,7 +30,8 @@ export type PageData = {
     maxPages: number;
     files: File[];
     hasNextPage: boolean,
-    hasPreviousPage: boolean
+    hasPreviousPage: boolean,
+    // state: 'filter' | 'no-filter';
 }
 
 export type File = {
@@ -72,7 +73,6 @@ export class DashBoard extends Event {
      sidebar: Sidebar;
      dropzone: DropZone | null = null;
      files: File[];
-     filterState: 'filter' | 'no-filter' = 'no-filter';
      filterValue?: string = '';
      llm = LLMInterface.getInstance();
 
@@ -84,7 +84,7 @@ export class DashBoard extends Event {
     };
 
     initApp(): void {
-        this.el.classList.add('p-4', 'bg-stone-200');
+        this.el.classList.add('p-4', 'bg-stone-200', 'dark:bg-gray-800');
         DashBoard.getFolders().then((folders) => {
             
             let folderId = null;
@@ -97,7 +97,7 @@ export class DashBoard extends Event {
             DashBoard.getFiles(folderId).then((data) => {
                 this.files = data.files;
                 // this.header.getPagination.updatePagination(data.currentPage, data.files.length, data.hasNextPage, data.hasPreviousPage);
-                this.header.getPagination.setPaginationData(1, data.hasNextPage, false);
+                this.header.getPagination.updatePagination(1, data.maxPages, data.hasNextPage, false);
                 this.renderHeroPage(this.files);
             });     
         });        
@@ -110,13 +110,12 @@ export class DashBoard extends Event {
         });
 
         GlobalEvent.subscribe('folderFocusChanged:renderFiles', (folderId) => {
-            this.filterState = 'no-filter';
             DashBoard.getFiles(folderId).then((data) => {
                 if(data.files) {
                     this.files = data.files;
                     // Pagination updaten und filter clearen im backend
                     console.log('Daten im Dashboard erhalten: ', data);
-                    this.header.getPagination.updatePagination(1 , data.hasNextPage, false);
+                    this.header.getPagination.updatePagination(1 , data.maxPages, data.hasNextPage, false);
                     this.renderGrid(this.files);
                 }
             });
@@ -124,17 +123,26 @@ export class DashBoard extends Event {
 
         // Hier weiter machen Schritt für Schritt, sonst werde ich verrückt :-)
         GlobalEvent.subscribe('change:page', (paginationData: PaginationEventData) => {
+            GlobalEvent.publish('spinner', { action: 'show' });
             const { nextPage } = paginationData;
-            if(this.filterState === 'no-filter') {
+            let state = '';
+            state = this.header.getFilter.getValue() ? 'filter' : 'no-filter';
+
             // Hier muss noch unterschieden werden ob gefiltert wird oder nicht, da es sonst zu Problemen mit der Pagination
-            DashBoard.getFiles(this.sidebar.getFocus(), nextPage).then((paginationData) => {
-                this.files = paginationData.files;  
-                this.header.getPagination.updatePagination(paginationData.currentPage, paginationData.hasNextPage, paginationData.hasPreviousPage);
-                this.renderGrid(this.files);
-            })
+            if(state === 'no-filter') {
+                DashBoard.getFiles(this.sidebar.getFocus(), nextPage).then((paginationData) => {
+                    this.files = paginationData.files;  
+                    this.header.getPagination.updatePagination(paginationData.currentPage, paginationData.maxPages, paginationData.hasNextPage, paginationData.hasPreviousPage);
+                    this.renderGrid(this.files);
+                });
+            
             } else {
-                 //... 
+                this.getFilteredFiles(this.sidebar.getFocus(), this.header.getFilter.getValue(), nextPage)
+                .then((pageData) => {
+                    GlobalEvent.publish('filter:renderFiles', pageData);
+                });
             }
+            GlobalEvent.publish('spinner', { action: 'hide' });
         });
 
         this.header.getPagination.onPageChange(async (params) => {
@@ -144,11 +152,10 @@ export class DashBoard extends Event {
         // upload:renderFiles ???
         // Es gibt eine strukturelle diskrepanz, beim filtern und ohne filtern rendering
          GlobalEvent.subscribe('renderFiles', (data: PageData) => {
-            this.filterState = 'no-filter';
             console.log('Daten im Dashboard erhalten: ', data);
             if(data.files){
                 this.files = data.files;
-                this.header.getPagination.updatePagination(data.currentPage, data.hasNextPage, data.hasPreviousPage);
+                this.header.getPagination.updatePagination(data.currentPage, data.maxPages, data.hasNextPage, data.hasPreviousPage);
                 this.renderGrid(this.files);
             } else {
                 console.error('Daten:', data);
@@ -156,11 +163,11 @@ export class DashBoard extends Event {
         });
 
         GlobalEvent.subscribe('filter:renderFiles', (data: PageData) => {
-            this.filterState = 'filter';
+            
             if(data.files) {
                 this.files = data.files;
                 this.renderGrid(this.files);
-                this.header.getPagination.updatePagination(data.currentPage, data.hasNextPage, data.hasPreviousPage);
+                this.header.getPagination.updatePagination(data.currentPage, data.maxPages, data.hasNextPage, data.hasPreviousPage);
             } else {
                 console.error('Daten:', data);
             }
@@ -169,7 +176,11 @@ export class DashBoard extends Event {
          GlobalEvent.subscribe('spinner', (data: Record<string, any>) => {
             const { action } = data;
             if (action === 'show') {
-                lockScreen();
+                lockScreen(
+                    {
+                        backdropOption: 'bg-transparent'
+                    }
+                );
             } else if (action === 'hide') {
                 unlockScreen();
             }
@@ -190,8 +201,7 @@ export class DashBoard extends Event {
 
             } else {    
 
-                const page = this.header.getPagination.getPage.currentPage;
-                const pageData = await this.getFilteredFiles(folderId, params.inputValue, page);
+                const pageData = await this.getFilteredFiles(folderId, params.inputValue, 1);
                 GlobalEvent.publish('filter:renderFiles', pageData);
             };
             GlobalEvent.publish('spinner', { action: 'hide'});
@@ -283,7 +293,7 @@ export class DashBoard extends Event {
     
     private renderHeroPage(files: File[]): void {
         const heroPage = document.createElement('div');
-        heroPage.classList.add('bg-stone-100', 'w-full');
+        heroPage.classList.add('bg-stone-100', 'dark:bg-grey-800', 'w-full');
         heroPage.append(this.header.el, this.widgetContainerWrapper);
         this.el.append(heroPage);
         this.renderGrid(files);
@@ -293,8 +303,8 @@ export class DashBoard extends Event {
         this.widgetContainer.innerHTML = ``;
         this.el.classList.add('flex', 'min-h-screen');
         this.widgetContainerWrapper.append(this.widgetContainer);
-        this.widgetContainerWrapper.classList.add('w-full', 'bg-stone-200', 'p-4');
-        this.widgetContainer.classList.add('min-h-screen', 'rounded', 'p-[10px]', 'bg-blue-200', 'grid', 'grid-cols-[repeat(auto-fill,minmax(210px,1fr))]', 'auto-rows-[300px]', 'rounded-[12px]');    
+        this.widgetContainerWrapper.classList.add('dark:bg-gray-800', 'w-full', 'bg-stone-200', 'p-4');
+        this.widgetContainer.classList.add('dark:bg-gray-700','min-h-screen', 'rounded', 'p-[10px]', 'bg-blue-200', 'grid', 'grid-cols-[repeat(auto-fill,minmax(210px,1fr))]', 'auto-rows-[300px]', 'rounded-[12px]');    
   
         this.createWidgets(files);
     };
@@ -358,13 +368,15 @@ export class DashBoard extends Event {
             widget.addContextMenu(
                 {
                     items: [
-                        new Button({ text: 'Datei löschen', color: 'bg-sky-500/30', hoverColor: 'hover:bg-sky-500/50', id: 'deleteFileBtn', width: 'w-[200px]', height: 'h-[30px]' }),
-                        new Button({ text: 'Dokumenten-Assistent', color: 'bg-sky-500/30', hoverColor: 'hover:bg-sky-500/50', id: 'assistant', width: 'w-[200px]', height: 'h-[30px]' })
+                        {
+                            btn: new Button({ text: 'Datei löschen', color: 'bg-sky-500/30', hoverColor: 'hover:bg-sky-500/50', id: 'deleteFileBtn', width: 'w-[200px]', height: 'h-[30px]' }),
+                            event: () => widget.deleteWidget()
+                        },
+                        {
+                            btn: new Button({ text: 'Dokumenten-Assistent', color: 'bg-sky-500/30', hoverColor: 'hover:bg-sky-500/50', id: 'assistant', width: 'w-[200px]', height: 'h-[30px]' }),
+                            event: () => this.showLLMInterface(file.id)
+                        }
                     ]
-                },
-                {
-                    deleteFileBtn: () => widget.deleteWidget(),
-                    assistant: () => this.showLLMInterface(file.id)
                 }
             );
         }
@@ -437,7 +449,7 @@ export class DashBoard extends Event {
             
             DashBoard.getFiles(this.sidebar.getFocus(), this.header.getPagination.currentPage).then((paginationData) => {
                 this.files = paginationData.files;  
-                this.header.getPagination.updatePagination(paginationData.currentPage, paginationData.hasNextPage, paginationData.hasPreviousPage);
+                this.header.getPagination.updatePagination(paginationData.currentPage, paginationData.maxPages, paginationData.hasNextPage, paginationData.hasPreviousPage);
                 GlobalEvent.publish('renderFiles', paginationData);
             });
         
