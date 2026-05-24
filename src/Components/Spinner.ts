@@ -1,7 +1,8 @@
 type TBackDropTransparent = 'bg-transparent';
 
 type TBackDropNoneTransparent = {
-    default: 'bg-slate-400', darkMode: 'dark:bg-slate-700'
+    default: 'bg-slate-400',
+    darkMode: 'dark:bg-slate-700'
 }
 
 type TBackDropStyle = TBackDropTransparent | TBackDropNoneTransparent;
