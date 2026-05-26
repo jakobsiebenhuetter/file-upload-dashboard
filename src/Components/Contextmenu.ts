@@ -48,7 +48,7 @@ export class ContextMenu extends Event {
             let handler = typeof item.event === 'function' ? item.event : () =>  console.log('Kein Event');
             item.btn.onClick(() => {
                 handler();
-                this.publish('destroy', this);
+                destroyContextMenu(this);
             });
         });
         
@@ -69,6 +69,7 @@ export class ContextMenu extends Event {
 
     public destroy(): void {
         this.props.items.forEach(item =>  item.btn.clearAll());
+        this.clearAll();
         this.el.remove();
         this.publish('destroy');
     }
@@ -80,7 +81,7 @@ export class ContextMenu extends Event {
 
 // util function zur Zerstörung des ContextMenus
 export function destroyContextMenu(contextMenu: ContextMenu) {
-    contextMenu.publish('destroy', contextMenu);
+    contextMenu.destroy();
     contextMenu = null;
 }
 

@@ -1,4 +1,4 @@
-import { Response, Folder, File } from '../Dashboard/Dashboard';
+import { Response, Folder } from '../Dashboard/Dashboard';
 import { Toast } from '../Components/Toast';
 
 export function isImage(ext: string): boolean {

@@ -1,23 +1,30 @@
 {
   "folders": [
     {
-      "id": "735d6202-9a67-4b5f-b48a-f144ab17ca08",
-      "folderName": "dfsf",
-      "path": "data\\Folders\\d18707d3-997b-4be7-9841-f71ed3eceaee",
+      "id": "7b17c90e-f466-4ee3-95a6-9adfccdd9f09",
+      "folderName": "sx",
+      "path": "data\\Folders\\6803a587-01cd-4b3d-9b21-f00a4ea3b2e5",
       "files": [
         {
-          "id": "b4eb227f-a4d6-44b6-b814-5c36a158e6bf",
-          "title": "KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026-2.pdf",
-          "path": "data\\Folders\\d18707d3-997b-4be7-9841-f71ed3eceaee\\KRUS_SR-20_Wniosek_o_emeryturÄ_rolniczÄ_wraz_z_informacjÄ_2026-2.pdf",
-          "thumbnailPath": "data\\Thumbnails\\812394d3-e8b5-402d-b46a-bfde673b10f6-1.png",
-          "date": "3.5.2026"
+          "id": "99e55875-04c0-4b5d-b762-e1a000f75ec6",
+          "title": "Screenshot 2026-04-04 095652 - Kopie.png",
+          "path": "data\\Folders\\6803a587-01cd-4b3d-9b21-f00a4ea3b2e5\\Screenshot 2026-04-04 095652 - Kopie.png",
+          "thumbnailPath": "data\\Thumbnails\\Screenshot 2026-04-04 095652 - Kopie.png",
+          "date": "26.5.2026"
         },
         {
-          "id": "4420186d-f192-44cb-8893-65365adb6fa9",
-          "title": "n-14_2009-1.pdf",
-          "path": "data\\Folders\\d18707d3-997b-4be7-9841-f71ed3eceaee\\n-14_2009-1.pdf",
-          "thumbnailPath": "data\\Thumbnails\\69c4476b-41de-49f2-94ca-11adfe89dbf8-1.png",
-          "date": "3.5.2026"
+          "id": "5ba25251-68dc-4ebf-a5d5-a019a2cbede1",
+          "title": "WhatsApp Image 2026-04-19 at 10.05.56 - Kopie.jpeg",
+          "path": "data\\Folders\\6803a587-01cd-4b3d-9b21-f00a4ea3b2e5\\WhatsApp Image 2026-04-19 at 10.05.56 - Kopie.jpeg",
+          "thumbnailPath": "data\\Thumbnails\\WhatsApp Image 2026-04-19 at 10.05.56 - Kopie.jpeg",
+          "date": "26.5.2026"
+        },
+        {
+          "id": "2a4127fa-f96e-4832-9ecc-c35ab86360ab",
+          "title": "Angular-Web-Developer-In-m-w-d - Kopie.pdf",
+          "path": "data\\Folders\\6803a587-01cd-4b3d-9b21-f00a4ea3b2e5\\Angular-Web-Developer-In-m-w-d - Kopie.pdf",
+          "thumbnailPath": "data\\Thumbnails\\7ad0448b-848f-491d-b9e4-5c46b0448b39-1.png",
+          "date": "26.5.2026"
         }
       ]
     }

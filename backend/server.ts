@@ -70,7 +70,7 @@ if(!fs.existsSync(tnPath)){
 }
 
 let mcpClient: Client;
-declare let mcpTools;
+let mcpTools = [];
 const globalPrompt: {
     role: string,
     parts: TParts[]

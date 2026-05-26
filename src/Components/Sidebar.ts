@@ -7,7 +7,7 @@ import { Modal } from './Modal';
 import { Toast } from './Toast';
 import { Tooltip } from './Tooltip';
 import { GlobalEvent } from '../Dashboard/events';
-import { DashBoard, File, Folder } from '../Dashboard/Dashboard';
+import { DashBoard, Folder } from '../Dashboard/Dashboard';
 import { API } from '../API';
 import { Button } from './Button';
 
@@ -96,6 +96,7 @@ export class Sidebar extends Event {
             deleteBtn.addTooltip('Ordner löschen');
 
             const span: HTMLElement = document.createElement('span');
+            span.classList.add('flex', 'items-center', 'justify-center');
 
             deleteBtn.el.setAttribute('btn-id', item.id);
 

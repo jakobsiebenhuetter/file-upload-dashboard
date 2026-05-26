@@ -92,7 +92,7 @@ export class JSONStorage {
 
     getFiles(folderId: string, page = 1): {filesForPage: TFile[], maxPages: number} {
         // ... hier weiter machen
-        let files = [];
+        let files;
         let maxPages = 1;
         let maxFilesForPage = 10;
          try {
@@ -102,8 +102,8 @@ export class JSONStorage {
             console.error('Error reading data:', error);
         }
 
-        let firstFile = (page - 1) * 4;
-        let lastFile = firstFile + 4;
+        let firstFile = (page - 1) * maxFilesForPage;
+        let lastFile = firstFile + maxFilesForPage;
 
 
         maxPages = files.files.length ? Math.ceil(files.files.length / 4)  : 1;

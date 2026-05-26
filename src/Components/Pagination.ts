@@ -2,7 +2,6 @@ import $ from 'jquery';
 
 import { Button } from "./Button";
 import { Event } from "./Event";
-import { File } from "../Dashboard/Dashboard";
 
 type PaginationProps = {
     maxPages?: number; // mit maxpages weiter machen
