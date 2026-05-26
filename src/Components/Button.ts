@@ -18,7 +18,7 @@ type ButtonProps = {
 }
 
 export class Button extends Event {
-    el = document.createElement('div');
+    el = document.createElement('button');
     protected props: ButtonProps;
 
     constructor(props?: ButtonProps) {
