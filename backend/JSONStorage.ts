@@ -94,6 +94,7 @@ export class JSONStorage {
         // ... hier weiter machen
         let files = [];
         let maxPages = 1;
+        let maxFilesForPage = 10;
          try {
             const data = this.getData();
             files = data.folders.find((folder: TFolder) => folder.id === folderId) || {files: []};

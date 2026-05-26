@@ -183,6 +183,7 @@ export class Widget extends Event {
     // Muss noch implementiert werden mit einer eigenen Komponente für das Contextmenü
     addContextMenu(contexMenuData: TContextMenu): void { 
         this.el.oncontextmenu = (e) => {
+            console.log(document.activeElement);
             e.preventDefault();
             // Hier muss überlegt werden, weches Pattern in Zukunft verwendet wird für das destroyen dei Componente sollte sich um sich selbst kümmern beim löschen
             if(this.contextMenu) {
@@ -190,6 +191,9 @@ export class Widget extends Event {
             }
             this.contextMenu = new ContextMenu(contexMenuData);
             this.contextMenu.show(e.pageX, e.pageY);
+            setTimeout(() => {
+                console.log(document.activeElement);
+            }, 1000);
         }
     }
 

@@ -6,9 +6,12 @@ import { KeyManager } from './KeyManager';
 import { lockScreen, unlockScreen } from './globVar';
 
 /**
- * @TODO Sidebartext zentrieren
- * @TODO Alle PRs mergen, danach Frontend in einen eigenen Ordner migrieren, am besten einen Neune Branch dafür erstellen
- * @TODO Dann einen Neune Branch für die komplette Integration mit sqlite3 durchführen und dann mit einem ORM arbeiten
+ * @TODO Assistenten mehrere Dokumente und Bilder analysieren lassen -> mit dem Fokus steuern
+ * @TODO Chatfenster erweitern um Slash Commands
+ * @Todo Dummy TN einbauen
+ * @Todo SQLLite weiter ausbauen, und danach mit ORM experementieren 
+ * @Todo im neuen Branch, die Pagination Klasse erweitern, um mehrere Seiten anzuzeigen, z.B. 1,2,3 anstatt nur 1; json file sollte automatisch erstellt werden wenn nicht vorhanden
+ * @BUGFIX Wenn man das letzte Element auf z.B.: Seite 2 löscht dann, wird die Seite nicht richtig aktualisiert mit der Pagination
  * @TODO Event Klasse erweitern um mehrere Funktionen zu einem Event zu speichern
  * @todo Event member als Objekt verwenden damit man nicht immer die Funktion durchgehen muss, sondern direkt auf die Funktion zugreifen kann, z.B. this.events['openModal']() anstatt this.events.forEach(fn => { if(fn.name === 'openModal') fn() })
  * @todo Uploadstatus anzeigen lassen, dank axios ist das möglich

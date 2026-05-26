@@ -81,8 +81,8 @@ export class Modal extends Event{
             this.el.append($modalBody[0], $footer[0]);
 
         } else if(this.props.confirmModal) {
-            this.$saveBtn.text('Ja');
-            const $cancelBtn = $('<button>Nein</button>').addClass("bg-gray-400 rounded p-2 hover:cursor-pointer mr-2 hover:bg-gray-500");
+            this.$saveBtn.text('Ja').addClass('bg-green-500 hover:bg-green-600 hover:cursor-pointer w-[60px]');
+            const $cancelBtn = $('<button>Nein</button>').addClass("bg-gray-400 rounded p-2 w-[60px] hover:cursor-pointer mr-2 hover:bg-gray-500");
             const $modalBody = $('<div></div>').addClass('flex flex-row justify-center items-center m-4 p-4');
             const $footer = $('<div></div>').addClass('flex flex-row justify-end gap-2 p-2 m-2');
         

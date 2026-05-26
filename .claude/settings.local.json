@@ -1,0 +1,27 @@
+{
+  "enabledMcpjsonServers": [
+    "doc-manager"
+  ],
+  "enableAllProjectMcpServers": true,
+  "permissions": {
+    "deny": [
+      "Read(./data/**)",
+      "Edit(./data/**)",
+      "Write(./data/**)",
+      "Glob(./data/**)",
+      "Grep(./data/**)",
+      "Bash(cat ./data/*)",
+      "Bash(cat data/*)",
+      "Bash(ls ./data/*)",
+      "Bash(ls data/*)",
+      "Bash(head ./data/*)",
+      "Bash(head data/*)",
+      "Bash(tail ./data/*)",
+      "Bash(tail data/*)",
+      "Bash(type ./data/*)",
+      "Bash(type data/*)",
+      "Bash(find ./data/*)",
+      "Bash(find data/*)"
+    ]
+  }
+}

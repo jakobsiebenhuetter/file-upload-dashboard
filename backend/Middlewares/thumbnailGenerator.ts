@@ -18,7 +18,7 @@ if (ffmpegPath) {
 }
 ffmpeg.setFfprobePath(ffprobePath.path);
 
-const tnPath = './data/Thumbnails';
+const tnPath = "./data/Thumbnails";
 
 // PDF to PNG converter middleware
 
@@ -47,8 +47,8 @@ async function pdfConverter(pdfPath: string) {
         console.error('Fehler bei der PDF-Konvertierung:', error);
     }
 
-    return newthumbnailPath;
-};
+  return newthumbnailPath;
+}
 
 // Puppeteer browser middleware
 console.log(process.env.BROWSER_PATH);
@@ -60,9 +60,9 @@ async function startPuppeteerBrowser(filePath: string) {
     });
     const page = await browser.newPage();
 
-    // Read and escape file content to avoid accidental HTML injection
+  // Read and escape file content to avoid accidental HTML injection
 
-    const fileContent = fs.readFileSync(filePath, 'utf-8');
+  const fileContent = fs.readFileSync(filePath, "utf-8");
 
     const escapeHtml = (str: string) =>
         str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -90,15 +90,15 @@ async function startPuppeteerBrowser(filePath: string) {
     </html>
     `;
 
-    await page.setContent(htmlContent);
-    const tnImage = await page.screenshot();
-    const uuid = crypto.randomUUID();
-    const newthumbnailPath = `${tnPath}/${uuid}.png`;
+  await page.setContent(htmlContent);
+  const tnImage = await page.screenshot();
+  const uuid = crypto.randomUUID();
+  const newthumbnailPath = `${tnPath}/${uuid}.png`;
 
-    fs.writeFileSync(newthumbnailPath, tnImage);
-    await browser.close();
+  fs.writeFileSync(newthumbnailPath, tnImage);
+  await browser.close();
 
-    return newthumbnailPath;
+  return newthumbnailPath;
 }
 
 // video thumbnail generator middleware

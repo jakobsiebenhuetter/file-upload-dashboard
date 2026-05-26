@@ -124,5 +124,3 @@ export class DatabaseStorage {
 
     // Zusätzlich fehlen getFolders, getFilteredFiles und getFile
 }
-
-module.exports = DatabaseStorage;

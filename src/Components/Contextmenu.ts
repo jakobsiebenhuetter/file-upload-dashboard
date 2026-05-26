@@ -26,8 +26,7 @@ export class ContextMenu extends Event {
             id: 'ContextMenu',
         };
 
-        this.props = {...defaults, ...props};
-        this.addListener();
+        this.props = {...defaults, ...props};  
     }
 
     private renderUI(): void {
@@ -44,11 +43,12 @@ export class ContextMenu extends Event {
     }
 
     private addListener(): void {
+        this.props.items[0]?.btn.el.focus({ focusVisible: true });
         this.props.items.forEach(item => {
             let handler = typeof item.event === 'function' ? item.event : () =>  console.log('Kein Event');
             item.btn.onClick(() => {
                 handler();
-                destroyContextMenu(this);
+                this.publish('destroy', this);
             });
         });
         
@@ -64,6 +64,7 @@ export class ContextMenu extends Event {
         this.props.xPosition = x;
         this.props.yPosition = y;
         this.renderUI();
+        this.addListener();
     }
 
     public destroy(): void {
@@ -79,7 +80,7 @@ export class ContextMenu extends Event {
 
 // util function zur Zerstörung des ContextMenus
 export function destroyContextMenu(contextMenu: ContextMenu) {
-    contextMenu.destroy();
+    contextMenu.publish('destroy', contextMenu);
     contextMenu = null;
 }
 
