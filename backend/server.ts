@@ -1,7 +1,11 @@
 import express from 'express';
 
 import OpenAI from 'openai';
-import {PDFParse} from 'pdf-parse';
+
+import { GoogleGenAI, Tool, FunctionDeclaration } from '@google/genai';
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+
 import fs from 'fs';
 import path from 'path';
 import cors from 'cors';
@@ -17,6 +21,15 @@ import { TPageData } from '../shared-types/Types.js';
 
 import {validateInput} from './util';
 
+
+type TParts = {
+    text: string
+} | {
+    inlineData: {
+        mimeType: string;
+        data: string;
+    }
+}
 
 const storage = new StorageInterface('json');
 
@@ -56,9 +69,12 @@ if(!fs.existsSync(tnPath)){
     fs.mkdirSync(tnPath);
 }
 
-let mcpClient;
-let mcpTools = [];
-const globalPrompt = [
+let mcpClient: Client;
+declare let mcpTools;
+const globalPrompt: {
+    role: string,
+    parts: TParts[]
+}[] = [
     {
         role: 'USER',
         parts: [
@@ -383,15 +399,12 @@ app.post('/get-filtered-files', (req, res) => {
     res.json(msg);
 })
 
-
 app.post('/ai-request', async(req, res) => {
+
     const { prompt, fileId, folderId } = req.body;
+    const apiKey = process.env.API_AI_GOOGLE_KEY
 
-    const fileData = storage.getFile(folderId, fileId);
-
-    const parser = new PDFParse({url: fileData.path});
-
-    const text = await parser.getText();
+    try {
 
         if(apiKey === undefined) {
             return res.json({
@@ -405,70 +418,94 @@ app.post('/ai-request', async(req, res) => {
         
         globalPrompt.push(
             {
-                role: 'USER',
+                role: 'user',
                 parts: [
                     {
-                        text: `FolderId = ${folderId}; FileId = ${fileId}; User:  ${prompt}`
+                        text: `Die FolderId lautet ${folderId}.
+                        der User schreibt ${prompt};
+                        Berücksichtige den gesamten Chatverlauf, um die Frage zu beantworten. Verwende die bereitgestellten Tools, aber nur wenn nötig.
+                        Wenn du die Frage nicht beantworten kannst, sage das auch. Antworte immer in einem vollständigen Satz. Bitte berücksichtige den gesamten Chatverlauf, um die Frage zu beantworten. Verwende die bereitgestellten Tools. Die läufst ihn einer Agenten Schleife also berücksichtige genau auch die alten Nachrichten. Wenn du die Antwort schon hast und die Schleife noch nicht zu Ende ist, dann antworte mit der selben Antwort wieder;`,
                     }
                 ]
             });
-
-        const response = await googleClient.models.generateContent({
-            model: "gemini-3-flash-preview",
-            // model: "gemini-2.5-flash",
-            // model: "gemini-2.5-flash-lite",
-            contents: globalPrompt,
-            config: {
-                tools: [
-                    mcpTools
+            
+        for(let i = 0; i < 3; i++) {
+            const response = await googleClient.models.generateContent({
+                model: "gemini-3-flash-preview",
+                // model: "gemini-2.5-flash",
+                // model: "gemini-2.5-flash-lite",
+                contents: globalPrompt,
+                config: {
+                    tools: mcpTools,
                     // {googleSearch: {}}
                     // {codeExecution: {}} 
-                ] 
-            }
-        });
-        
-        console.dir(response.functionCalls);
-        
-        if(response.functionCalls) {
-            const toolResponse = await mcpClient.callTool({
-                name: response.functionCalls[0].name,
-                arguments: response.functionCalls[0].args
-            });
-            console.log('Tool Response:', toolResponse);
-        }
-
-        const modelResponse = {
-            role: 'MODEL',
-            parts: []
-        };
-
-        if(response.text) {
-            modelResponse.parts.push({
-                text: response.text
-            });
-        } else if(response.functionCalls) {
-            modelResponse.parts.push(
-                {
-                    text: `Tool ${response.functionCalls[0].name} wurde aufgerufen mit den Argumenten
-                    ${JSON.stringify(response.functionCalls[0].args)}
-                    und hat die folgende Antwort zurückgegeben: ${toolResponse.content[0].text}`
                 }
-            );
-        }
-
-        globalPrompt.push(modelResponse);
-
-        } catch (error) {
-            console.error('Error handling AI request:', error);
-            return res.json({
-                answer: 'Fehler bei der Verarbeitung der AI-Anfrage'
             });
-        }
+            
+            console.log('functionCalls:', response.functionCalls);
+            console.log('text:', response.text);
+
+            const modelResponse: { role: string,
+                parts: TParts[]
+            } = {
+                role: 'model',
+                parts: []
+            };
+            
+            if(response.text) {
+                let text = response.text;
+                modelResponse.parts.push({
+                text: text
+            });
+
+            const breakLoop = text.match(/{loop: 'break'}/g)
+            text = text.replace(/{loop: 'break'}/g, '').trim();
+            console.log('breakLoop: ', breakLoop);
+
+            if(breakLoop) {
+                globalPrompt.push(modelResponse);
+                break;  
+            }
+
+            } else if(response.functionCalls?.length) {
+                const call = response.functionCalls[0];
+                const toolResponse = await mcpClient.callTool({
+                    name: call?.name,
+                    arguments: call?.args
+                });
+
+                modelResponse.parts.push(
+                    {
+                        text: `Tool ${call?.name} wurde aufgerufen mit den Argumenten ${JSON.stringify(call?.args)}.`
+                    }
+                );
+
+                for (const item of ((toolResponse.content as any[]) ?? [])) {
+                    if (item.type === 'text') {
+                        modelResponse.parts.push({ text: item.text });
+                    } else if (item.type === 'image') {
+                        modelResponse.parts.push({
+                            inlineData: {
+                                mimeType: item.mimeType,
+                                data: item.data
+                            }
+                        });
+                    }
+                }
+            }   
+            globalPrompt.push(modelResponse);
+        } 
+    } catch (error) {
+        console.error('Error handling AI request:', error);
+        return res.json({
+            answer: 'Fehler bei der Verarbeitung der AI-Anfrage'
+        });
+    }
 
     console.dir(globalPrompt);
 
     res.json({
-        answer: response.output_text
+        answer: (globalPrompt[globalPrompt.length - 1]?.parts[0] as any)?.text
     });
 
 });

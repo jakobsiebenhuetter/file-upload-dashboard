@@ -43,7 +43,7 @@ export class ContextMenu extends Event {
     }
 
     private addListener(): void {
-        this.props.items[0]?.el.focus({ focusVisible: true });
+        this.props.items[0]?.btn.el.focus({ focusVisible: true });
         this.props.items.forEach(item => {
             let handler = typeof item.event === 'function' ? item.event : () =>  console.log('Kein Event');
             item.btn.onClick(() => {
