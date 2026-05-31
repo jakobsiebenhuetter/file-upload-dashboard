@@ -106,7 +106,7 @@ export class JSONStorage {
         let lastFile = firstFile + maxFilesForPage;
 
 
-        maxPages = files.files.length ? Math.ceil(files.files.length / 4)  : 1;
+        maxPages = files.files.length ? Math.ceil(files.files.length / maxFilesForPage)  : 1;
         
         if(files.files.length < lastFile + 1) {
             lastFile = files.files.length;

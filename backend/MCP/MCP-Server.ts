@@ -1,16 +1,16 @@
-const { Server } = require("@modelcontextprotocol/sdk/server/index.js");
-const { StdioServerTransport } = require("@modelcontextprotocol/sdk/server/stdio.js");
-const { CallToolRequestSchema, ListToolsRequestSchema } = require("@modelcontextprotocol/sdk/types.js");
-const fs = require('fs');
-const path = require('path');
-const resolvePath = (p) => path.isAbsolute(p) ? p : path.resolve(__dirname,'..', p);
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import fs from 'fs';
+import path from 'path';
 
-const StorageInterface = require('../StorageInterface.js');
-const { extractPDFText } = require('../Middlewares/PDFExtractor.js');
+import { StorageInterface } from '../StorageInterface.js';
+import { extractPDFText } from '../Middlewares/PDFExtractor.js';
+
+const resolvePath = (p: string) => path.isAbsolute(p) ? p : path.resolve(p);
 
 const storage = new StorageInterface('json');
 
-const server = new Server({
+export const server = new Server({
     name: "MCP File Tool Server",
     version: "1.0.0",
 },
@@ -18,7 +18,7 @@ const server = new Server({
     capabilities: {tools: {}},
 });
 
-server.setRequestHandler(ListToolsRequestSchema, async () => { 
+server.setRequestHandler(ListToolsRequestSchema, async () => {
     return {
         tools: [
         {
@@ -35,7 +35,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 
         {
             name: 'Dokumentinhalt-png',
-            description: 'Gibt den Inhalt eines Bilddokuments zurück als bae64',
+            description: 'Gibt den Inhalt eines Bilddokuments zurück als base64',
             inputSchema: {
                 type: 'object',
                 properties: {
@@ -62,26 +62,27 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 }})
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
-    const {name, arguments: args} = request.params;
-    
+    const { name } = request.params;
+    const args = (request.params.arguments ?? {}) as { folderId?: string; fileId?: string };
+
     if(name === "alle-Dokumente") {
-        const { filesForPage } = storage.getFiles(args.folderId, 1);
+        const { filesForPage } = storage.getFiles(args.folderId as string, 1);
         return {
             content: [{ type: "text", text: JSON.stringify(filesForPage) }]
         };
     }
-    
+
     if(name === "Dokumentinhalt-pdf") {
-        const fileData = storage.getFile(args.folderId, args.fileId);
+        const fileData = storage.getFile(args.folderId as string, args.fileId as string);
         if (fileData.path.endsWith('.pdf')) {
             console.error(`Extrahiere Text aus PDF: ${fileData.path}`);
             const text = await extractPDFText(resolvePath(fileData.path));
-            return { content: [{ type: "text", text }] };  
+            return { content: [{ type: "text", text }] };
         }
     }
-    
+
     if (name === "Dokumentinhalt-png") {
-        const fileData = storage.getFile(args.folderId, args.fileId);
+        const fileData = storage.getFile(args.folderId as string, args.fileId as string);
         console.error(`Lese Bilddatei: ${fileData.path}`);
         if(!fileData.path.endsWith('.png') && !fileData.path.endsWith('.jpeg')) return;
         const base64 = fs.readFileSync(resolvePath(fileData.path)).toString('base64');
@@ -96,14 +97,3 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         }
         throw new Error(`Tool ${name} nicht gefunden`);
     });
-
-async function main() {
-    const transport = new StdioServerTransport();
-    await server.connect(transport);
-    console.error("MCP Server läuft und ist bereit für Anfragen.");
-}
-
-main().catch((error) => {
-    console.error("Fehler beim Starten des Servers:", error);
-    process.exit(1);
-});

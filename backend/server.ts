@@ -4,7 +4,9 @@ import OpenAI from 'openai';
 
 import { GoogleGenAI, Tool, FunctionDeclaration } from '@google/genai';
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
+
+import { server as mcpServer } from "./MCP/MCP-Server.js";
 
 import fs from 'fs';
 import path from 'path';
@@ -86,17 +88,15 @@ const globalPrompt: {
 ];
 
 async function initMcp() {
-    const mcpTransport = new StdioClientTransport({
-        command: 'node',
-        args: [path.join(__dirname, 'MCP', 'MCP-Server.js')],
-    });
+    const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+    await mcpServer.connect(serverTransport);
 
     mcpClient = new Client(
         { name: 'MCP Client host', version: '1.0.0' },
         { capabilities: {} }
     );
 
-    await mcpClient.connect(mcpTransport);
+    await mcpClient.connect(clientTransport);
 
     const { tools } = await mcpClient.listTools();
     mcpTools = [
@@ -425,7 +425,8 @@ app.post('/ai-request', async(req, res) => {
                         Du bekommst den Inhalt eines Dokuments und eine Frage dazu, beantworte die Frage so gut wie möglich auf Basis des Inhalts.
                         Gib zusätzlich {loop: 'break'} zurück wenn du mit der Beantwortung fertig bist.
                         Wenn der Benutzer eine Frage stellt, die du nicht beantworten kannst, weil die Information nicht im Dokument enthalten ist, dann sage das auch. Antworte immer in einem vollständigen Satz. Bitte berücksichtige den gesamten Chatverlauf, um die Frage zu beantworten. Verwende die bereitgestellten Tools, aber nur wenn nötig. 
-                        Wenn du die Frage nicht beantworten kannst, sage das auch. Antworte immer in einem vollständigen Satz. Bitte berücksichtige den gesamten Chatverlauf, um die Frage zu beantworten. Verwende die bereitgestellten Tools. Die läufst ihn einer Agenten Schleife also berücksichtige genau auch die alten Nachrichten. Wenn du die Antwort schon hast und die Schleife noch nicht zu Ende ist, dann antworte mit der selben Antwort wieder;`
+                        Wenn du die Frage nicht beantworten kannst, sage das auch. Antworte immer in einem vollständigen Satz.
+                        Die FolderId ist ${folderId} und der userprompt ist: ${prompt}`
                     }
                 ]
             });
@@ -455,18 +456,18 @@ app.post('/ai-request', async(req, res) => {
             
             if(response.text) {
                 let text = response.text;
+                const breakLoop = text.match(/{loop: 'break'}/g)
+                text = text.replace(/{loop: 'break'}/g, '').trim();
+                
+                if(breakLoop) {
+                    modelResponse.parts.push({ text });
+                    globalPrompt.push(modelResponse);
+                    break;
+                }
+               
                 modelResponse.parts.push({
                 text: text
             });
-
-            const breakLoop = text.match(/{loop: 'break'}/g)
-            text = text.replace(/{loop: 'break'}/g, '').trim();
-            console.log('breakLoop: ', breakLoop);
-
-            if(breakLoop) {
-                globalPrompt.push(modelResponse);
-                break;  
-            }
 
             } else if(response.functionCalls?.length) {
                 const call = response.functionCalls[0];
@@ -515,5 +516,9 @@ app.post('/ai-request', async(req, res) => {
 app.listen(PORT, () => {
     console.log(`Server listen on Port ${PORT}`);
     console.log(process.platform);
+    initMcp().catch(err => {
+        console.error('MCP-Init fehlgeschlagen:', err);
+        process.exit(1);
+    });
     exec(`start ${url}`);
 });
